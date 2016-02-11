@@ -1,0 +1,73 @@
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: "com.jfrog.artifactory"
+apply plugin: 'maven-publish'
+
+sourceCompatibility = 1.7
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"   // artifactory
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'http://labs.mastercard.com/artifactory/repo' }
+}
+
+ext {
+    signpostVersion = '1.2.1.2'
+    jsonSimpleVersion = '1.1.1'
+    httpClientVersion = '4.5.1'
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.4'
+    testCompile group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.4'
+
+    compile group: 'oauth.signpost', name: 'signpost-core', version: signpostVersion
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
+
+//    compile group: 'org.apache.httpcomponents', name: 'fluent-hc', version: httpClientVersion
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: httpClientVersion
+//    compile group: 'org.apache.httpcomponents', name: 'httpclient-cache', version: httpClientVersion
+//    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: httpClientVersion
+//    compile group: 'org.apache.httpcomponents', name: 'httpmime', version: httpClientVersion
+}
+
+// Maven-Publishing+Artifactory.
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+artifactory {
+    contextUrl = 'http://tools.labs.mastercard.com/artifactory/'
+
+    publish {
+        repository {
+            repoKey = version.contains('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+        }
+        defaults {
+            publications('mavenJava')
+            publishArtifacts = true
+            publishPom = true
+        }
+    }
+
+    resolve {
+        repoKey = 'jcenter'
+    }
+}
