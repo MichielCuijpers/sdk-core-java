@@ -1,6 +1,6 @@
 package com.mastercard.api.core.security.oauth;
 
-import com.mastercard.api.core.Method;
+import com.mastercard.api.core.HttpMethod;
 import oauth.signpost.http.HttpRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.entity.ContentType;
@@ -53,8 +53,8 @@ public class OAuthRequest implements HttpRequest {
         this.contentType = contentType.getMimeType();
     }
 
-    public void setMethod(Method method) {
-        this.method = method.getMethod();
+    public void setMethod(HttpMethod httpMethod) {
+        this.method = httpMethod.getHttpMethodAsString();
     }
 
     @Override

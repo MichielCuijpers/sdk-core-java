@@ -35,20 +35,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ *
+ */
 public abstract class BaseObject extends BaseMap {
-
-    protected Authentication authentication;
 
     protected abstract String getBasePath();
 
     protected abstract String getObjectType();
 
-    public Authentication getAuthentication() {
-        return authentication;
-    }
-
-    protected static BaseObject findObject(final Authentication authentication, final String type, final BaseObject value)
+    protected static BaseObject readObject(final Authentication authentication, final String type, final BaseObject value)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
@@ -68,143 +64,96 @@ public abstract class BaseObject extends BaseMap {
             }
         };
 
-        requestObject.authentication = authentication;
         requestObject.putAll(response);
 
         return requestObject;
     }
 
     protected static <T extends BaseObject> ResourceList<T> listObjects(final Authentication authentication, T template)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            NotAllowedException, SystemException, MessageSignerException {
+            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
+            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
+
         return listObjects(authentication, template, null);
     }
 
     protected static <T extends BaseObject> ResourceList<T> listObjects(final Authentication authentication, T template, Map criteria)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            NotAllowedException, SystemException, MessageSignerException {
+            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
+            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
         ResourceList<T> listResults = new ResourceList<T>();
 
-        try {
-            Map<? extends String, ? extends Object> response = new ApiController(template.getBasePath())
-                    .execute(authentication, template.getObjectType(), "list", criteria);
-            listResults.putAll(response);
+        Map<? extends String, ? extends Object> response = new ApiController(template.getBasePath())
+                .execute(authentication, template.getObjectType(), "list", criteria);
 
+        listResults.putAll(response);
 
-            List<T> val = null;
-            if (listResults.containsKey("list")) {
-                List<Map<String, Object>> rawList = (List<Map<String, Object>>) listResults.get("list");
+        List<T> val = null;
+        if (listResults.containsKey("list")) {
+            List<Map<String, Object>> rawList = (List<Map<String, Object>>) listResults.get("list");
 
-                val = new ArrayList<T>(((List) rawList).size());
-                for (Object o : (List) rawList) {
-                    if (o instanceof Map) {
-                        T item = (T) template.clone();
-                        item.authentication = authentication;
-                        item.putAll((Map<? extends String, ? extends Object>) o);
-                        val.add(item);
-                    }
+            val = new ArrayList<T>(((List) rawList).size());
+
+            for (Object o : (List) rawList) {
+                if (o instanceof Map) {
+                    T item = (T) template.clone();
+                    item.putAll((Map<? extends String, ? extends Object>) o);
+                    val.add(item);
                 }
-            } else {
-                val = new ArrayList<T>();
             }
-            listResults.put("list", val);
-            return listResults;
-
-        } catch (ObjectNotFoundException e) {
-            throw new IllegalStateException("ObjectNotFoundException not expected", e);
         }
+        else {
+            val = new ArrayList<T>();
+        }
+
+        listResults.put("list", val);
+
+        return listResults;
     }
 
     protected static BaseObject createObject(final Authentication authentication, final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            NotAllowedException, SystemException, MessageSignerException {
+            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
+            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController(requestObject.getBasePath());
-
-        requestObject.authentication = authentication;
-
-        try {
-            Map<? extends String, ? extends Object> response = apiController.execute(authentication, requestObject.getObjectType(), "create", requestObject);
-            BaseObject responseObject = getResponseBaseObject(requestObject);
-
-            responseObject.authentication = authentication;
-
-            // Response can be null (204)
-            if (response != null) {
-                responseObject.putAll(response);
-            }
-
-            return responseObject;
-
-        } catch (ObjectNotFoundException e) {
-            throw new IllegalStateException("ObjectNotFoundException not expected", e);
-        }
+        return execute(authentication, requestObject.getObjectType(), "create", requestObject);
     }
 
     protected BaseObject updateObject(final BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController(getBasePath());
-
-        Map<? extends String, ? extends Object> response = apiController.execute(authentication, requestObject.getObjectType(), "update", requestObject);
-        BaseObject responseObject = getResponseBaseObject(requestObject);
-
-        // Response can be null (204)
-        if (response != null) {
-            responseObject.putAll(response);
-        }
-
-        return responseObject;
+        return updateObject(null, requestObject);
     }
 
     protected BaseObject updateObject(final Authentication authentication, final BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController(getBasePath());
-
-        requestObject.authentication = authentication;
-
-        Map<? extends String, ? extends Object> response = apiController.execute(authentication, requestObject.getObjectType(), "update", requestObject);
-        BaseObject responseObject = getResponseBaseObject(requestObject);
-
-        // Response can be null (204)
-        if (response != null) {
-            responseObject.putAll(response);
-        }
-
-        return responseObject;
+        return execute(authentication, requestObject.getObjectType(), "update", requestObject);
     }
 
     protected BaseObject deleteObject(final BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController(getBasePath());
-
-        Map<? extends String, ? extends Object> response = apiController.execute(authentication, getObjectType(), "delete", requestObject);
-
-        BaseObject responseObject = getResponseBaseObject(requestObject);
-
-        // Response can be null (204)
-        if (response != null) {
-            responseObject.putAll(response);
-        }
-
-        return responseObject;
+        return deleteObject(null, requestObject);
     }
 
     protected BaseObject deleteObject(final Authentication authentication, final BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController(getBasePath());
+        return execute(authentication, getObjectType(), "delete", requestObject);
+    }
 
-        Map<? extends String, ? extends Object> response = apiController.execute(authentication, getObjectType(), "delete", requestObject);
+    private static BaseObject execute(Authentication authentication, String objectType, String action, BaseObject requestObject)
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        BaseObject responseObject = getResponseBaseObject(requestObject);
+        ApiController apiController = new ApiController(requestObject.getBasePath());
+
+        Map<? extends String, ? extends Object> response = apiController.execute(authentication, objectType, action, requestObject);
+
+        BaseObject responseObject = createResponseBaseObject(requestObject);
 
         // Response can be null (204)
         if (response != null) {
@@ -215,11 +164,11 @@ public abstract class BaseObject extends BaseMap {
     }
 
     /**
-     *
+     * Create an instance of Base Object for Response
      * @param bo
      * @return
      */
-    private static BaseObject getResponseBaseObject(final BaseObject bo) {
+    private static BaseObject createResponseBaseObject(final BaseObject bo) {
         return new BaseObject() {
             @Override
             protected String getObjectType() {

@@ -28,7 +28,7 @@
 package com.mastercard.api.core.security.jws;
 
 import com.mastercard.api.core.security.Authentication;
-import com.mastercard.api.core.Method;
+import com.mastercard.api.core.HttpMethod;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 
@@ -83,7 +83,7 @@ public class JwsAuthentication implements Authentication {
     }
 
     @Override
-    public HttpRequestBase sign(URI uri, Method method, ContentType contentType, Object body, HttpRequestBase message) {
+    public HttpRequestBase sign(URI uri, HttpMethod httpMethod, ContentType contentType, Object body, HttpRequestBase message) {
         return null;
     }
 }

@@ -3,9 +3,9 @@ package com.mastercard.api.core;
 import org.apache.http.client.methods.*;
 
 /**
- * Created by eamondoyle on 11/02/2016.
+ * Enum to represent HTTP Methods
  */
-public enum Method {
+public enum HttpMethod {
     GET(HttpGet.class),
     PUT(HttpPut.class),
     POST(HttpPost.class),
@@ -19,11 +19,15 @@ public enum Method {
         return this.requestType;
     }
 
-    private Method(Class<? extends HttpRequestBase> type) {
+    private HttpMethod(Class<? extends HttpRequestBase> type) {
         this.requestType = type;
     }
 
-    public String getMethod() {
+    /**
+     * Returns the HTTP Method as a String
+     * @return
+     */
+    public String getHttpMethodAsString() {
         try {
             return this.requestType.newInstance().getMethod().toUpperCase();
         }
@@ -33,31 +37,32 @@ public enum Method {
     }
 
     /**
+     * Get HTTP HttpMethod from an Action
      *
      * @param action
      * @return
      */
-    public static Method fromAction(Action action) {
-        Method method = null;
+    public static HttpMethod fromAction(Action action) {
+        HttpMethod httpMethod = null;
 
         switch (action) {
-            case show:
-                method = GET;
+            case read:
+                httpMethod = GET;
                 break;
             case list:
-                method = GET;
+                httpMethod = GET;
                 break;
             case update:
-                method = PUT;
+                httpMethod = PUT;
                 break;
             case create:
-                method = POST;
+                httpMethod = POST;
                 break;
             case delete:
-                method = DELETE;
+                httpMethod = DELETE;
                 break;
         }
 
-        return method;
+        return httpMethod;
     }
 }

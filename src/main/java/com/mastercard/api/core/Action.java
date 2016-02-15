@@ -27,10 +27,13 @@
 
 package com.mastercard.api.core;
 
+/**
+ * SDK Object Action
+ */
 public enum Action {
-    show,
+    create,
+    read,
     list,
     update,
-    create,
     delete
 }

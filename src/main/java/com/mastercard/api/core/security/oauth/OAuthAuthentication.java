@@ -29,7 +29,7 @@ package com.mastercard.api.core.security.oauth;
 
 import com.mastercard.api.core.exception.MessageSignerException;
 import com.mastercard.api.core.security.Authentication;
-import com.mastercard.api.core.Method;
+import com.mastercard.api.core.HttpMethod;
 import oauth.signpost.OAuth;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.basic.DefaultOAuthConsumer;
@@ -64,10 +64,10 @@ public class OAuthAuthentication implements Authentication {
     }
 
     @Override
-    public HttpRequestBase sign(URI uri, Method method, ContentType contentType, Object body, HttpRequestBase message) throws MessageSignerException {
+    public HttpRequestBase sign(URI uri, HttpMethod httpMethod, ContentType contentType, Object body, HttpRequestBase message) throws MessageSignerException {
         // Set the OAuthRequest
         OAuthRequest request = new OAuthRequest();
-        request.setMethod(method);
+        request.setMethod(httpMethod);
         request.setRequestUrl(uri.toString());
         request.setContentType(contentType);
         request.setBody((String) body);
