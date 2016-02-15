@@ -50,7 +50,7 @@ public abstract class BaseObject extends RequestMap {
 
         ApiController apiController = new ApiController(value.getBasePath());
 
-        Map<? extends String, ? extends Object> response = apiController.execute(authentication, type, "show", value);
+        Map<? extends String, ? extends Object> response = apiController.execute(authentication, type, "read", value);
 
         BaseObject requestObject = new BaseObject() {
             @Override
