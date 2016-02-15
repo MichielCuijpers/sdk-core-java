@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  *
  */
-public abstract class BaseObject extends BaseMap {
+public abstract class BaseObject extends RequestMap {
 
     protected abstract String getBasePath();
 

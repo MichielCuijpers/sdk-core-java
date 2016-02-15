@@ -27,7 +27,7 @@
 
 package com.mastercard.api.core.model;
 
-import com.mastercard.api.core.BaseMap;
+import com.mastercard.api.core.RequestMap;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @param <T> the model class.
  */
-public class ResourceList<T> extends BaseMap {
+public class ResourceList<T> extends RequestMap {
 
     /**
      * Returns the list of domain objects.

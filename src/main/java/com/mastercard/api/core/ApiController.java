@@ -218,7 +218,7 @@ public class ApiController {
 
         switch (action) {
             case create:
-                payload = JSONValue.toJSONString(BaseMap.normalize(objectMap));
+                payload = JSONValue.toJSONString(RequestMap.normalize(objectMap));
                 message = new HttpPost(uri);
 
                 HttpEntity createEntity = null;
@@ -238,7 +238,7 @@ public class ApiController {
                 break;
 
             case update:
-                payload = JSONValue.toJSONString(BaseMap.normalize(objectMap));
+                payload = JSONValue.toJSONString(RequestMap.normalize(objectMap));
                 message = new HttpPut(uri);
 
                 HttpEntity updateEntity = null;

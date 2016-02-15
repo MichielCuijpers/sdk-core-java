@@ -57,7 +57,7 @@ import java.util.regex.Pattern;
  * <p>
  * Examples:
  * <pre>
- * BaseMap map  = new BaseMap();
+ * RequestMap map  = new RequestMap();
  * map.put("card.number", "5555555555554444");
  * map.put("card.cvc", "123");
  * map.put("card.expMonth", 5);
@@ -67,7 +67,7 @@ import java.util.regex.Pattern;
  * </pre>
  * There is also an set() method which is similar to put() but returns the map providing a fluent map builder.
  * <pre>
- * BaseMap map = new BaseMap()
+ * RequestMap map = new RequestMap()
  *      .set("card.number", "5555555555554444")
  *      .set("card.cvc", "123")
  *      .set("card.expMonth", 5)
@@ -75,10 +75,10 @@ import java.util.regex.Pattern;
  *      .set("currency", "USD")
  *      .set("amount", 1234);
  * </pre>
- * Both of these examples construct a BaseMap containing the keys 'currency', 'amount' and 'card'.  The
+ * Both of these examples construct a RequestMap containing the keys 'currency', 'amount' and 'card'.  The
  * value for the 'card' key is a map containing the key 'number', 'cvc', 'expMonth' and 'expYear'.
  */
-public class BaseMap extends LinkedHashMap<String, Object> {
+public class RequestMap extends LinkedHashMap<String, Object> {
     private static final Pattern arrayIndexPattern = Pattern.compile("(.*)\\[(.*)\\]");
 
     /**
@@ -87,7 +87,7 @@ public class BaseMap extends LinkedHashMap<String, Object> {
      * @param initialCapacity the initial capacity
      * @param loadFactor      the load factor
      */
-    public BaseMap(int initialCapacity, float loadFactor) {
+    public RequestMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }
 
@@ -96,14 +96,14 @@ public class BaseMap extends LinkedHashMap<String, Object> {
      *
      * @param initialCapacity the initial capacity
      */
-    public BaseMap(int initialCapacity) {
+    public RequestMap(int initialCapacity) {
         super(initialCapacity);
     }
 
     /**
      * Constructs an empty map with the default capacity and load factor.
      */
-    public BaseMap() {
+    public RequestMap() {
         super();
     }
 
@@ -112,7 +112,7 @@ public class BaseMap extends LinkedHashMap<String, Object> {
      *
      * @param map the map whose mappings are to be placed in this map
      */
-    public BaseMap(Map<String, Object> map) {
+    public RequestMap(Map<String, Object> map) {
         super(map);
     }
 
@@ -121,7 +121,7 @@ public class BaseMap extends LinkedHashMap<String, Object> {
      *
      * @param jsonMapString the JSON string used to construct the map
      */
-    public BaseMap(String jsonMapString) {
+    public RequestMap(String jsonMapString) {
         super();
         putAll((Map<? extends String, ? extends Object>) JSONValue.parse(jsonMapString));
     }
@@ -133,7 +133,7 @@ public class BaseMap extends LinkedHashMap<String, Object> {
      * @param keyPath key path with which the specified value is to be associated.
      * @param value   value to be associated with the specified key path.
      */
-    public BaseMap(String keyPath, Object value) {
+    public RequestMap(String keyPath, Object value) {
         put(keyPath, value);
     }
 
@@ -145,7 +145,7 @@ public class BaseMap extends LinkedHashMap<String, Object> {
      */
     public static Map<String, Object> normalize(Map<String, Object> m) {
 
-        BaseMap pm = new BaseMap();
+        RequestMap pm = new RequestMap();
 
         for (String k : m.keySet()) {
             Object v = m.get(k);
@@ -236,7 +236,7 @@ public class BaseMap extends LinkedHashMap<String, Object> {
             return super.put(keyPath, value);
         } else if (value instanceof Map) {     // if putting a map, call put all
             destinationObject.clear();
-            BaseMap m = new BaseMap();
+            RequestMap m = new RequestMap();
             m.putAll((Map<? extends String, ? extends Object>) value);
             destinationObject.put(properties[properties.length - 1], m);
             return destinationObject;
@@ -255,7 +255,7 @@ public class BaseMap extends LinkedHashMap<String, Object> {
      * @throws IllegalArgumentException  if part of the key path does not match the expected type.
      * @throws IndexOutOfBoundsException if using an array index in the key path is out of bounds.
      */
-    public BaseMap set(String keyPath, Object value) {
+    public RequestMap set(String keyPath, Object value) {
         put(keyPath, value);
         return this;
     }
