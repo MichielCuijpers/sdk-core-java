@@ -73,7 +73,7 @@ public class ApiController {
 
         String baseUrl = API_BASE_LIVE_URL;
 
-        if (ApiConfig.SANDBOX) {
+        if (ApiConfig.sandbox) {
             baseUrl = API_BASE_SANDBOX_URL;
         }
 
@@ -198,6 +198,15 @@ public class ApiController {
             throws InvalidRequestException, MessageSignerException {
 
         HttpRequestBase message = null;
+
+        // Try set default authentication if no authentication provided
+        if (authentication == null) {
+            if (ApiConfig.authentication == null) {
+                throw new MessageSignerException("Authentication is null. Set \"ApiConfig.authentication\" or pass an instance of com.mastercard.api.core.security.Authentication to the method call");
+            }
+
+            authentication = ApiConfig.authentication;
+        }
 
         String payload = null;
         switch (action) {
