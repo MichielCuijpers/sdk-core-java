@@ -35,11 +35,7 @@ dependencies {
     compile group: 'oauth.signpost', name: 'signpost-core', version: signpostVersion
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
 
-//    compile group: 'org.apache.httpcomponents', name: 'fluent-hc', version: httpClientVersion
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: httpClientVersion
-//    compile group: 'org.apache.httpcomponents', name: 'httpclient-cache', version: httpClientVersion
-//    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: httpClientVersion
-//    compile group: 'org.apache.httpcomponents', name: 'httpmime', version: httpClientVersion
 }
 
 // Maven-Publishing+Artifactory.

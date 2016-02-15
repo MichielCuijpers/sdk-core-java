@@ -29,6 +29,7 @@ package com.mastercard.api.core;
 
 import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.security.Authentication;
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
@@ -49,10 +50,8 @@ import java.util.*;
 
 public class ApiController {
 
-//    public static final String X_AUTH_TOKEN = "X-Auth-Token";
     public static String API_BASE_LIVE_URL = Constants.API_BASE_LIVE_URL;
     public static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
-//    public static String OAUTH_BASE_URL = Constants.OAUTH_BASE_URL;
 
     /**
      * User agent string sent with requests.
@@ -60,6 +59,26 @@ public class ApiController {
     public static String USER_AGENT = null;
 
     private static String HEADER_SEPARATOR = ";";
+
+    private String apiPath;
+
+    /**
+     *
+     * @param basePath - basePath for the API e.g. /fraud/loststolen/v1
+     */
+    public ApiController(String basePath) {
+        if (basePath == null || basePath.trim().length() < 0) {
+            throw new IllegalStateException("basePath cannot be empty");
+        }
+
+        String baseUrl = API_BASE_LIVE_URL;
+
+        if (ApiConfig.SANDBOX) {
+            baseUrl = API_BASE_SANDBOX_URL;
+        }
+
+        this.apiPath = baseUrl + basePath;
+    }
 
     private void checkState() throws RuntimeException {
         try {
@@ -96,14 +115,8 @@ public class ApiController {
 
         StringBuilder s = new StringBuilder("%s/%s");
 
-        String baseUrl = API_BASE_LIVE_URL;
-
-        if (ApiConfig.SANDBOX) {
-            baseUrl = API_BASE_SANDBOX_URL;
-        }
-
         List<Object> objectList = new ArrayList<Object>();
-        objectList.add(baseUrl.replaceAll("/$", ""));
+        objectList.add(apiPath.replaceAll("/$", ""));
         objectList.add(type.replaceAll("/$", ""));
 
         switch (action) {

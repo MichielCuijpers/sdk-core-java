@@ -40,25 +40,38 @@ public abstract class BaseObject extends BaseMap {
 
     protected Authentication authentication;
 
-    protected static BaseObject findObject(final Authentication authentication, final String type, BaseObject value)
+    protected abstract String getBasePath();
+
+    protected abstract String getObjectType();
+
+    public Authentication getAuthentication() {
+        return authentication;
+    }
+
+    protected static BaseObject findObject(final Authentication authentication, final String type, final BaseObject value)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController();
+        ApiController apiController = new ApiController(value.getBasePath());
 
         Map<? extends String, ? extends Object> response = apiController.execute(authentication, type, "show", value);
 
-        BaseObject paymentsObject = new BaseObject() {
+        BaseObject requestObject = new BaseObject() {
             @Override
             protected String getObjectType() {
                 return type;
             }
+
+            @Override
+            protected String getBasePath() {
+                return value.getBasePath();
+            }
         };
 
-        paymentsObject.authentication = authentication;
-        paymentsObject.putAll(response);
+        requestObject.authentication = authentication;
+        requestObject.putAll(response);
 
-        return paymentsObject;
+        return requestObject;
     }
 
     protected static <T extends BaseObject> ResourceList<T> listObjects(final Authentication authentication, T template)
@@ -74,7 +87,8 @@ public abstract class BaseObject extends BaseMap {
         ResourceList<T> listResults = new ResourceList<T>();
 
         try {
-            Map<? extends String, ? extends Object> response = new ApiController().execute(authentication, template.getObjectType(), "list", criteria);
+            Map<? extends String, ? extends Object> response = new ApiController(template.getBasePath())
+                    .execute(authentication, template.getObjectType(), "list", criteria);
             listResults.putAll(response);
 
 
@@ -102,129 +116,120 @@ public abstract class BaseObject extends BaseMap {
         }
     }
 
-    protected static BaseObject createObject(final Authentication authentication, final BaseObject paymentsObject)
+    protected static BaseObject createObject(final Authentication authentication, final BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController();
+        ApiController apiController = new ApiController(requestObject.getBasePath());
 
-        paymentsObject.authentication = authentication;
+        requestObject.authentication = authentication;
 
         try {
-            Map<? extends String, ? extends Object> response = apiController.execute(authentication, paymentsObject.getObjectType(), "create", paymentsObject);
-            BaseObject object = new BaseObject() {
-                @Override
-                protected String getObjectType() {
-                    return paymentsObject.getObjectType();
-                }
-            };
+            Map<? extends String, ? extends Object> response = apiController.execute(authentication, requestObject.getObjectType(), "create", requestObject);
+            BaseObject responseObject = getResponseBaseObject(requestObject);
 
-            object.authentication = authentication;
+            responseObject.authentication = authentication;
 
             // Response can be null (204)
             if (response != null) {
-                object.putAll(response);
+                responseObject.putAll(response);
             }
 
-            return object;
+            return responseObject;
 
         } catch (ObjectNotFoundException e) {
             throw new IllegalStateException("ObjectNotFoundException not expected", e);
         }
     }
 
-    protected abstract String getObjectType();
-
-    public Authentication getAuthentication() {
-        return authentication;
-    }
-
-    protected BaseObject updateObject(final BaseObject paymentsObject)
+    protected BaseObject updateObject(final BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController();
+        ApiController apiController = new ApiController(getBasePath());
 
-        Map<? extends String, ? extends Object> response = apiController.execute(authentication, paymentsObject.getObjectType(), "update", paymentsObject);
-        BaseObject object = new BaseObject() {
-            @Override
-            protected String getObjectType() {
-                return paymentsObject.getObjectType();
-            }
-        };
+        Map<? extends String, ? extends Object> response = apiController.execute(authentication, requestObject.getObjectType(), "update", requestObject);
+        BaseObject responseObject = getResponseBaseObject(requestObject);
 
         // Response can be null (204)
         if (response != null) {
-            object.putAll(response);
+            responseObject.putAll(response);
         }
 
-        return object;
+        return responseObject;
     }
 
-    protected BaseObject updateObject(final Authentication authentication, final BaseObject paymentsObject)
+    protected BaseObject updateObject(final Authentication authentication, final BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController();
+        ApiController apiController = new ApiController(getBasePath());
 
-        paymentsObject.authentication = authentication;
+        requestObject.authentication = authentication;
 
-        Map<? extends String, ? extends Object> response = apiController.execute(authentication, paymentsObject.getObjectType(), "update", paymentsObject);
-        BaseObject object = new BaseObject() {
-            @Override
-            protected String getObjectType() {
-                return paymentsObject.getObjectType();
-            }
-        };
+        Map<? extends String, ? extends Object> response = apiController.execute(authentication, requestObject.getObjectType(), "update", requestObject);
+        BaseObject responseObject = getResponseBaseObject(requestObject);
 
         // Response can be null (204)
         if (response != null) {
-            object.putAll(response);
+            responseObject.putAll(response);
         }
 
-        return object;
+        return responseObject;
     }
 
-    protected BaseObject deleteObject(final BaseObject paymentsObject)
+    protected BaseObject deleteObject(final BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController();
-        Map<? extends String, ? extends Object> response = apiController.execute(authentication, getObjectType(), "delete", paymentsObject);
+        ApiController apiController = new ApiController(getBasePath());
 
-        BaseObject object = new BaseObject() {
-            @Override
-            protected String getObjectType() {
-                return paymentsObject.getObjectType();
-            }
-        };
+        Map<? extends String, ? extends Object> response = apiController.execute(authentication, getObjectType(), "delete", requestObject);
+
+        BaseObject responseObject = getResponseBaseObject(requestObject);
+
         // Response can be null (204)
         if (response != null) {
-            object.putAll(response);
+            responseObject.putAll(response);
         }
 
-        return object;
+        return responseObject;
     }
 
-    protected BaseObject deleteObject(final Authentication authentication, final BaseObject paymentsObject)
+    protected BaseObject deleteObject(final Authentication authentication, final BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController();
-        Map<? extends String, ? extends Object> response = apiController.execute(authentication, getObjectType(), "delete", paymentsObject);
+        ApiController apiController = new ApiController(getBasePath());
 
-        BaseObject object = new BaseObject() {
-            @Override
-            protected String getObjectType() {
-                return paymentsObject.getObjectType();
-            }
-        };
+        Map<? extends String, ? extends Object> response = apiController.execute(authentication, getObjectType(), "delete", requestObject);
+
+        BaseObject responseObject = getResponseBaseObject(requestObject);
 
         // Response can be null (204)
         if (response != null) {
-            object.putAll(response);
+            responseObject.putAll(response);
         }
 
-        return object;
+        return responseObject;
+    }
+
+    /**
+     *
+     * @param bo
+     * @return
+     */
+    private static BaseObject getResponseBaseObject(final BaseObject bo) {
+        return new BaseObject() {
+            @Override
+            protected String getObjectType() {
+                return bo.getObjectType();
+            }
+
+            @Override
+            protected String getBasePath() {
+                return bo.getBasePath();
+            }
+        };
     }
 }
