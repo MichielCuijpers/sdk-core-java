@@ -34,7 +34,6 @@ import java.util.Map;
  */
 public class ApiException extends Exception {
 
-    private String reference;
     private String errorCode;
     private String message;
     private int status;
@@ -93,7 +92,6 @@ public class ApiException extends Exception {
 
         this.status = status;
         this.errorData = errorData;
-        reference = (String) errorData.get("reference");
         Map<? extends String, ? extends Object> error = (Map<? extends String, ? extends Object>) errorData.get("error");
         if (error != null) {
             errorCode = (String) error.get("code");
@@ -108,15 +106,6 @@ public class ApiException extends Exception {
      */
     public Map<? extends String, ? extends Object> getErrorData() {
         return errorData;
-    }
-
-    /**
-     * Returns the reference string for this exception.
-     *
-     * @return an ID representing a unique reference for API error (which may be <code>null</code>).
-     */
-    public String getReference() {
-        return reference;
     }
 
     /**
@@ -166,8 +155,6 @@ public class ApiException extends Exception {
                 .append(getStatus())
                 .append(", error code: ")
                 .append(getErrorCode())
-                .append(", reference: ")
-                .append(getReference())
                 .append(")").toString();
     }
 }
