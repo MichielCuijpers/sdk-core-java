@@ -1,8 +1,10 @@
 apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: "com.jfrog.artifactory"
+apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
+apply plugin: 'net.saliman.cobertura'
+//apply plugin: 'cobertura'
 
 sourceCompatibility = 1.7
 
@@ -12,7 +14,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"   // artifactory
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0'   // artifactory
+        classpath 'net.saliman:gradle-cobertura-plugin:2.3.0'
     }
 }
 
@@ -31,6 +34,9 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.4'
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.4'
+    testRuntime 'org.slf4j:slf4j-api:1.7.16'
+    testRuntime 'cglib:cglib-nodep:3.2.0'
+    testRuntime 'log4j:log4j:1.2.17'
 
     compile group: 'oauth.signpost', name: 'signpost-core', version: signpostVersion
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
