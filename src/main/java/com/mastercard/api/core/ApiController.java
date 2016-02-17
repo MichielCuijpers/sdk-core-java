@@ -67,7 +67,7 @@ public class ApiController {
 
         String baseUrl = API_BASE_LIVE_URL;
 
-        if (ApiConfig.sandbox) {
+        if (ApiConfig.isSandbox()) {
             baseUrl = API_BASE_SANDBOX_URL;
         }
 
@@ -207,18 +207,18 @@ public class ApiController {
 
         // Try set default authentication if no authentication provided
         if (authentication == null) {
-            if (ApiConfig.authentication == null) {
+            if (ApiConfig.getAuthentication() == null) {
                 throw new MessageSignerException("Authentication is null. Set \"ApiConfig.authentication\" or pass an instance of com.mastercard.api.core.security.Authentication to the method call");
             }
 
-            authentication = ApiConfig.authentication;
+            authentication = ApiConfig.getAuthentication();
         }
 
         String payload = null;
 
         switch (action) {
             case create:
-                payload = JSONValue.toJSONString(RequestMap.normalize(objectMap));
+                payload = JSONValue.toJSONString(objectMap);
                 message = new HttpPost(uri);
 
                 HttpEntity createEntity = null;
@@ -238,7 +238,7 @@ public class ApiController {
                 break;
 
             case update:
-                payload = JSONValue.toJSONString(RequestMap.normalize(objectMap));
+                payload = JSONValue.toJSONString(objectMap);
                 message = new HttpPut(uri);
 
                 HttpEntity updateEntity = null;

@@ -6,9 +6,9 @@ import com.mastercard.api.core.security.Authentication;
  * SDK Configuration Overrides
  */
 public class ApiConfig {
-    public static boolean sandbox = true;
-    public static boolean debug = false;
-    public static Authentication authentication;
+    private static boolean sandbox = true;
+    private static boolean debug = false;
+    private static Authentication authentication;
 
     /**
      * SDK will use sanbox APIs instead of production APIs
@@ -18,12 +18,20 @@ public class ApiConfig {
         ApiConfig.sandbox = sandbox;
     }
 
+    public static boolean isSandbox() {
+        return sandbox;
+    }
+
     /**
      * Turn on debug logging for the SDK
      * @param debug
      */
     public static void setDebug(boolean debug) {
         ApiConfig.debug = debug;
+    }
+
+    public static boolean isDebug() {
+        return debug;
     }
 
     /**
@@ -40,5 +48,9 @@ public class ApiConfig {
      */
     public static void setAuthentication(Authentication authentication) {
         ApiConfig.authentication = authentication;
+    }
+
+    public static Authentication getAuthentication() {
+        return authentication;
     }
 }

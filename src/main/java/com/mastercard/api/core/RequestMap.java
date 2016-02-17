@@ -82,25 +82,6 @@ public class RequestMap extends LinkedHashMap<String, Object> {
     private static final Pattern arrayIndexPattern = Pattern.compile("(.*)\\[(.*)\\]");
 
     /**
-     * Constructs an empty map with the specified capacity and load factor.
-     *
-     * @param initialCapacity the initial capacity
-     * @param loadFactor      the load factor
-     */
-    public RequestMap(int initialCapacity, float loadFactor) {
-        super(initialCapacity, loadFactor);
-    }
-
-    /**
-     * Constructs an empty map with the specified capacity and default load factor.
-     *
-     * @param initialCapacity the initial capacity
-     */
-    public RequestMap(int initialCapacity) {
-        super(initialCapacity);
-    }
-
-    /**
      * Constructs an empty map with the default capacity and load factor.
      */
     public RequestMap() {
@@ -124,83 +105,6 @@ public class RequestMap extends LinkedHashMap<String, Object> {
     public RequestMap(String jsonMapString) {
         super();
         putAll((Map<? extends String, ? extends Object>) JSONValue.parse(jsonMapString));
-    }
-
-
-    /**
-     * Constructs a map with an initial mapping of keyPath to value.
-     *
-     * @param keyPath key path with which the specified value is to be associated.
-     * @param value   value to be associated with the specified key path.
-     */
-    public RequestMap(String keyPath, Object value) {
-        put(keyPath, value);
-    }
-
-    /**
-     * Returns an identical copy of the map except values which JSONValue.toJSONString() would render as
-     * unquoted strings are converted to string values.
-     * <p>
-     * See https://code.google.com/p/json-simple/issues/detail?id=104
-     */
-    public static Map<String, Object> normalize(Map<String, Object> m) {
-
-        RequestMap pm = new RequestMap();
-
-        for (String k : m.keySet()) {
-            Object v = m.get(k);
-
-            if (v == null) {
-                pm.set(k, v);
-
-            } else if (v instanceof List) {
-                pm.set(k, normalize((List<Object>) v));
-
-            } else if (v instanceof Map) {
-                pm.set(k, normalize((Map<String, Object>) v));
-
-            } else if (v instanceof String ||
-                    v instanceof Double ||
-                    v instanceof Float ||
-                    v instanceof Number ||
-                    v instanceof Boolean ||
-                    v instanceof JSONAware) {
-                pm.set(k, v);
-
-            } else {
-                pm.set(k, v.toString());
-            }
-        }
-
-        return pm;
-    }
-
-    private static List<Object> normalize(List<Object> l) {
-        List<Object> pl = new ArrayList<Object>();
-
-        for (Object v : l) {
-            if (v == null) {
-                pl.add(v);
-
-            } else if (v instanceof List) {
-                pl.add(normalize((List<Object>) v));
-
-            } else if (v instanceof Map) {
-                pl.add(normalize((Map<String, Object>) v));
-
-            } else if (v instanceof String ||
-                    v instanceof Double ||
-                    v instanceof Float ||
-                    v instanceof Number ||
-                    v instanceof Boolean ||
-                    v instanceof JSONAware) {
-                pl.add(v);
-
-            } else {
-                pl.add(v.toString());
-            }
-        }
-        return pl;
     }
 
     /**

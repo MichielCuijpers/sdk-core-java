@@ -29,10 +29,10 @@ public enum HttpMethod {
      */
     public String getHttpMethodAsString() {
         try {
-            return this.requestType.newInstance().getMethod().toUpperCase();
+            return this.getRequestType().newInstance().getMethod().toUpperCase();
         }
         catch (Exception e) {
-            return this.name();
+            throw new IllegalArgumentException(e);
         }
     }
 
