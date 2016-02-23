@@ -76,7 +76,6 @@ public class NotAllowedException extends ApiException {
      * Constructs an <code>NotAllowedException</code> with the specified status
      * and error data.
      *
-     * @param status    the HTTP status code
      * @param errorData a map representing the error details returned by the API.  The map is
      *                  expected to contain <code>String</code> value for the key  <code>"reference"</code> and
      *                  a map containing the detailed error data for the key <code>"key"</code>.  This map in turn
@@ -84,8 +83,13 @@ public class NotAllowedException extends ApiException {
      *                  <code>"code"</code> and <code>"message"</code>.
      * @see com.mastercard.api.core.exception.ApiException
      */
-    public NotAllowedException(int status, Map<? extends String, ? extends Object> errorData) {
-        super(status, errorData);
+    public NotAllowedException(Map<? extends String, ? extends Object> errorData) {
+        super(403, errorData);
+    }
+
+    @Override
+    public int getStatus() {
+        return 403;
     }
 }
 

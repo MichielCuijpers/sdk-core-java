@@ -27,22 +27,12 @@
 
 package com.mastercard.api.core.exception;
 
-import java.util.Map;
-
 /**
- * Thrown to indicate that an API object cannot be found.
+ * Thrown to indicate that the request message could not be signed.
  *
  * @see ApiException
  */
 public class MessageSignerException extends ApiException {
-
-
-    /**
-     * Constructs a <code>MessageSignerException</code> with no detail message.
-     */
-    public MessageSignerException() {
-        super();
-    }
 
     /**
      * Constructs a <code>MessageSignerException</code> with the specified detail message.
@@ -54,17 +44,6 @@ public class MessageSignerException extends ApiException {
     }
 
     /**
-     * Constructs a <code>MessageSignerException</code> with the specified detail message
-     * and cause.
-     *
-     * @param s     the detail message.
-     * @param cause the detail message.
-     */
-    public MessageSignerException(String s, Throwable cause) {
-        super(s, cause);
-    }
-
-    /**
      * Constructs a <code>MessageSignerException</code> with the specified cause.
      *
      * @param cause the detail message.
@@ -73,19 +52,9 @@ public class MessageSignerException extends ApiException {
         super(cause);
     }
 
-    /**
-     * Constructs a <code>MessageSignerException</code> with the specified status
-     * and error data.
-     *
-     * @param status    the HTTP status code.
-     * @param errorData a map representing the error details returned by the API.  The map is
-     *                  expected to contain <code>String</code> value for the key  <code>"reference"</code> and
-     *                  a map containing the detailed error data for the key <code>"key"</code>.  This map in turn
-     *                  is expected to contain <code>String</code> values for the keys
-     *                  <code>"code"</code> and <code>"message"</code>.
-     * @see ApiException
-     */
-    public MessageSignerException(int status, Map<? extends String, ? extends Object> errorData) {
-        super(status, errorData);
+    @Override
+    public int getStatus() {
+        return 0;
     }
+
 }

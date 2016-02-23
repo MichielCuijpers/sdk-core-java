@@ -27,18 +27,22 @@
 
 package com.mastercard.api.core.exception;
 
+import com.mastercard.api.core.RequestMap;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Base class for all API exceptions.
  */
-public class ApiException extends Exception {
+public abstract class ApiException extends Exception {
 
     private String errorCode;
     private String message;
     private int status;
 
-    private Map<? extends String, ? extends Object> errorData;
+    private List<Map<? extends String, ? extends Object>> errors = new ArrayList<>();
 
     /**
      * Constructs an <code>ApiException</code> with no detail message.
@@ -91,21 +95,28 @@ public class ApiException extends Exception {
         super();
 
         this.status = status;
-        this.errorData = errorData;
-        Map<? extends String, ? extends Object> error = (Map<? extends String, ? extends Object>) errorData.get("error");
-        if (error != null) {
-            errorCode = (String) error.get("code");
-            message = (String) error.get("message");
-        }
-    }
 
-    /**
-     * Returns the API error data for this exception.
-     *
-     * @return a map representing the error data for this exception (which may be <code>null</code>).
-     */
-    public Map<? extends String, ? extends Object> getErrorData() {
-        return errorData;
+        // Use RequestMap for easy traversing
+        RequestMap requestMap = new RequestMap((Map<String, Object>) errorData);
+
+        if (!requestMap.containsKey("Errors.Error"))
+            return;
+
+        Object o = requestMap.get("Errors.Error");
+
+        if (o instanceof Map) {
+            errors.add((Map<? extends String, ? extends Object>) o);
+        }
+        else if (o instanceof List) {
+            errors = (List<Map<? extends String, ? extends Object>>) o;
+        }
+
+        // Use the first error
+        if (errors.size() > 0) {
+            Map<? extends String, ? extends Object> error = errors.get(0);
+            errorCode = (String) error.get("ReasonCode");
+            message = (String) error.get("Description");
+        }
     }
 
     /**
@@ -122,8 +133,10 @@ public class ApiException extends Exception {
      *
      * @return an integer representing the HTTP status code for this API error (or 0 if there is no status)
      */
-    public int getStatus() {
-        return status;
+    public abstract int getStatus();
+
+    public List<Map<? extends String, ? extends Object>> getErrors() {
+        return errors;
     }
 
     /**
