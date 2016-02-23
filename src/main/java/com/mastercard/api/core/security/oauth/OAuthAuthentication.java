@@ -49,18 +49,26 @@ public class OAuthAuthentication implements Authentication {
     private PrivateKey privateKey;
 
     public OAuthAuthentication(String clientId, InputStream is, String alias, String password) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        if(clientId == null) {
+            throw new IllegalArgumentException("ClientId cannot null");
+        }
+
+        if(is == null) {
+            throw new IllegalArgumentException("InputStream cannot null");
+        }
+
         this.clientId = clientId;
         setP12(is, alias, password);
     }
 
     private void setP12(InputStream is, String alias, String password) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
-        if(is == null) {
-            throw new IllegalArgumentException("Key inputstream is null");
-        }
-
         KeyStore ks = KeyStore.getInstance("PKCS12");
         ks.load(is, password.toCharArray());
         this.privateKey = (PrivateKey) ks.getKey(alias, password.toCharArray());
+
+        if (this.privateKey == null) {
+            throw new IllegalArgumentException("No key found for alias ["+ alias +"]");
+        }
     }
 
     @Override

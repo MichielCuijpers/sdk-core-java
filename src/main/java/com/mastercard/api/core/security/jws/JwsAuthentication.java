@@ -58,24 +58,12 @@ public class JwsAuthentication implements Authentication {
     public JwsAuthentication() {
     }
 
-    public String getPrivateKey() {
-        return privateKey;
-    }
-
     public void setPrivateKey(String privateKey) {
         this.privateKey = privateKey;
     }
 
-    public String getPublicKey() {
-        return publicKey;
-    }
-
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
     }
 
     public void setAccessToken(String accessToken) {
@@ -84,6 +72,6 @@ public class JwsAuthentication implements Authentication {
 
     @Override
     public HttpRequestBase sign(URI uri, HttpMethod httpMethod, ContentType contentType, Object body, HttpRequestBase message) {
-        return null;
+        throw new UnsupportedOperationException("JWS is not currently supported");
     }
 }
