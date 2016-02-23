@@ -48,13 +48,4 @@ public class ResourceList<T> extends RequestMap {
         return (List<T>) get("list");
     }
 
-    /**
-     * Returns the total number of domain objects available which may be larger than
-     * the number of objects in the list.
-     *
-     * @return the total number of domain objects available.
-     */
-    public int getTotal() {
-        return this.get("total") == null ? 0 : Integer.parseInt(this.get("total").toString());
-    }
 }
