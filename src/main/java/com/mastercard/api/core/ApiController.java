@@ -61,8 +61,8 @@ public class ApiController {
      * @param basePath - basePath for the API e.g. /fraud/loststolen/v1
      */
     public ApiController(String basePath) {
-        if (basePath == null || basePath.trim().length() < 0) {
-            throw new IllegalStateException("basePath cannot be empty");
+        if (basePath == null || basePath.trim().length() < 1) {
+            throw new IllegalArgumentException("basePath cannot be empty");
         }
 
         String baseUrl = API_BASE_LIVE_URL;
@@ -112,7 +112,7 @@ public class ApiController {
         return s;
     }
 
-    private String urlEncode(Object stringToEncode) throws UnsupportedEncodingException {
+    String urlEncode(Object stringToEncode) throws UnsupportedEncodingException {
         return URLEncoder.encode(stringToEncode.toString(), "UTF-8");
     }
 
@@ -125,63 +125,31 @@ public class ApiController {
         objectList.add(apiPath.replaceAll("/$", ""));
         objectList.add(type.replaceAll("/$", ""));
 
+        // Handle Id
         switch (action) {
-            case create:
-                break;
             case read:
             case update:
             case delete:
                 if (objectMap.containsKey("id")) {
                     s.append("/%s");
                     objectList.add(urlEncode(objectMap.get("id")));
+                    objectMap.remove("id");
                 }
+
                 break;
+        }
 
+        // Add Query Params
+        switch (action) {
+            case read:
+            case delete:
             case list:
-                if (objectMap != null) {
-                    if (objectMap.containsKey("max")) {
-                        s = appendToQueryString(s, "max=%s");
-                        objectList.add(urlEncode(objectMap.get("max")));
-                    }
-
-                    if (objectMap.containsKey("offset")) {
-                        s = appendToQueryString(s, "offset=%s");
-                        objectList.add(urlEncode(objectMap.get("offset")));
-                    }
-
-                    if (objectMap.containsKey("sorting")) {
-                        if (objectMap.get("sorting") instanceof Map) {
-                            Map<String, Object> sorting = (Map<String, Object>) objectMap.get("sorting");
-                            Iterator it = sorting.entrySet().iterator();
-                            while (it.hasNext()) {
-                                Map.Entry entry = (Map.Entry) it.next();
-                                s = appendToQueryString(s, "sorting[%s]=%s");
-                                objectList.add(urlEncode(entry.getKey().toString()));
-                                objectList.add(urlEncode(entry.getValue().toString()));
-                            }
-                        }
-                    }
-
-                    if (objectMap.containsKey("filter")) {
-                        if (objectMap.get("filter") instanceof Map) {
-                            Map<String, Object> filter = (Map<String, Object>) objectMap.get("filter");
-                            Iterator it = filter.entrySet().iterator();
-                            while (it.hasNext()) {
-                                Map.Entry entry = (Map.Entry) it.next();
-                                s = appendToQueryString(s, "filter[%s]=%s");
-                                objectList.add(urlEncode(entry.getKey().toString()));
-                                objectList.add(urlEncode(entry.getValue().toString()));
-                            }
-                        }
-                    }
-
-                    Iterator it = objectMap.entrySet().iterator();
-                    while (it.hasNext()) {
-                        Map.Entry entry = (Map.Entry) it.next();
-                        s = appendToQueryString(s, "%s=%s");
-                        objectList.add(urlEncode(entry.getKey().toString()));
-                        objectList.add(urlEncode(entry.getValue().toString()));
-                    }
+                Iterator it = objectMap.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry entry = (Map.Entry) it.next();
+                    s = appendToQueryString(s, "%s=%s");
+                    objectList.add(urlEncode(entry.getKey().toString()));
+                    objectList.add(urlEncode(entry.getValue().toString()));
                 }
 
                 break;
@@ -221,7 +189,7 @@ public class ApiController {
                 payload = JSONValue.toJSONString(objectMap);
                 message = new HttpPost(uri);
 
-                HttpEntity createEntity = null;
+                HttpEntity createEntity;
                 try {
                     createEntity = new StringEntity(payload);
                 }
@@ -241,7 +209,7 @@ public class ApiController {
                 payload = JSONValue.toJSONString(objectMap);
                 message = new HttpPut(uri);
 
-                HttpEntity updateEntity = null;
+                HttpEntity updateEntity;
                 try {
                     updateEntity = new StringEntity(payload);
                 }
@@ -285,10 +253,16 @@ public class ApiController {
     }
 
     private Action getAction(String action) throws InvalidRequestException {
-        Action act = Action.valueOf(action);
+        if (action == null) {
+            throw new IllegalArgumentException("Action cannot be null");
+        }
 
-        if (null == act) {
-            throw new IllegalStateException("Invalid action supplied: " + action);
+        Action act;
+        try {
+            act = Action.valueOf(action);
+        }
+        catch (Exception e) {
+            throw new IllegalArgumentException("Invalid action supplied: " + action);
         }
 
         return act;
@@ -304,6 +278,10 @@ public class ApiController {
 
         URI uri = null;
 
+        if (objectMap == null) {
+            objectMap = new LinkedHashMap<String, Object>();
+        }
+
         try {
             uri = getURI(type, act, objectMap);
         }
@@ -313,16 +291,9 @@ public class ApiController {
 
         int port = uri.getPort();
         String scheme = uri.getScheme();
-        if (port == PORTS.UNKNOWN.number) {
-            port = PORTS.HTTP.number;
-            if (scheme.equals(PORTS.HTTPS.name)) {
-                port = PORTS.HTTPS.number;
-            }
-        }
 
         HttpHost host = new HttpHost(uri.getHost(), port, scheme);
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        CloseableHttpClient httpClient = httpClientBuilder.build();
+        CloseableHttpClient httpClient = createHttpClient();
 
         try {
             Map<String, String> header = new LinkedHashMap<String, String>();
@@ -330,81 +301,44 @@ public class ApiController {
 
             message = getRequest(auth, uri, act, objectMap, header);
 
-            ResponseHandler<ApiControllerResponse> responseHandler = new ResponseHandler<ApiControllerResponse>() {
-                public ApiControllerResponse handleResponse(HttpResponse httpResponse) throws IOException {
-                    ApiControllerResponse apiResponse = new ApiControllerResponse();
-                    apiResponse.setHttpResponse(httpResponse);
+            ResponseHandler<ApiControllerResponse> responseHandler = createResponseHandler();
 
-                    StatusLine statusLine = httpResponse.getStatusLine();
-                    apiResponse.setStatus(statusLine.getStatusCode());
+            ApiControllerResponse apiResponse = httpClient.execute(host, message, responseHandler);
 
-                    HttpEntity entity = httpResponse.getEntity();
-                    Header header = httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE);
+            if (apiResponse.hasPayload()) {
 
-                    String payload = null;
-                    if (entity != null) {
-                        payload = EntityUtils.toString(entity);
-                    }
-                    else if (204 != statusLine.getStatusCode()) {
-                        throw new IOException("Invalid response, there is no content in the response and the status code is " + statusLine.getStatusCode() + ".  Status code should be 204.");
-                    }
+                Object response = JSONValue.parse(apiResponse.getPayload());
 
-                    String responseContentType;
-                    if (null != header) {
-                        if (header.getValue().contains(HEADER_SEPARATOR)) {
-                            String parts[] = header.getValue().split(HEADER_SEPARATOR);
-                            responseContentType = parts[0];
-                        }
-                        else {
-                            responseContentType = header.getValue();
-                        }
-
-                        if (responseContentType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
-                            apiResponse.setPayload(payload);
-                        }
-                        else {
-                            throw new IOException("Response was not " + ContentType.APPLICATION_JSON.getMimeType() + ", it was: " + responseContentType + ". Unable to process payload.");
-                        }
-
-                        return apiResponse;
-
-                    }
-                    return null;
-                }
-            };
-
-            ApiControllerResponse paymentsApiResponse = httpClient.execute(host, message, responseHandler);
-
-            if (paymentsApiResponse.hasPayload()) {
-
-                Object response = JSONValue.parse(paymentsApiResponse.getPayload());
-
-                if (response instanceof Map) {
-                    if (paymentsApiResponse.getStatus() < 300) {
+                if (apiResponse.getStatus() < 300) {
+                    if (response instanceof Map) {
                         return (Map<? extends String, ? extends Object>) response;
+                    }
+                    else if (response instanceof List) {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("list", response);
+                        return map;
+                    }
+                }
+                else {
+                    int status = apiResponse.getStatus();
 
+                    if (status == HttpStatus.SC_BAD_REQUEST) {
+                        throw new InvalidRequestException((Map<? extends String, ? extends Object>) response);
+                    }
+                    else if (status == HttpStatus.SC_UNAUTHORIZED) {
+                        throw new AuthenticationException((Map<? extends String, ? extends Object>) response);
+                    }
+                    else if (status == HttpStatus.SC_NOT_FOUND) {
+                        throw new ObjectNotFoundException((Map<? extends String, ? extends Object>) response);
+                    }
+                    else if (status == HttpStatus.SC_FORBIDDEN) {
+                        throw new NotAllowedException((Map<? extends String, ? extends Object>) response);
+                    }
+                    else if (status == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+                        throw new SystemException((Map<? extends String, ? extends Object>) response);
                     }
                     else {
-                        int status = paymentsApiResponse.getStatus();
-
-                        if (status == HttpStatus.SC_BAD_REQUEST) {
-                            throw new InvalidRequestException(status, (Map<? extends String, ? extends Object>) response);
-                        }
-                        else if (status == HttpStatus.SC_UNAUTHORIZED) {
-                            throw new AuthenticationException(status, (Map<? extends String, ? extends Object>) response);
-                        }
-                        else if (status == HttpStatus.SC_NOT_FOUND) {
-                            throw new ObjectNotFoundException(status, (Map<? extends String, ? extends Object>) response);
-                        }
-                        else if (status == HttpStatus.SC_METHOD_NOT_ALLOWED) {
-                            throw new NotAllowedException(status, (Map<? extends String, ? extends Object>) response);
-                        }
-                        else if (status < 500) {
-                            throw new InvalidRequestException(status, (Map<? extends String, ? extends Object>) response);
-                        }
-                        else {
-                            throw new SystemException(status, (Map<? extends String, ? extends Object>) response);
-                        }
+                        throw new ApiCommunicationException((Map<? extends String, ? extends Object>) response);
                     }
                 }
             }
@@ -434,18 +368,57 @@ public class ApiController {
         }
     }
 
-    public enum PORTS {
-        HTTP("http", 80),
-        HTTPS("https", 443),
-        UNKNOWN("unknown", -1);
+    CloseableHttpClient createHttpClient() {
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        return httpClientBuilder.build();
+    }
 
-        private final String name;
-        private final int number;
+    ResponseHandler<ApiControllerResponse> createResponseHandler() {
+        return new ResponseHandler<ApiControllerResponse>() {
+            public ApiControllerResponse handleResponse(HttpResponse httpResponse) throws IOException {
+                ApiControllerResponse apiResponse = new ApiControllerResponse();
+                apiResponse.setHttpResponse(httpResponse);
 
-        PORTS(String name, int number) {
-            this.name = name;
-            this.number = number;
-        }
+                StatusLine statusLine = httpResponse.getStatusLine();
+                apiResponse.setStatus(statusLine.getStatusCode());
+
+                HttpEntity entity = httpResponse.getEntity();
+                Header header = httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE);
+
+                String payload = null;
+                if (entity != null) {
+                    payload = EntityUtils.toString(entity);
+                }
+                else if (204 != statusLine.getStatusCode()) {
+                    throw new IOException("Invalid response, there is no content in the response and the status code is " + statusLine.getStatusCode() + ".  Status code should be 204.");
+                }
+
+                String responseContentType;
+
+                if (header == null) {
+                    throw new IllegalStateException("Unknown content type. Missing Content-Type header");
+                }
+                else {
+                    if (header.getValue().contains(HEADER_SEPARATOR)) {
+                        String parts[] = header.getValue().split(HEADER_SEPARATOR);
+                        responseContentType = parts[0];
+                    }
+                    else {
+                        responseContentType = header.getValue();
+                    }
+                }
+
+                if (responseContentType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
+                    apiResponse.setPayload(payload);
+                }
+                else {
+                    throw new IOException("Response was not " + ContentType.APPLICATION_JSON.getMimeType() + ", it was: " + responseContentType + ". Unable to process payload.");
+                }
+
+                return apiResponse;
+
+            }
+        };
     }
 
     public class ApiControllerResponse {

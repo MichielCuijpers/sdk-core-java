@@ -40,6 +40,8 @@ import java.util.Map;
  */
 public abstract class BaseObject extends RequestMap {
 
+    private static final ApiControllerFactory apiControllerFactory = new ApiControllerFactory();
+
     protected abstract String getBasePath();
 
     protected abstract String getObjectType();
@@ -48,7 +50,7 @@ public abstract class BaseObject extends RequestMap {
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController(value.getBasePath());
+        ApiController apiController = apiControllerFactory.createApiController(value.getBasePath());
 
         Map<? extends String, ? extends Object> response = apiController.execute(authentication, type, "read", value);
 
@@ -82,27 +84,21 @@ public abstract class BaseObject extends RequestMap {
 
         ResourceList<T> listResults = new ResourceList<T>();
 
-        Map<? extends String, ? extends Object> response = new ApiController(template.getBasePath())
+        Map<? extends String, ? extends Object> response = apiControllerFactory.createApiController(template.getBasePath())
                 .execute(authentication, template.getObjectType(), "list", criteria);
 
         listResults.putAll(response);
 
-        List<T> val = null;
-        if (listResults.containsKey("list")) {
-            List<Map<String, Object>> rawList = (List<Map<String, Object>>) listResults.get("list");
+        List<Map<String, Object>> rawList = (List<Map<String, Object>>) listResults.get("list");
 
-            val = new ArrayList<T>(((List) rawList).size());
+        List<T> val = new ArrayList<T>(((List) rawList).size());
 
-            for (Object o : (List) rawList) {
-                if (o instanceof Map) {
-                    T item = (T) template.clone();
-                    item.putAll((Map<? extends String, ? extends Object>) o);
-                    val.add(item);
-                }
+        for (Object o : (List) rawList) {
+            if (o instanceof Map) {
+                T item = (T) template.clone();
+                item.putAll((Map<? extends String, ? extends Object>) o);
+                val.add(item);
             }
-        }
-        else {
-            val = new ArrayList<T>();
         }
 
         listResults.put("list", val);
@@ -149,7 +145,7 @@ public abstract class BaseObject extends RequestMap {
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = new ApiController(requestObject.getBasePath());
+        ApiController apiController = apiControllerFactory.createApiController(requestObject.getBasePath());
 
         Map<? extends String, ? extends Object> response = apiController.execute(authentication, objectType, action, requestObject);
 

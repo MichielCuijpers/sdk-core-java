@@ -5,10 +5,13 @@ import com.mastercard.api.core.security.Authentication;
 /**
  * SDK Configuration Overrides
  */
-public class ApiConfig {
+public final class ApiConfig {
     private static boolean sandbox = true;
     private static boolean debug = false;
     private static Authentication authentication;
+
+    private ApiConfig() {
+    }
 
     /**
      * SDK will use sanbox APIs instead of production APIs
