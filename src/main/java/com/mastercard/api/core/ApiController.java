@@ -61,8 +61,8 @@ public class ApiController {
      * @param basePath - basePath for the API e.g. /fraud/loststolen/v1
      */
     public ApiController(String basePath) {
-        if (basePath == null || basePath.trim().length() < 1) {
-            throw new IllegalArgumentException("basePath cannot be empty");
+        if (basePath == null) {
+            throw new IllegalArgumentException("basePath cannot be null");
         }
 
         String baseUrl = API_BASE_LIVE_URL;
@@ -232,7 +232,8 @@ public class ApiController {
         }
 
         // Set JSON
-        message.setHeader("Accept", "application/json");
+        message.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        message.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
 
         // Set other headers
         for (Map.Entry<String, String> headerEntry : headerMap.entrySet()) {
@@ -310,13 +311,15 @@ public class ApiController {
                 Object response = JSONValue.parse(apiResponse.getPayload());
 
                 if (apiResponse.getStatus() < 300) {
-                    if (response instanceof Map) {
-                        return (Map<? extends String, ? extends Object>) response;
-                    }
-                    else if (response instanceof List) {
+                    if (act == Action.list) {
                         Map<String, Object> map = new HashMap<>();
-                        map.put("list", response);
+                        List list = convertToList((Map<? extends String, ? extends Object>) response);
+
+                        map.put("list", list);
                         return map;
+                    }
+                    else {
+                        return (Map<? extends String, ? extends Object>) response;
                     }
                 }
                 else {
@@ -366,6 +369,27 @@ public class ApiController {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Converts an XML Gateway response to a List
+     * @param response
+     * @return
+     */
+    private List convertToList(Map<? extends String, ? extends Object> response) {
+        List list = new ArrayList();
+
+        if (response.keySet().iterator().hasNext()) {
+            String key = response.keySet().iterator().next();
+            Map<? extends String, ? extends Object> level1 = response.get(key) instanceof Map ? (Map<? extends String, ? extends Object>) response.get(key) : null;
+
+            if (level1 != null && level1.keySet().iterator().hasNext()) {
+                key = level1.keySet().iterator().next();
+                list = level1.get(key) instanceof List ? (List) level1.get(key) : new ArrayList<>();
+            }
+        }
+
+        return list;
     }
 
     CloseableHttpClient createHttpClient() {

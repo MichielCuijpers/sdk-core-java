@@ -51,21 +51,7 @@ class ApiControllerSpec extends Specification {
 
         then:
         def ex = thrown(IllegalArgumentException)
-        ex.message == "basePath cannot be empty"
-
-        when:
-        new ApiController("")
-
-        then:
-        ex = thrown(IllegalArgumentException)
-        ex.message == "basePath cannot be empty"
-
-        when:
-        new ApiController(" ")
-
-        then:
-        ex = thrown(IllegalArgumentException)
-        ex.message == "basePath cannot be empty"
+        ex.message == "basePath cannot be null"
     }
 
     def "test checkState" () {
@@ -511,9 +497,36 @@ class ApiControllerSpec extends Specification {
         where:
         mockHttpResponse | executeResult
         new MockHttpResponse(200, MockHttpResponse.defaultJsonResponse) | MockHttpResponse.defaultJsonResponse
-        new MockHttpResponse(200, [MockHttpResponse.defaultJsonResponse, MockHttpResponse.defaultJsonResponse]) | [list: [MockHttpResponse.defaultJsonResponse, MockHttpResponse.defaultJsonResponse]]
         new MockHttpResponse(201, MockHttpResponse.defaultJsonResponse) | MockHttpResponse.defaultJsonResponse
         new MockHttpResponse(204, null) | null
+    }
+
+    @Unroll
+    def "test execute with list mockHttpResponse #mockHttpResponse executeResult #executeResult" () {
+        given:
+        MockBaseObject mockBaseObject = new MockBaseObject()
+        String basePath = mockBaseObject.getBasePath()
+        String  action = "list"
+        String type = mockBaseObject.getObjectType()
+        Map<String, Object> objectMap = [a: 1]
+        MockHttpClient mockHttpClient = new MockHttpClient(mockHttpResponse)
+
+        ApiController apiController = Spy(ApiController, constructorArgs: [basePath]) {
+            createHttpClient() >> mockHttpClient
+        }
+
+        when:
+        Map<String, Object> response = apiController.execute(null, type, action, objectMap)
+
+        then:
+        response == executeResult
+        mockHttpClient.closed == true
+
+        where:
+        mockHttpResponse | executeResult
+        new MockHttpResponse(200, [Countries: [Country: [MockHttpResponse.defaultJsonResponse, MockHttpResponse.defaultJsonResponse]]]) | [list: [MockHttpResponse.defaultJsonResponse, MockHttpResponse.defaultJsonResponse]]
+        new MockHttpResponse(200, [Countries: [Country: []]]) | [list: []]
+        new MockHttpResponse(200, [Countries: ""]) | [list: []]
     }
 
     @Unroll
