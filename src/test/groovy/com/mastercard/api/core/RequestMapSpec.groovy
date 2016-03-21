@@ -32,6 +32,15 @@ class RequestMapSpec extends Specification {
         requestMap.get("Account.Status") == "true"
     }
 
+    def 'test RequestMap(String keyPath, Object value)' () {
+        given:
+        RequestMap requestMap = new RequestMap("mockKey", "mockValue")
+
+        expect:
+        requestMap.get("mockKey") == "mockValue"
+        requestMap.size() == 1
+    }
+
     def 'test put' () {
         given:
         RequestMap requestMap = new RequestMap()

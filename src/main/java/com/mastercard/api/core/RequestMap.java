@@ -108,6 +108,15 @@ public class RequestMap extends LinkedHashMap<String, Object> {
     }
 
     /**
+     * Constructs a map with an initial mapping of keyPath to value.
+     * @param keyPath key path with which the specified value is to be associated.
+     * @param value value to be associated with the specified key path.
+     */
+    public RequestMap(String keyPath, Object value) {
+        put(keyPath, value);
+    }
+
+    /**
      * Associates the specified value to the specified key path.
      *
      * @param keyPath key path to which the specified value is to be associated.
