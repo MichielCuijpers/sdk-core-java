@@ -45,7 +45,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.*;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ApiController {
 
@@ -57,7 +58,6 @@ public class ApiController {
     private String apiPath;
 
     /**
-     *
      * @param basePath - basePath for the API e.g. /fraud/loststolen/v1
      */
     public ApiController(String basePath) {
@@ -77,15 +77,13 @@ public class ApiController {
     private void checkState() throws RuntimeException {
         try {
             new URL(API_BASE_LIVE_URL);
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             throw new IllegalStateException("Invalid URL supplied for API_BASE_LIVE_URL", e);
         }
 
         try {
             new URL(API_BASE_SANDBOX_URL);
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             throw new IllegalStateException("Invalid URL supplied for API_BASE_SANDBOX_URL", e);
         }
     }
@@ -94,8 +92,7 @@ public class ApiController {
      * Append parameter to URL
      *
      * @param s
-     * @param stringToAppend    e.g. max=10
-     *
+     * @param stringToAppend e.g. max=10
      * @return
      */
     private StringBuilder appendToQueryString(StringBuilder s, String stringToAppend) {
@@ -116,59 +113,96 @@ public class ApiController {
         return URLEncoder.encode(stringToEncode.toString(), "UTF-8");
     }
 
-    private URI getURI(String type, Action action, Map<String, Object> objectMap) throws UnsupportedEncodingException {
+    /**
+     * This is the method which is used to replace {pathid} in the url with the values in the map.
+     * Once the value in the map is used, it is removed.
+     *
+     * @param url       - url where the values need to be replaced.
+     * @param objectMap - map containing the values which can be replace.
+     * @return formatted string
+     */
+    String getTypeWithReplacedPathParams(String url, Map<String, Object> objectMap) {
+
+        String regexToRemovePathParameters = "\\{(.*?)\\}";
+        Pattern pattern = Pattern.compile(regexToRemovePathParameters);
+        Matcher matcher = pattern.matcher(url);
+
+        StringBuffer sb = new StringBuffer();
+
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            if (objectMap.containsKey(group)) {
+                matcher.appendReplacement(sb, objectMap.remove(group).toString());
+            } else {
+                matcher.appendReplacement(sb, "");
+            }
+        }
+
+        return sb.length() > 0 ? sb.toString().replaceAll("//", "/").replaceAll("/$", "").replaceAll("^/", "") : url;
+    }
+
+    private URI getURI(String type, Action action, Map<String, Object> objectMap)
+            throws UnsupportedEncodingException {
         URI uri;
+
+        //arizzini: need to replace all the path variables
+        String updatedType = getTypeWithReplacedPathParams(type, objectMap);
 
         StringBuilder s = new StringBuilder("%s/%s");
 
         List<Object> objectList = new ArrayList<Object>();
+        //arizzini: removing last slash (/)
         objectList.add(apiPath.replaceAll("/$", ""));
-        objectList.add(type.replaceAll("/$", ""));
+        //arizzini: removing last slash (/)
+        objectList.add(updatedType.replaceAll("/$", ""));
 
         // Handle Id
         switch (action) {
-            case read:
-            case update:
-            case delete:
-                if (objectMap.containsKey("id")) {
-                    s.append("/%s");
-                    objectList.add(urlEncode(objectMap.get("id")));
-                    objectMap.remove("id");
-                }
+        case read:
+        case update:
+        case delete:
+            if (objectMap.containsKey("id")) {
+                s.append("/%s");
+                objectList.add(urlEncode(objectMap.get("id")));
+                objectMap.remove("id");
+            }
 
-                break;
+            break;
         }
 
         // Add Query Params
         switch (action) {
-            case read:
-            case delete:
-            case list:
-                Iterator it = objectMap.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry entry = (Map.Entry) it.next();
-                    s = appendToQueryString(s, "%s=%s");
-                    objectList.add(urlEncode(entry.getKey().toString()));
-                    objectList.add(urlEncode(entry.getValue().toString()));
-                }
+        case read:
+        case delete:
+        case list:
+            Iterator it = objectMap.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry entry = (Map.Entry) it.next();
+                s = appendToQueryString(s, "%s=%s");
+                objectList.add(urlEncode(entry.getKey().toString()));
+                objectList.add(urlEncode(entry.getValue().toString()));
+            }
 
-                break;
+            break;
         }
 
         // Use JSON
         s = appendToQueryString(s, "Format=JSON");
 
+
+
+
         try {
             uri = new URI(String.format(s.toString(), objectList.toArray()));
-        }
-        catch (URISyntaxException e) {
+        } catch (URISyntaxException e) {
             throw new IllegalStateException("Failed to build URI", e);
         }
 
         return uri;
     }
 
-    private HttpRequestBase getRequest(Authentication authentication, URI uri, Action action, Map<String, Object> objectMap, Map<String, String> headerMap)
+    private HttpRequestBase getRequest(Authentication authentication, URI uri, Action action,
+            Map<String, Object> objectMap, List<String> headerList)
             throws InvalidRequestException, MessageSignerException {
 
         HttpRequestBase message = null;
@@ -176,59 +210,65 @@ public class ApiController {
         // Try set default authentication if no authentication provided
         if (authentication == null) {
             if (ApiConfig.getAuthentication() == null) {
-                throw new MessageSignerException("Authentication is null. Set \"ApiConfig.authentication\" or pass an instance of com.mastercard.api.core.security.Authentication to the method call");
+                throw new MessageSignerException(
+                        "Authentication is null. Set \"ApiConfig.authentication\" or pass an instance of com.mastercard.api.core.security.Authentication to the method call");
             }
 
             authentication = ApiConfig.getAuthentication();
         }
 
+        Map<String, String> headerMap = new LinkedHashMap<>();
+        for (String headerName : headerList) {
+            if (objectMap.containsKey(headerName)) {
+                headerMap.put(headerName, objectMap.remove(headerName).toString());
+            }
+        }
+
         String payload = null;
 
         switch (action) {
-            case create:
-                payload = JSONValue.toJSONString(objectMap);
-                message = new HttpPost(uri);
+        case create:
+            payload = JSONValue.toJSONString(objectMap);
+            message = new HttpPost(uri);
 
-                HttpEntity createEntity;
-                try {
-                    createEntity = new StringEntity(payload);
-                }
-                catch (UnsupportedEncodingException e) {
-                    throw new IllegalStateException("Unsupported encoding for create action.", e);
-                }
-                ((HttpPost) message).setEntity(createEntity);
+            HttpEntity createEntity;
+            try {
+                createEntity = new StringEntity(payload);
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException("Unsupported encoding for create action.", e);
+            }
+            ((HttpPost) message).setEntity(createEntity);
 
-                break;
+            break;
 
-            case delete:
-                payload = "";
-                message = new HttpDelete(uri);
-                break;
+        case delete:
+            payload = "";
+            message = new HttpDelete(uri);
+            break;
 
-            case update:
-                payload = JSONValue.toJSONString(objectMap);
-                message = new HttpPut(uri);
+        case update:
+            payload = JSONValue.toJSONString(objectMap);
+            message = new HttpPut(uri);
 
-                HttpEntity updateEntity;
-                try {
-                    updateEntity = new StringEntity(payload);
-                }
-                catch (UnsupportedEncodingException e) {
-                    throw new IllegalStateException("Unsupported encoding for create action.", e);
-                }
-                ((HttpPut) message).setEntity(updateEntity);
+            HttpEntity updateEntity;
+            try {
+                updateEntity = new StringEntity(payload);
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException("Unsupported encoding for create action.", e);
+            }
+            ((HttpPut) message).setEntity(updateEntity);
 
-                break;
+            break;
 
-            case read:
-                payload = "";
-                message = new HttpGet(uri);
-                break;
+        case read:
+            payload = "";
+            message = new HttpGet(uri);
+            break;
 
-            case list:
-                payload = "";
-                message = new HttpGet(uri);
-                break;
+        case list:
+            payload = "";
+            message = new HttpGet(uri);
+            break;
         }
 
         // Set JSON
@@ -236,8 +276,8 @@ public class ApiController {
         message.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
 
         // Set other headers
-        for (Map.Entry<String, String> headerEntry : headerMap.entrySet()) {
-            message.setHeader(headerEntry.getKey(), headerEntry.getValue());
+        for (Map.Entry<String, String> entry : headerMap.entrySet()) {
+            message.setHeader(entry.getKey(), entry.getValue());
         }
 
         // Add user agent
@@ -248,7 +288,8 @@ public class ApiController {
         message.setHeader("User-Agent", userAgent);
 
         // Sign the request
-        authentication.sign(uri, HttpMethod.fromAction(action), ContentType.APPLICATION_JSON, payload, message);
+        authentication
+                .sign(uri, HttpMethod.fromAction(action), ContentType.APPLICATION_JSON, payload, message);
 
         return message;
     }
@@ -261,15 +302,15 @@ public class ApiController {
         Action act;
         try {
             act = Action.valueOf(action);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Invalid action supplied: " + action);
         }
 
         return act;
     }
 
-    public Map<? extends String, ? extends Object> execute(Authentication auth, String type, String action, Map<String, Object> objectMap)
+    public Map<? extends String, ? extends Object> execute(Authentication auth, String type, String action,
+            Map<String, Object> objectMap, List<String> headerList)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -285,8 +326,7 @@ public class ApiController {
 
         try {
             uri = getURI(type, act, objectMap);
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
 
@@ -297,10 +337,8 @@ public class ApiController {
         CloseableHttpClient httpClient = createHttpClient();
 
         try {
-            Map<String, String> header = new LinkedHashMap<String, String>();
-            HttpRequestBase message = null;
 
-            message = getRequest(auth, uri, act, objectMap, header);
+            HttpRequestBase message = getRequest(auth, uri, act, objectMap, headerList);
 
             ResponseHandler<ApiControllerResponse> responseHandler = createResponseHandler();
 
@@ -317,55 +355,45 @@ public class ApiController {
 
                         map.put("list", list);
                         return map;
-                    }
-                    else {
+                    } else {
                         return (Map<? extends String, ? extends Object>) response;
                     }
-                }
-                else {
+                } else {
                     int status = apiResponse.getStatus();
 
                     if (status == HttpStatus.SC_BAD_REQUEST) {
                         throw new InvalidRequestException((Map<? extends String, ? extends Object>) response);
-                    }
-                    else if (status == HttpStatus.SC_UNAUTHORIZED) {
+                    } else if (status == HttpStatus.SC_UNAUTHORIZED) {
                         throw new AuthenticationException((Map<? extends String, ? extends Object>) response);
-                    }
-                    else if (status == HttpStatus.SC_NOT_FOUND) {
+                    } else if (status == HttpStatus.SC_NOT_FOUND) {
                         throw new ObjectNotFoundException((Map<? extends String, ? extends Object>) response);
-                    }
-                    else if (status == HttpStatus.SC_FORBIDDEN) {
+                    } else if (status == HttpStatus.SC_FORBIDDEN) {
                         throw new NotAllowedException((Map<? extends String, ? extends Object>) response);
-                    }
-                    else if (status == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+                    } else if (status == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
                         throw new SystemException((Map<? extends String, ? extends Object>) response);
-                    }
-                    else {
-                        throw new ApiCommunicationException((Map<? extends String, ? extends Object>) response);
+                    } else {
+                        throw new ApiCommunicationException(
+                                (Map<? extends String, ? extends Object>) response);
                     }
                 }
             }
 
             return null;
 
-        }
-        catch (HttpResponseException e) {
-            throw new ApiCommunicationException("Failed to communicate with response code " + String.format("%d", e.getStatusCode()), e);
+        } catch (HttpResponseException e) {
+            throw new ApiCommunicationException(
+                    "Failed to communicate with response code " + String.format("%d", e.getStatusCode()), e);
 
-        }
-        catch (ClientProtocolException e) {
+        } catch (ClientProtocolException e) {
             throw new ApiCommunicationException("HttpClient exception", e);
 
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ApiCommunicationException("I/O error", e);
 
-        }
-        finally {
+        } finally {
             try {
                 httpClient.close();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -373,6 +401,7 @@ public class ApiController {
 
     /**
      * Converts an XML Gateway response to a List
+     *
      * @param response
      * @return
      */
@@ -381,7 +410,9 @@ public class ApiController {
 
         if (response.keySet().iterator().hasNext()) {
             String key = response.keySet().iterator().next();
-            Map<? extends String, ? extends Object> level1 = response.get(key) instanceof Map ? (Map<? extends String, ? extends Object>) response.get(key) : null;
+            Map<? extends String, ? extends Object> level1 = response.get(key) instanceof Map ?
+                    (Map<? extends String, ? extends Object>) response.get(key) :
+                    null;
 
             if (level1 != null && level1.keySet().iterator().hasNext()) {
                 key = level1.keySet().iterator().next();
@@ -412,31 +443,31 @@ public class ApiController {
                 String payload = null;
                 if (entity != null) {
                     payload = EntityUtils.toString(entity);
-                }
-                else if (204 != statusLine.getStatusCode()) {
-                    throw new IOException("Invalid response, there is no content in the response and the status code is " + statusLine.getStatusCode() + ".  Status code should be 204.");
+                } else if (204 != statusLine.getStatusCode()) {
+                    throw new IOException(
+                            "Invalid response, there is no content in the response and the status code is "
+                                    + statusLine.getStatusCode() + ".  Status code should be 204.");
                 }
 
                 String responseContentType;
 
                 if (header == null) {
                     throw new IllegalStateException("Unknown content type. Missing Content-Type header");
-                }
-                else {
+                } else {
                     if (header.getValue().contains(HEADER_SEPARATOR)) {
                         String parts[] = header.getValue().split(HEADER_SEPARATOR);
                         responseContentType = parts[0];
-                    }
-                    else {
+                    } else {
                         responseContentType = header.getValue();
                     }
                 }
 
                 if (responseContentType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
                     apiResponse.setPayload(payload);
-                }
-                else {
-                    throw new IOException("Response was not " + ContentType.APPLICATION_JSON.getMimeType() + ", it was: " + responseContentType + ". Unable to process payload.");
+                } else {
+                    throw new IOException(
+                            "Response was not " + ContentType.APPLICATION_JSON.getMimeType() + ", it was: "
+                                    + responseContentType + ". Unable to process payload.");
                 }
 
                 return apiResponse;
