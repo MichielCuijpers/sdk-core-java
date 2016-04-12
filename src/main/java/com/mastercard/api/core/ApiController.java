@@ -309,14 +309,12 @@ public class ApiController {
         return act;
     }
 
-    public Map<? extends String, ? extends Object> execute(Authentication auth, String type, String action,
+    public Map<? extends String, ? extends Object> execute(Authentication auth, String type, Action action,
             Map<String, Object> objectMap, List<String> headerList)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
         checkState();
-
-        Action act = getAction(action);
 
         URI uri = null;
 
@@ -325,7 +323,7 @@ public class ApiController {
         }
 
         try {
-            uri = getURI(type, act, objectMap);
+            uri = getURI(type, action, objectMap);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
@@ -338,7 +336,7 @@ public class ApiController {
 
         try {
 
-            HttpRequestBase message = getRequest(auth, uri, act, objectMap, headerList);
+            HttpRequestBase message = getRequest(auth, uri, action, objectMap, headerList);
 
             ResponseHandler<ApiControllerResponse> responseHandler = createResponseHandler();
 
@@ -349,7 +347,7 @@ public class ApiController {
                 Object response = JSONValue.parse(apiResponse.getPayload());
 
                 if (apiResponse.getStatus() < 300) {
-                    if (act == Action.list) {
+                    if (action == Action.list) {
                         Map<String, Object> map = new HashMap<>();
                         List list = convertToList((Map<? extends String, ? extends Object>) response);
 

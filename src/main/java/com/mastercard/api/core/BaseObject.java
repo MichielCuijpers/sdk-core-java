@@ -56,7 +56,7 @@ public abstract class BaseObject extends RequestMap {
         ApiController apiController = apiControllerFactory.createApiController(value.getBasePath());
 
         Map<? extends String, ? extends Object> response = apiController
-                .execute(authentication, type, "read", value, value.getHeaderParams());
+                .execute(authentication, type, Action.read, value, value.getHeaderParams());
 
         BaseObject requestObject = createResponseBaseObject(value);
         requestObject.putAll(response);
@@ -80,7 +80,7 @@ public abstract class BaseObject extends RequestMap {
 
         Map<? extends String, ? extends Object> response = apiControllerFactory
                 .createApiController(template.getBasePath())
-                .execute(authentication, template.getObjectType(), "list", criteria, new ArrayList<String>());
+                .execute(authentication, template.getObjectType(), Action.list, criteria, new ArrayList<String>());
 
         listResults.putAll(response);
 
@@ -106,7 +106,7 @@ public abstract class BaseObject extends RequestMap {
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        return execute(authentication, requestObject.getObjectType(), "create", requestObject);
+        return execute(authentication, requestObject.getObjectType(), Action.create, requestObject);
     }
 
     protected BaseObject updateObject(final BaseObject requestObject)
@@ -120,7 +120,7 @@ public abstract class BaseObject extends RequestMap {
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        return execute(authentication, requestObject.getObjectType(), "update", requestObject);
+        return execute(authentication, requestObject.getObjectType(), Action.update, requestObject);
     }
 
     protected BaseObject deleteObject(final BaseObject requestObject)
@@ -134,10 +134,10 @@ public abstract class BaseObject extends RequestMap {
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        return execute(authentication, getObjectType(), "delete", requestObject);
+        return execute(authentication, getObjectType(), Action.delete, requestObject);
     }
 
-    private static BaseObject execute(Authentication authentication, String objectType, String action,
+    private static BaseObject execute(Authentication authentication, String objectType, Action action,
             BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
