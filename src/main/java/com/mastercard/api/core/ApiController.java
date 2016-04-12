@@ -309,8 +309,8 @@ public class ApiController {
         return act;
     }
 
-    public Map<? extends String, ? extends Object> execute(Authentication auth, String type, Action action,
-            Map<String, Object> objectMap, List<String> headerList)
+    public Map<? extends String, ? extends Object> execute(Authentication auth, Action action, String type,
+            List<String> headerList, Map<String, Object> objectMap)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 

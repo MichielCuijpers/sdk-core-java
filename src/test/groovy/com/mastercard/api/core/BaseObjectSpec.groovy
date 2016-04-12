@@ -36,7 +36,7 @@ class BaseObjectSpec extends Specification {
         MockAuthentication auth = new MockAuthentication()
 
         when:
-        MockBaseObject response = MockBaseObject.readObject(auth, value.getObjectType(), value)
+        MockBaseObject response = MockBaseObject.readObject(auth, value)
 
         then:
         1 * mockApiControllerFactory.createApiController(_) >> mockApiController

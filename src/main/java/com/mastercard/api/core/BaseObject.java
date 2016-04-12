@@ -44,24 +44,51 @@ public abstract class BaseObject extends RequestMap {
 
     protected abstract String getBasePath();
 
-    protected abstract String getObjectType();
+    protected abstract String getObjectType(Action action) throws IllegalArgumentException;
 
-    protected abstract List<String> getHeaderParams();
+    protected abstract List<String> getHeaderParams(Action action) throws IllegalArgumentException;
 
-    protected static BaseObject readObject(final Authentication authentication, final String type,
-            final BaseObject value)
+    protected static BaseObject readObject(final Authentication authentication, final BaseObject value)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = apiControllerFactory.createApiController(value.getBasePath());
+        return execute(authentication, Action.read, value);
+    }
 
-        Map<? extends String, ? extends Object> response = apiController
-                .execute(authentication, type, Action.read, value, value.getHeaderParams());
+    protected static BaseObject createObject(final Authentication authentication,
+            final BaseObject requestObject)
+            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
+            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        BaseObject requestObject = createResponseBaseObject(value);
-        requestObject.putAll(response);
+        return execute(authentication, Action.create, requestObject);
+    }
 
-        return requestObject;
+    protected BaseObject updateObject(final BaseObject requestObject)
+            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
+            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
+
+        return updateObject(null, requestObject);
+    }
+
+    protected BaseObject updateObject(final Authentication authentication, final BaseObject requestObject)
+            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
+            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
+
+        return execute(authentication, Action.update, requestObject);
+    }
+
+    protected BaseObject deleteObject(final BaseObject requestObject)
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
+
+        return deleteObject(null, requestObject);
+    }
+
+    protected BaseObject deleteObject(final Authentication authentication, final BaseObject requestObject)
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
+
+        return execute(authentication, Action.delete, requestObject);
     }
 
     protected static <T extends BaseObject> ResourceList<T> listObjects(final Authentication authentication,
@@ -77,10 +104,12 @@ public abstract class BaseObject extends RequestMap {
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
         ResourceList<T> listResults = new ResourceList<T>();
+        Action list = Action.list;
 
         Map<? extends String, ? extends Object> response = apiControllerFactory
                 .createApiController(template.getBasePath())
-                .execute(authentication, template.getObjectType(), Action.list, criteria, new ArrayList<String>());
+                .execute(authentication, list, template.getObjectType(list), template.getHeaderParams(list),
+                        criteria);
 
         listResults.putAll(response);
 
@@ -101,51 +130,37 @@ public abstract class BaseObject extends RequestMap {
         return listResults;
     }
 
-    protected static BaseObject createObject(final Authentication authentication,
-            final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
-            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
+    /**
+     * Create an instance of Base Object for Response
+     *
+     * @param bo
+     * @return
+     */
+    private static BaseObject createResponseBaseObject(final BaseObject bo) {
+        return new BaseObject() {
+            @Override protected String getObjectType(Action action) {
+                return bo.getObjectType(action);
+            }
 
-        return execute(authentication, requestObject.getObjectType(), Action.create, requestObject);
+            @Override protected String getBasePath() {
+                return bo.getBasePath();
+            }
+
+            @Override protected List<String> getHeaderParams(Action action) {
+                return bo.getHeaderParams(action);
+            }
+        };
     }
 
-    protected BaseObject updateObject(final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
-            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
-
-        return updateObject(null, requestObject);
-    }
-
-    protected BaseObject updateObject(final Authentication authentication, final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
-            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
-
-        return execute(authentication, requestObject.getObjectType(), Action.update, requestObject);
-    }
-
-    protected BaseObject deleteObject(final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
-
-        return deleteObject(null, requestObject);
-    }
-
-    protected BaseObject deleteObject(final Authentication authentication, final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
-
-        return execute(authentication, getObjectType(), Action.delete, requestObject);
-    }
-
-    private static BaseObject execute(Authentication authentication, String objectType, Action action,
-            BaseObject requestObject)
+    private static BaseObject execute(Authentication authentication, Action action, BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
         ApiController apiController = apiControllerFactory.createApiController(requestObject.getBasePath());
 
         Map<? extends String, ? extends Object> response = apiController
-                .execute(authentication, objectType, action, requestObject, requestObject.getHeaderParams());
+                .execute(authentication, action, requestObject.getObjectType(action),
+                        requestObject.getHeaderParams(action), requestObject);
 
         BaseObject responseObject = createResponseBaseObject(requestObject);
 
@@ -157,25 +172,5 @@ public abstract class BaseObject extends RequestMap {
         return responseObject;
     }
 
-    /**
-     * Create an instance of Base Object for Response
-     *
-     * @param bo
-     * @return
-     */
-    private static BaseObject createResponseBaseObject(final BaseObject bo) {
-        return new BaseObject() {
-            @Override protected String getObjectType() {
-                return bo.getObjectType();
-            }
 
-            @Override protected String getBasePath() {
-                return bo.getBasePath();
-            }
-
-            @Override protected List<String> getHeaderParams() {
-                return bo.getHeaderParams();
-            }
-        };
-    }
 }

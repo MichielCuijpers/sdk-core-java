@@ -1,5 +1,6 @@
 package com.mastercard.api.core.mocks
 
+import com.mastercard.api.core.Action
 import com.mastercard.api.core.BaseObject
 
 /**
@@ -12,12 +13,12 @@ class MockBaseObject extends BaseObject {
     }
 
     @Override
-    protected String getObjectType() {
+    protected String getObjectType(Action action) throws IllegalArgumentException {
         return "MockObject"
     }
 
     @Override
-    protected List<String> getHeaderParams() {
+    protected List<String> getHeaderParams(Action action) throws IllegalArgumentException {
         return Arrays.asList("header-param")
     }
 }

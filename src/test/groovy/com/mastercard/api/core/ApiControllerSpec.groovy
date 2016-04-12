@@ -572,7 +572,7 @@ class ApiControllerSpec extends Specification {
         }
 
         when:
-        apiController.execute(null, type, Action.valueOf(action), objectMap, [])
+        apiController.execute(null, Action.valueOf(action), type, [], objectMap)
 
         then:
         thrown(IllegalStateException)
@@ -593,7 +593,7 @@ class ApiControllerSpec extends Specification {
         }
 
         when:
-        Map<String, Object> response = apiController.execute(null, type, Action.valueOf(action), objectMap, [])
+        Map<String, Object> response = apiController.execute(null, Action.valueOf(action), type, [], objectMap)
 
         then:
         response == executeResult
@@ -621,7 +621,7 @@ class ApiControllerSpec extends Specification {
         }
 
         when:
-        Map<String, Object> response = apiController.execute(null, type, Action.valueOf(action), objectMap, [])
+        Map<String, Object> response = apiController.execute(null, Action.valueOf(action), type, [], objectMap)
 
         then:
         response == executeResult
@@ -649,7 +649,7 @@ class ApiControllerSpec extends Specification {
         }
 
         when:
-        apiController.execute(null, type, Action.valueOf(action), objectMap, [])
+        apiController.execute(null, Action.valueOf(action), type, [], objectMap)
 
         then:
         thrown(thrownEx)
@@ -687,27 +687,27 @@ class ApiControllerSpec extends Specification {
         }
 
         when:
-        def response = apiController.execute(null, type, Action.valueOf(action), objectMap, [])
+        def response = apiController.execute(null, Action.valueOf(action), type, [], objectMap)
 
         then:
         response
 
         when:
-        response = apiController.execute(null, type, Action.valueOf(action), null, [])
+        response = apiController.execute(null, Action.valueOf(action), type, [], null)
 
         then:
         response
 
         when:
         mockHttpResponse.contentType = "$ContentType.APPLICATION_XML.mimeType; $ContentType.APPLICATION_JSON.mimeType"
-        apiController.execute(null, type, Action.valueOf(action), objectMap, [])
+        apiController.execute(null, Action.valueOf(action), type, [], objectMap)
 
         then:
         thrown(ApiCommunicationException)
 
         when:
         mockHttpResponse.contentType = null
-        apiController.execute(null, type, Action.valueOf(action), objectMap, [])
+        apiController.execute(null, Action.valueOf(action), type, [], objectMap)
 
         then:
         thrown(IllegalStateException)
