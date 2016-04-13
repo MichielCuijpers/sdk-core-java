@@ -39,6 +39,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.io.IOException;
@@ -63,6 +64,11 @@ public class ApiController {
     public ApiController(String basePath) {
         if (basePath == null) {
             throw new IllegalArgumentException("basePath cannot be null");
+        }
+
+        //arizzini: making sure that the basePath has a leading forward slash
+        if (!basePath.startsWith("/")) {
+            basePath = "/"+basePath;
         }
 
         String baseUrl = API_BASE_LIVE_URL;
@@ -137,18 +143,26 @@ public class ApiController {
                 matcher.appendReplacement(sb, "");
             }
         }
+        matcher.appendTail(sb);
 
-        return sb.length() > 0 ? sb.toString().replaceAll("//", "/").replaceAll("/$", "").replaceAll("^/", "") : url;
+
+        String tmpResult = sb.length() > 0 ? sb.toString().replaceAll("//", "/").replaceAll("/$", "") : url;
+
+        //arizzini: need to make sure that the correct format is maintained.
+        if (!tmpResult.startsWith("/"))
+            tmpResult = "/"+tmpResult;
+
+        return tmpResult;
     }
 
-    private URI getURI(String type, Action action, Map<String, Object> objectMap)
+    private URI getURI(Action action, Map<String, Object> objectMap, String type, List<String> headerParams)
             throws UnsupportedEncodingException {
         URI uri;
 
         //arizzini: need to replace all the path variables
         String updatedType = getTypeWithReplacedPathParams(type, objectMap);
 
-        StringBuilder s = new StringBuilder("%s/%s");
+        StringBuilder s = new StringBuilder("%s%s");
 
         List<Object> objectList = new ArrayList<Object>();
         //arizzini: removing last slash (/)
@@ -178,9 +192,13 @@ public class ApiController {
             Iterator it = objectMap.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry entry = (Map.Entry) it.next();
-                s = appendToQueryString(s, "%s=%s");
-                objectList.add(urlEncode(entry.getKey().toString()));
-                objectList.add(urlEncode(entry.getValue().toString()));
+
+                //arizzini: do no append parameters which should be header parameters
+                if(! headerParams.contains(entry.getKey())) {
+                    s = appendToQueryString(s, "%s=%s");
+                    objectList.add(urlEncode(entry.getKey().toString()));
+                    objectList.add(urlEncode(entry.getValue().toString()));
+                }
             }
 
             break;
@@ -318,12 +336,14 @@ public class ApiController {
 
         URI uri = null;
 
+
+
         if (objectMap == null) {
             objectMap = new LinkedHashMap<String, Object>();
         }
 
         try {
-            uri = getURI(type, action, objectMap);
+            uri = getURI(action, objectMap, type, headerList);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
@@ -348,8 +368,18 @@ public class ApiController {
 
                 if (apiResponse.getStatus() < 300) {
                     if (action == Action.list) {
+
                         Map<String, Object> map = new HashMap<>();
-                        List list = convertToList((Map<? extends String, ? extends Object>) response);
+                        List list = null;
+
+                        //arizzini:  if the response is an object we need to convert this into a map
+                        if (response instanceof JSONObject) {
+                            list = convertToList((Map<? extends String, ? extends Object>) response);
+                        }
+                        //arizzini:  if the response is an array we need simply case to a List of Maps.
+                        else {
+                            list = ((List<Map<? extends String, ? extends Object>>) response);
+                        }
 
                         map.put("list", list);
                         return map;

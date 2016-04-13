@@ -47,3 +47,4 @@ build/
 .gradle/
 .idea/
 
+src/test/resources/nodejs-server-server/node_modules/*

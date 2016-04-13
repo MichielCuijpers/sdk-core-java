@@ -124,148 +124,100 @@ class ApiControllerSpec extends Specification {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
         String basePath = mockBaseObject.getBasePath()
-        String type = mockBaseObject.getObjectType()
-        List<String> headers = mockBaseObject.getHeaderParams()
 
         basePath == "/mock"
-        type == "MockObject"
-        headers == ["header-param"]
 
-        Action action
+
         Map<String, Object> objectMapWithParams = [random: "abc", id: "123", max: "10", offset: "1"]
         Map<String, Object> objectMapNoId = [:]
 
+        when:
+        Action action = Action.create
         ApiController apiController = new ApiController(basePath)
-
-        String baseResultUri = "$ApiController.API_BASE_SANDBOX_URL$basePath/$type"
-        String jsonFormat = "Format=JSON"
-        StringBuilder sb = new StringBuilder()
-
-
-        // Action.create
-        when: "getURI with action create and object map no id"
-        action = Action.create
-        sb = new StringBuilder()
-                .append(baseResultUri)
-                .append("?$jsonFormat")
-        URI uri = apiController.getURI(type, action, objectMapNoId)
+        URI uri = apiController.getURI(action, objectMapNoId, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
-        uri.toASCIIString() == sb.toString()
+        uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
 
         when: "getURI with action create and object map with params including id"
-        uri = apiController.getURI(type, action, objectMapWithParams.clone())
+        uri = apiController.getURI(action, objectMapWithParams.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
-        uri.toASCIIString() == sb.toString()
+        uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
 
 
         // Action.read
         when: "getURI with action read and object map no id"
         action = Action.read
-        sb = new StringBuilder()
-                .append(baseResultUri)
-                .append("?$jsonFormat")
 
-        uri = apiController.getURI(type, action, objectMapNoId)
+
+        uri = apiController.getURI(action, objectMapNoId, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
-        uri.toASCIIString() == sb.toString()
+        uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
 
         when: "getURI with action read and object map with params including id"
-        sb = new StringBuilder()
-                .append(baseResultUri)
-                .append("/$objectMapWithParams.id")
-                .append("?random=$objectMapWithParams.random&")
-                .append("max=$objectMapWithParams.max&")
-                .append("offset=$objectMapWithParams.offset&")
-                .append(jsonFormat)
 
-        uri = apiController.getURI(type, action, objectMapWithParams.clone())
+
+        uri = apiController.getURI(action, objectMapWithParams.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         then: "we get /mock with all params appended"
-        uri.toASCIIString() == sb.toString()
+        uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject/123?random=abc&max=10&offset=1&Format=JSON"
 
 
         // Action.update
         when: "getURI with action update and object map no id"
         action = Action.update
-        sb = new StringBuilder()
-                .append(baseResultUri)
-                .append("?" + jsonFormat)
 
-        uri = apiController.getURI(type, action, objectMapNoId)
+        uri = apiController.getURI(action, objectMapNoId, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
-        uri.toASCIIString() == sb.toString()
+        uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
 
         when: "getURI with action update and object map with params including id"
-        sb = new StringBuilder()
-                .append(baseResultUri)
-                .append("/$objectMapWithParams.id")
-                .append("?$jsonFormat")
 
-        uri = apiController.getURI(type, action, objectMapWithParams.clone())
+        uri = apiController.getURI(action, objectMapWithParams.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         then: "we get /mock with id"
-        uri.toASCIIString() == sb.toString()
+        uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject/123?Format=JSON"
 
 
         // Action.delete
         when: "getURI with action delete and object map no id"
         action = Action.delete
-        sb = new StringBuilder()
-                .append(baseResultUri)
-                .append("?$jsonFormat")
 
-        uri = apiController.getURI(type, action, objectMapNoId)
+        uri = apiController.getURI(action, objectMapNoId, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
-        uri.toASCIIString() == sb.toString()
+        uri.toASCIIString() ==  "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
 
         when: "getURI with action delete and object map with params including id"
-        sb = new StringBuilder()
-                .append(baseResultUri)
-                .append("/$objectMapWithParams.id")
-                .append("?random=$objectMapWithParams.random&")
-                .append("max=$objectMapWithParams.max&")
-                .append("offset=$objectMapWithParams.offset&")
-                .append(jsonFormat)
 
-        uri = apiController.getURI(type, action, objectMapWithParams.clone())
+        uri = apiController.getURI(action, objectMapWithParams.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         then: "we get /mock with all params appended"
-        uri.toASCIIString() == sb.toString()
+        uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject/123?random=abc&max=10&offset=1&Format=JSON"
 
 
         // Action.list
         when: "getURI with action list and object map no id"
         action = Action.list
-        sb = new StringBuilder()
-                .append(baseResultUri)
-                .append("?$jsonFormat")
 
-        uri = apiController.getURI(type, action, objectMapNoId)
+        uri = apiController.getURI(action, objectMapNoId, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
-        uri.toASCIIString() == sb.toString()
+        uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
 
         when: "getURI with action list and object map with params including id"
-        sb = new StringBuilder()
-                .append(baseResultUri)
-                .append("?random=$objectMapWithParams.random&")
-                .append("id=$objectMapWithParams.id&")
-                .append("max=$objectMapWithParams.max&")
-                .append("offset=$objectMapWithParams.offset&")
-                .append(jsonFormat)
 
-        uri = apiController.getURI(type, action, objectMapWithParams.clone())
+
+        uri = apiController.getURI(action, objectMapWithParams.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         then: "we get /mock with all params appended"
-        uri.toASCIIString() == sb.toString()
+        uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?random=abc&id=123&max=10&offset=1&Format=JSON"
 
         when: "invalid uri"
-        apiController.getURI("%", action, [a:"%"])
+        apiController.getURI(action, [a:"%"], "%", [])
 
         then: "IllegalStateException is thrown"
         thrown(IllegalStateException)
@@ -276,25 +228,23 @@ class ApiControllerSpec extends Specification {
         given:
         MockComplexObject mockComplexObject = new MockComplexObject()
         String basePath = mockComplexObject.getBasePath()
-        String type = mockComplexObject.getObjectType()
         Action action
         Map<String, Object> objectMapWithParams = [random: "abc", id: "123", max: "10", offset: "1", 'mock-type-id': "111"]
         Map<String, Object> objectMapNoId = ['mock-type-id': "111"]
+        List<String> header
 
         ApiController apiController = new ApiController(basePath)
-
-        String baseResultUri = "$ApiController.API_BASE_SANDBOX_URL$basePath/$type"
 
         // Action.create
         when: "getURI with action create and object map no id"
         action = Action.create
-        URI uri = apiController.getURI(type, action, objectMapNoId.clone())
+        URI uri = apiController.getURI(action, objectMapNoId.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON";
 
         when: "getURI with action create and object map with params including id"
-        uri = apiController.getURI(type, action, objectMapWithParams.clone())
+        uri = apiController.getURI( action, objectMapWithParams.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON"
@@ -304,14 +254,13 @@ class ApiControllerSpec extends Specification {
         when: "getURI with action read and object map no id"
         action = Action.read
 
-
-        uri = apiController.getURI(type, action, objectMapNoId.clone())
+        uri = apiController.getURI(action, objectMapNoId.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON"
 
         when: "getURI with action read and object map with params including id"
-        uri = apiController.getURI(type, action, objectMapWithParams.clone())
+        uri = apiController.getURI(action, objectMapWithParams.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
 
         then: "we get /mock with all params appended"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex/123?random=abc&max=10&offset=1&Format=JSON"
@@ -320,13 +269,13 @@ class ApiControllerSpec extends Specification {
         // Action.update
         when: "getURI with action update and object map no id"
         action = Action.update
-        uri = apiController.getURI(type, action, objectMapNoId.clone())
+        uri = apiController.getURI(action, objectMapNoId.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON"
 
         when: "getURI with action update and object map with params including id"
-        uri = apiController.getURI(type, action, objectMapWithParams.clone())
+        uri = apiController.getURI(action, objectMapWithParams.clone(), mockComplexObject.getObjectType(action),  mockComplexObject.getHeaderParams(action))
 
         then: "we get /mock with id"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex/123?Format=JSON"
@@ -335,13 +284,13 @@ class ApiControllerSpec extends Specification {
         // Action.delete
         when: "getURI with action delete and object map no id"
         action = Action.delete
-        uri = apiController.getURI(type, action, objectMapNoId.clone())
+        uri = apiController.getURI(action, objectMapNoId.clone(),mockComplexObject.getObjectType(action),  mockComplexObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON"
 
         when: "getURI with action delete and object map with params including id"
-        uri = apiController.getURI(type, action, objectMapWithParams.clone())
+        uri = apiController.getURI(action, objectMapWithParams.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
 
         then: "we get /mock with all params appended"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex/123?random=abc&max=10&offset=1&Format=JSON"
@@ -350,19 +299,19 @@ class ApiControllerSpec extends Specification {
         // Action.list
         when: "getURI with action list and object map no id"
         action = Action.list
-        uri = apiController.getURI(type, action, objectMapNoId.clone())
+        uri = apiController.getURI(action, objectMapNoId.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON"
 
         when: "getURI with action list and object map with params including id"
-        uri = apiController.getURI(type, action, objectMapWithParams.clone())
+        uri = apiController.getURI(action, objectMapWithParams.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
 
         then: "we get /mock with all params appended"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?random=abc&id=123&max=10&offset=1&Format=JSON"
 
         when: "invalid uri"
-        apiController.getURI("%", action, [a:"%"])
+        apiController.getURI(action, [a:"%"], "%", [])
 
         then: "IllegalStateException is thrown"
         thrown(IllegalStateException)
@@ -393,10 +342,10 @@ class ApiControllerSpec extends Specification {
         MockAuthentication providedAuthentication = new MockAuthentication()
 
         ApiController apiController = new ApiController(basePath)
-        URI uri = apiController.getURI(mockBaseObject.getObjectType(), action, objectMap)
+        URI uri = apiController.getURI(action, objectMap, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         when: "using global authentication"
-        apiController.getRequest(null, uri, action, objectMap, [])
+        apiController.getRequest(null, uri, action, objectMap, mockBaseObject.getHeaderParams(action))
 
         then: "global authentication is called"
         mockAuthentication.called == true
@@ -406,7 +355,7 @@ class ApiControllerSpec extends Specification {
         providedAuthentication = new MockAuthentication()
         mockAuthentication = new MockAuthentication()
         ApiConfig.authentication = mockAuthentication
-        apiController.getRequest(providedAuthentication, uri, action, objectMap, [])
+        apiController.getRequest(providedAuthentication, uri, action, objectMap, mockBaseObject.getHeaderParams(action))
 
         then: "provided authentication is called"
         mockAuthentication.called == false
@@ -422,7 +371,7 @@ class ApiControllerSpec extends Specification {
         List<String> headersList = ['x-sdk-mock-header' ]
 
         ApiController apiController = new ApiController(basePath)
-        URI uri = apiController.getURI(mockBaseObject.getObjectType(), action, objectMap)
+        URI uri = apiController.getURI(action, objectMap, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         when: "getRequest for create"
         HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headersList)
@@ -455,7 +404,7 @@ class ApiControllerSpec extends Specification {
         List<String> headersList = ['x-sdk-mock-header' ]
 
         ApiController apiController = new ApiController(basePath)
-        URI uri = apiController.getURI(mockBaseObject.getObjectType(), action, objectMap.clone())
+        URI uri = apiController.getURI(action, objectMap.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         when: "getRequest for read"
         HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headersList)
@@ -498,7 +447,7 @@ class ApiControllerSpec extends Specification {
         List<String> headerList = ['x-sdk-mock-header']
 
         ApiController apiController = new ApiController(basePath)
-        URI uri = apiController.getURI(mockBaseObject.getObjectType(), action, objectMap)
+        URI uri = apiController.getURI(action, objectMap, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
 
         when:
         HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerList)
