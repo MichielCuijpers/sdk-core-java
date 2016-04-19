@@ -118,7 +118,7 @@ public class ApiController {
      * @param objectMap - map containing the values which can be replace.
      * @return formatted string
      */
-    String getTypeWithReplacedPathParams(String url, Map<String, Object> objectMap) throws IllegalStateException {
+    String getPathWithReplacedPath(String url, Map<String, Object> objectMap) throws IllegalStateException {
 
         String regexToRemovePathParameters = "\\{(.*?)\\}";
         Pattern pattern = Pattern.compile(regexToRemovePathParameters);
@@ -151,7 +151,7 @@ public class ApiController {
         URI uri;
 
         //arizzini: need to replace all the path variables
-        String updatedType = getTypeWithReplacedPathParams(type, objectMap);
+        String updatedType = getPathWithReplacedPath(type, objectMap);
 
         StringBuilder s = new StringBuilder("%s%s");
 
