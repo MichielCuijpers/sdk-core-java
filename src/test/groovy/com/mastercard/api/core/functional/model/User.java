@@ -37,16 +37,16 @@ import java.util.Map;
 
 
 
-public class Post extends BaseObject  {
+public class User extends BaseObject  {
 
-    public Post() {
+    public User() {
     }
 
-    public Post(BaseObject o) {
+    public User(BaseObject o) {
         putAll(o);
     }
 
-    public Post(Map m) {
+    public User(Map m) {
         putAll(m);
     }
 
@@ -57,19 +57,19 @@ public class Post extends BaseObject  {
             throw new IllegalArgumentException("Action cannot be null");
         }
         if (action == Action.list) {
-           return "/mock_crud_server/posts";
+           return "/mock_crud_server/users";
         }
         if (action == Action.create) {
-            return "/mock_crud_server/posts";
+            return "/mock_crud_server/users";
         }
         if (action == Action.read) {
-            return "/mock_crud_server/posts/{id}";
+            return "/mock_crud_server/users/{id}";
         }
         if (action == Action.update) {
-            return "/mock_crud_server/posts/{id}";
+            return "/mock_crud_server/users/{id}";
         }
         if (action == Action.delete) {
-            return "/mock_crud_server/posts/{id}";
+            return "/mock_crud_server/users/{id}";
         }
         throw new IllegalArgumentException("Invalid action supplied: " + action);
     }
@@ -98,17 +98,17 @@ public class Post extends BaseObject  {
         throw new IllegalArgumentException("Invalid action supplied: " + action);
     }
 
-    // max:(query:true, param:, header:, cookie:, body:)
+    
     
     
     
     /**
-     * Retrieve <code>Post</code> objects using the static properties <code>ApiController.PUBLIC_KEY</code> and
+     * Retrieve <code>User</code> objects using the static properties <code>ApiController.PUBLIC_KEY</code> and
      * <code>ApiController.PRIVATE_KEY</code> as the default public and private API keys respectively and the default
      * criteria (max 20, offset 0, default sorting and no filtering).
      *
-     * @return      a ResourceList<Post> object which holds the list of Post objects and the total
-     *              number of Post objects available.
+     * @return      a ResourceList<User> object which holds the list of User objects and the total
+     *              number of User objects available.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -120,20 +120,20 @@ public class Post extends BaseObject  {
      *
      * @see ResourceList
      */
-    public static ResourceList<Post> list()
+    public static ResourceList<User> list()
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(null, new Post(), null);
+        return BaseObject.listObjects(null, new User(), null);
     }
 
     /**
-     * Retrieve <code>Post</code> objects using the default criteria (max 20, offset 0, default sorting and no filtering).
+     * Retrieve <code>User</code> objects using the default criteria (max 20, offset 0, default sorting and no filtering).
      *
      * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
      *
-     * @return      a ResourceList<Post> object which holds the list of Post objects and the total
-     *              number of Post objects available.
+     * @return      a ResourceList<User> object which holds the list of User objects and the total
+     *              number of User objects available.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -145,23 +145,23 @@ public class Post extends BaseObject  {
      *
      * @see ResourceList
      */
-    public static ResourceList<Post> list(Authentication auth)
+    public static ResourceList<User> list(Authentication auth)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(auth, new Post(), null);
+        return BaseObject.listObjects(auth, new User(), null);
     }
 
     /**
-     * Retrieve <code>Post</code> objects using the specified criteria and using the static properties
+     * Retrieve <code>User</code> objects using the specified criteria and using the static properties
      * <code>ApiController.PUBLIC_KEY</code> and <code>ApiController.PRIVATE_KEY</code> as the default public and private
      * API keys respectively.
      *
      * @param       criteria a map of parameters; valid keys and types are:<dl style="padding-left:10px;"><#list method.visibleFlattenedInputs as input>
      *              <dt><code>${input.type} ${input.fullName}</code></dt>    <dd>${input.message} <#if input.required == true><strong>required </strong></#if><#if input.fullName == 'sorting'>The value maps properties to the sort direction (either <code>asc</code> for ascending or <code>desc</code> for descending).  Sortable properties are: <#list sortableProperties as input><code>${input}</code> </#list>.</#if></dd></#list></dl>
      *
-     * @return      a ResourceList<Post> object which holds the list of Post objects and the total
-     *              number of Post objects available.
+     * @return      a ResourceList<User> object which holds the list of User objects and the total
+     *              number of User objects available.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -173,22 +173,22 @@ public class Post extends BaseObject  {
      *
      * @see ResourceList
      */
-    public static ResourceList<Post> list(Map criteria)
+    public static ResourceList<User> list(Map criteria)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(null, new Post(), criteria);
+        return BaseObject.listObjects(null, new User(), criteria);
     }
 
     /**
-     * Retrieve <code>Post</code> objects using the specified criteria.
+     * Retrieve <code>User</code> objects using the specified criteria.
      *
      * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
      * @param       criteria a map of parameters; valid keys and types are: <dl style="padding-left:10px;"><#list method.visibleFlattenedInputs as input>
      *              <dt><code>${input.type} ${input.fullName}</code></dt> <dd>${input.message} <#if input.required == true><strong>required </strong></#if><#if input.fullName == 'sorting'>The value maps properties to the sort direction (either <code>asc</code> for ascending or <code>desc</code> for descending). Sortable properties are: <#list sortableProperties as input> <code>${input}</code> </#list>.</#if></dd></#list></dl>
      *
-     * @return      a ResourceList<Post> object which holds the list of Post objects and the total
-     *              number of Post objects available.
+     * @return      a ResourceList<User> object which holds the list of User objects and the total
+     *              number of User objects available.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -200,11 +200,11 @@ public class Post extends BaseObject  {
      *
      * @see ResourceList
      */
-    public static ResourceList<Post> list(Authentication auth, Map criteria)
+    public static ResourceList<User> list(Authentication auth, Map criteria)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(auth, new Post(), criteria);
+        return BaseObject.listObjects(auth, new User(), criteria);
     }
 
 
@@ -213,13 +213,13 @@ public class Post extends BaseObject  {
     // body:(query:, param:, header:, cookie:, body:true)
     
     /**
-     * Creates an <code>Post</code> object using the static properties <code>ApiController.PUBLIC_KEY</code> and
+     * Creates an <code>User</code> object using the static properties <code>ApiController.PUBLIC_KEY</code> and
      * <code>ApiController.PRIVATE_KEY</code> as the default public and private API keys respectively.
      *
      * @param       map  a map of parameters, valid keys and types:<dl style="padding-left:10px;"><#list method.visibleFlattenedInputs as input>
      *              <dt><code>${input.type} ${input.fullName}</code></dt>    <dd>${input.message} <#if input.required == true><strong>required </strong></#if></dd></#list></dl>
      *
-     * @return      a Post object.
+     * @return      a User object.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -229,7 +229,7 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public static Post create(RequestMap map)
+    public static User create(RequestMap map)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -237,14 +237,14 @@ public class Post extends BaseObject  {
     }
 
     /**
-     * Creates an <code>Post</code> object
+     * Creates an <code>User</code> object
      *
      * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
      * @param       privateKey Private API key. If null, the value of static <code>ApiController.PRIVATE_KEY</code> will be used
      * @param       map  a map of parameters, valid keys and types: <dl style="padding-left:10px;"><#list method.visibleFlattenedInputs as input>
      *              <dt><code>${input.type} ${input.fullName}</code></dt> <dd>${input.message} <#if input.required == true><strong>required </strong></#if></dd></#list></dl>
      *
-     * @return      a Post object.
+     * @return      a User object.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -254,11 +254,11 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public static Post create(Authentication auth, RequestMap map)
+    public static User create(Authentication auth, RequestMap map)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return new Post(BaseObject.createObject(auth, new Post(map)));
+        return new User(BaseObject.createObject(auth, new User(map)));
     }
 
     
@@ -272,12 +272,12 @@ public class Post extends BaseObject  {
     
     
     /**
-     * Retrieve a <code>Post</code> object using the static properties <code>ApiController.PUBLIC_KEY</code> and
+     * Retrieve a <code>User</code> object using the static properties <code>ApiController.PUBLIC_KEY</code> and
      * <code>ApiController.PRIVATE_KEY</code> as the default public and private API keys respectively.
      *
-     * @param       id  the id of the Post object to retrieve
+     * @param       id  the id of the User object to retrieve
      *
-     * @return      a Post object
+     * @return      a User object
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -287,7 +287,7 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public static Post read(String id)
+    public static User read(String id)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -295,13 +295,13 @@ public class Post extends BaseObject  {
     }
 
     /**
-     * Retrieve a <code>Post</code> object using the static properties <code>ApiController.PUBLIC_KEY</code> and
+     * Retrieve a <code>User</code> object using the static properties <code>ApiController.PUBLIC_KEY</code> and
      * <code>ApiController.PRIVATE_KEY</code> as the default public and private API keys respectively.
      *
-     * @param       id  the id of the Post object to retrieve
+     * @param       id  the id of the User object to retrieve
      * @param       query a map of additional query parameters
      *
-     * @return      a Post object
+     * @return      a User object
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -311,7 +311,7 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public static Post read(String id, Map query)
+    public static User read(String id, Map query)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -319,12 +319,12 @@ public class Post extends BaseObject  {
     }
 
     /**
-     * Retrieve a <code>Post</code> object.
+     * Retrieve a <code>User</code> object.
      *
      * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
-     * @param       id  the id of the <code>Post</code> object to retrieve
+     * @param       id  the id of the <code>User</code> object to retrieve
      *
-     * @return      a Post object
+     * @return      a User object
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -334,7 +334,7 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public static Post read(Authentication auth, String id)
+    public static User read(Authentication auth, String id)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -342,13 +342,13 @@ public class Post extends BaseObject  {
     }
 
     /**
-     * Retrieve a <code>Post</code> object.
+     * Retrieve a <code>User</code> object.
      *
      * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
-     * @param       id  the id of the <code>Post</code> object to retrieve
+     * @param       id  the id of the <code>User</code> object to retrieve
      * @param       query a map of additional query parameters
      *
-     * @return      a Post object
+     * @return      a User object
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -358,28 +358,28 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public static Post read(Authentication auth, String id, Map query)
+    public static User read(Authentication auth, String id, Map query)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        Post val = new Post();
+        User val = new User();
         if (id != null) val.put("id", id);
         if (query != null)  val.putAll(query);
-        return new Post(BaseObject.readObject(auth, val));
+        return new User(BaseObject.readObject(auth, val));
     }
 
     // id:(query:, param:true, header:, cookie:, body:)// body:(query:, param:, header:, cookie:, body:true)
     
     
     /**
-     * Updates an <code>Post</code> object.
+     * Updates an <code>User</code> object.
      *
      * The properties that can be updated:
      * <ul><#list method.visibleFlattenedInputs as input>
      * <#if input.fullName != "id"><li>${input.name} <#if input.required == true><strong>(required)</strong></#if></li></#if>
      * </#list></ul>
      *
-     * @return      a Post object.
+     * @return      a User object.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -389,7 +389,7 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public Post update()
+    public User update()
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -399,7 +399,7 @@ public class Post extends BaseObject  {
     }
 
     /**
-     * Updates an <code>Post</code> object.
+     * Updates an <code>User</code> object.
      *
      * The properties that can be updated:
      * <ul><#list method.visibleFlattenedInputs as input>
@@ -408,7 +408,7 @@ public class Post extends BaseObject  {
      *
      * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
      *
-     * @return      a Post object.
+     * @return      a User object.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -418,7 +418,7 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public Post update(Authentication auth)
+    public User update(Authentication auth)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -436,9 +436,9 @@ public class Post extends BaseObject  {
     
     
     /**
-     * Deletes an <code>Post</code> object.
+     * Deletes an <code>User</code> object.
      *
-     * @return      a Post object.
+     * @return      a User object.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -448,7 +448,7 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public Post delete()
+    public User delete()
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -458,9 +458,9 @@ public class Post extends BaseObject  {
     }
 
     /**
-     * Deletes an <code>Post</code> object.
+     * Deletes an <code>User</code> object.
      *
-     * @return      a Post object.
+     * @return      a User object.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -470,7 +470,7 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public Post delete(Authentication auth)
+    public User delete(Authentication auth)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -481,12 +481,12 @@ public class Post extends BaseObject  {
     }
 
     /**
-     * Deletes an <code>Post</code> object using the static properties <code>ApiController.PUBLIC_KEY</code> and
+     * Deletes an <code>User</code> object using the static properties <code>ApiController.PUBLIC_KEY</code> and
      * <code>ApiController.PRIVATE_KEY</code> as the default public and private API keys respectively.
      *
      * @param       id  the id of the object to delete
      *
-     * @return      a Post object.
+     * @return      a User object.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -496,7 +496,7 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public static Post delete(String id)
+    public static User delete(String id)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -504,11 +504,11 @@ public class Post extends BaseObject  {
     }
 
     /**
-     * Deletes an <code>Post</code> object
+     * Deletes an <code>User</code> object
      * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
      * @param       id  the id of the object to delete
      *
-     * @return      a Post object.
+     * @return      a User object.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -518,11 +518,11 @@ public class Post extends BaseObject  {
      * @throws      ObjectNotFoundException
      * @throws      SystemException
      */
-    public static Post delete(Authentication auth, String id)
+    public static User delete(Authentication auth, String id)
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        Post object = new Post(new RequestMap("id", id));
+        User object = new User(new RequestMap("id", id));
         return object.delete(auth);
     }
     

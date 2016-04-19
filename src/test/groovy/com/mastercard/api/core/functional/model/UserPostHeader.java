@@ -27,15 +27,15 @@
 
 package com.mastercard.api.core.functional.model;
 
-import com.mastercard.api.core.Action;
-import com.mastercard.api.core.BaseObject;
+import com.mastercard.api.core.*;
 import com.mastercard.api.core.exception.*;
-import com.mastercard.api.core.model.ResourceList;
-import com.mastercard.api.core.security.Authentication;
-
+import com.mastercard.api.core.model.*;
+import com.mastercard.api.core.security.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+
 
 public class UserPostHeader extends BaseObject  {
 
@@ -50,18 +50,14 @@ public class UserPostHeader extends BaseObject  {
         putAll(m);
     }
 
-    @Override
-    protected String getBasePath() {
-        return "/mock_crud_server";
-    }
 
     @Override
-    protected String getObjectType(Action action) throws IllegalArgumentException {
+    protected String getResourcePath(Action action) throws IllegalArgumentException {
         if (action == null) {
             throw new IllegalArgumentException("Action cannot be null");
         }
         if (action == Action.list) {
-           return "/users/posts";
+           return "/mock_crud_server/users/posts";
         }
         throw new IllegalArgumentException("Invalid action supplied: " + action);
     }
@@ -73,7 +69,7 @@ public class UserPostHeader extends BaseObject  {
             throw new IllegalArgumentException("Action cannot be null");
         }
         if (action == Action.list) {
-           return Arrays.asList("user_id");
+           return Arrays.asList("userId");
         }
         throw new IllegalArgumentException("Invalid action supplied: " + action);
     }

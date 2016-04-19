@@ -8,13 +8,8 @@ import com.mastercard.api.core.BaseObject
  */
 class MockComplexObject extends BaseObject {
     @Override
-    protected String getBasePath() {
-        return "/mock/v2"
-    }
-
-    @Override
-    protected String getObjectType(Action action) throws IllegalArgumentException {
-        return "/{mock-type-id}/MockObjectComplex/{mock-id}"
+    protected String getResourcePath(Action action) throws IllegalArgumentException {
+        return "/mock/v2/{mock-type-id}/MockObjectComplex"
     }
 
     @Override

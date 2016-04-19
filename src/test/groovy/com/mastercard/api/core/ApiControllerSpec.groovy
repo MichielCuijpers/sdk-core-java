@@ -42,17 +42,10 @@ class ApiControllerSpec extends Specification {
 
     def "test constructor: ApiController(String basePath)" () {
         when:
-        ApiController apiController = new ApiController("/mock")
+        ApiController apiController = new ApiController()
 
         then:
-        apiController.apiPath == "$ApiController.API_BASE_SANDBOX_URL/mock"
-
-        when:
-        new ApiController(null)
-
-        then:
-        def ex = thrown(IllegalArgumentException)
-        ex.message == "basePath cannot be null"
+        apiController.apiPath == "$ApiController.API_BASE_SANDBOX_URL"
     }
 
 
@@ -60,7 +53,7 @@ class ApiControllerSpec extends Specification {
         given:
         String originalLive = ApiController.API_BASE_LIVE_URL
         String originalSandbox = ApiController.API_BASE_SANDBOX_URL
-        ApiController apiController = new ApiController("/mock")
+        ApiController apiController = new ApiController()
 
         when:
         ApiController.API_BASE_LIVE_URL = "API_BASE_LIVE_URL"
@@ -86,7 +79,7 @@ class ApiControllerSpec extends Specification {
 
     def "test appendToQueryString" () {
         given:
-        ApiController apiController = new ApiController("/mock")
+        ApiController apiController = new ApiController()
         StringBuilder sb = new StringBuilder()
 
         when:
@@ -110,7 +103,7 @@ class ApiControllerSpec extends Specification {
 
     def "test urlEncode" () {
         given:
-        ApiController apiController = new ApiController("/mock")
+        ApiController apiController = new ApiController()
         String stringToEncode = "a b+="
 
         when:
@@ -123,24 +116,20 @@ class ApiControllerSpec extends Specification {
     def "test getURI" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
-        String basePath = mockBaseObject.getBasePath()
-
-        basePath == "/mock"
-
 
         Map<String, Object> objectMapWithParams = [random: "abc", id: "123", max: "10", offset: "1"]
         Map<String, Object> objectMapNoId = [:]
 
         when:
         Action action = Action.create
-        ApiController apiController = new ApiController(basePath)
-        URI uri = apiController.getURI(action, objectMapNoId, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        ApiController apiController = new ApiController()
+        URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMapNoId)
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
 
         when: "getURI with action create and object map with params including id"
-        uri = apiController.getURI(action, objectMapWithParams.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMapWithParams.clone())
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
@@ -151,7 +140,7 @@ class ApiControllerSpec extends Specification {
         action = Action.read
 
 
-        uri = apiController.getURI(action, objectMapNoId, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMapNoId)
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
@@ -159,7 +148,7 @@ class ApiControllerSpec extends Specification {
         when: "getURI with action read and object map with params including id"
 
 
-        uri = apiController.getURI(action, objectMapWithParams.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMapWithParams.clone())
 
         then: "we get /mock with all params appended"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject/123?random=abc&max=10&offset=1&Format=JSON"
@@ -169,14 +158,14 @@ class ApiControllerSpec extends Specification {
         when: "getURI with action update and object map no id"
         action = Action.update
 
-        uri = apiController.getURI(action, objectMapNoId, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMapNoId)
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
 
         when: "getURI with action update and object map with params including id"
 
-        uri = apiController.getURI(action, objectMapWithParams.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMapWithParams.clone())
 
         then: "we get /mock with id"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject/123?Format=JSON"
@@ -186,14 +175,14 @@ class ApiControllerSpec extends Specification {
         when: "getURI with action delete and object map no id"
         action = Action.delete
 
-        uri = apiController.getURI(action, objectMapNoId, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMapNoId)
 
         then: "we get /mock with no params"
         uri.toASCIIString() ==  "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
 
         when: "getURI with action delete and object map with params including id"
 
-        uri = apiController.getURI(action, objectMapWithParams.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMapWithParams.clone())
 
         then: "we get /mock with all params appended"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject/123?random=abc&max=10&offset=1&Format=JSON"
@@ -203,7 +192,7 @@ class ApiControllerSpec extends Specification {
         when: "getURI with action list and object map no id"
         action = Action.list
 
-        uri = apiController.getURI(action, objectMapNoId, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMapNoId)
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
@@ -211,15 +200,33 @@ class ApiControllerSpec extends Specification {
         when: "getURI with action list and object map with params including id"
 
 
-        uri = apiController.getURI(action, objectMapWithParams.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMapWithParams.clone())
 
         then: "we get /mock with all params appended"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/MockObject?random=abc&id=123&max=10&offset=1&Format=JSON"
 
         when: "invalid uri"
-        apiController.getURI(action, [a:"%"], "%", [])
+        apiController.getURI(action, "%", [a:"%"] )
 
         then: "IllegalStateException is thrown"
+        thrown(IllegalStateException)
+
+    }
+
+    def "test getURI with MockComplexObject throws IllegalStateException" () {
+        given:
+        MockComplexObject mockComplexObject = new MockComplexObject()
+        Action action
+        Map<String, Object> objectMapWithParams = [random: "abc", id: "123", max: "10", offset: "1"]
+
+        ApiController apiController = new ApiController()
+
+        // Action.create
+        when: "getURI with action create and object map no id"
+        action = Action.create
+        URI uri = apiController.getURI(action, mockComplexObject.getResourcePath(), objectMapWithParams)
+
+        then:
         thrown(IllegalStateException)
 
     }
@@ -227,24 +234,23 @@ class ApiControllerSpec extends Specification {
     def "test getURI with MockComplexObject" () {
         given:
         MockComplexObject mockComplexObject = new MockComplexObject()
-        String basePath = mockComplexObject.getBasePath()
         Action action
         Map<String, Object> objectMapWithParams = [random: "abc", id: "123", max: "10", offset: "1", 'mock-type-id': "111"]
         Map<String, Object> objectMapNoId = ['mock-type-id': "111"]
-        List<String> header
 
-        ApiController apiController = new ApiController(basePath)
+
+        ApiController apiController = new ApiController()
 
         // Action.create
         when: "getURI with action create and object map no id"
         action = Action.create
-        URI uri = apiController.getURI(action, objectMapNoId.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
+        URI uri = apiController.getURI(action, mockComplexObject.getResourcePath(), objectMapNoId.clone())
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON";
 
         when: "getURI with action create and object map with params including id"
-        uri = apiController.getURI( action, objectMapWithParams.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
+        uri = apiController.getURI( action, mockComplexObject.getResourcePath(), objectMapWithParams.clone())
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON"
@@ -254,13 +260,13 @@ class ApiControllerSpec extends Specification {
         when: "getURI with action read and object map no id"
         action = Action.read
 
-        uri = apiController.getURI(action, objectMapNoId.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockComplexObject.getResourcePath(), objectMapNoId.clone())
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON"
 
         when: "getURI with action read and object map with params including id"
-        uri = apiController.getURI(action, objectMapWithParams.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockComplexObject.getResourcePath(), objectMapWithParams.clone())
 
         then: "we get /mock with all params appended"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex/123?random=abc&max=10&offset=1&Format=JSON"
@@ -269,13 +275,13 @@ class ApiControllerSpec extends Specification {
         // Action.update
         when: "getURI with action update and object map no id"
         action = Action.update
-        uri = apiController.getURI(action, objectMapNoId.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockComplexObject.getResourcePath(), objectMapNoId.clone())
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON"
 
         when: "getURI with action update and object map with params including id"
-        uri = apiController.getURI(action, objectMapWithParams.clone(), mockComplexObject.getObjectType(action),  mockComplexObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockComplexObject.getResourcePath(), objectMapWithParams.clone())
 
         then: "we get /mock with id"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex/123?Format=JSON"
@@ -284,13 +290,13 @@ class ApiControllerSpec extends Specification {
         // Action.delete
         when: "getURI with action delete and object map no id"
         action = Action.delete
-        uri = apiController.getURI(action, objectMapNoId.clone(),mockComplexObject.getObjectType(action),  mockComplexObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockComplexObject.getResourcePath(), objectMapNoId.clone())
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON"
 
         when: "getURI with action delete and object map with params including id"
-        uri = apiController.getURI(action, objectMapWithParams.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockComplexObject.getResourcePath(), objectMapWithParams.clone())
 
         then: "we get /mock with all params appended"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex/123?random=abc&max=10&offset=1&Format=JSON"
@@ -299,19 +305,19 @@ class ApiControllerSpec extends Specification {
         // Action.list
         when: "getURI with action list and object map no id"
         action = Action.list
-        uri = apiController.getURI(action, objectMapNoId.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockComplexObject.getResourcePath(), objectMapNoId.clone())
 
         then: "we get /mock with no params"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?Format=JSON"
 
         when: "getURI with action list and object map with params including id"
-        uri = apiController.getURI(action, objectMapWithParams.clone(), mockComplexObject.getObjectType(action), mockComplexObject.getHeaderParams(action))
+        uri = apiController.getURI(action, mockComplexObject.getResourcePath(), objectMapWithParams.clone())
 
         then: "we get /mock with all params appended"
         uri.toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/111/MockObjectComplex?random=abc&id=123&max=10&offset=1&Format=JSON"
 
         when: "invalid uri"
-        apiController.getURI(action, [a:"%"], "%", [])
+        apiController.getURI(action, "%", [a:"%"] )
 
         then: "IllegalStateException is thrown"
         thrown(IllegalStateException)
@@ -322,7 +328,7 @@ class ApiControllerSpec extends Specification {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
         ApiConfig.authentication = null
-        ApiController apiController = new ApiController(mockBaseObject.getBasePath())
+        ApiController apiController = new ApiController()
 
         when:
         apiController.getRequest(null, null, null, null, null)
@@ -335,17 +341,17 @@ class ApiControllerSpec extends Specification {
     def "test getRequest authentication" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
-        String basePath = mockBaseObject.getBasePath()
         Map<String, Object> objectMap = [a: 1]
+        Map<String, Object> headerMap = [:]
         Action action = Action.create
 
         MockAuthentication providedAuthentication = new MockAuthentication()
 
-        ApiController apiController = new ApiController(basePath)
-        URI uri = apiController.getURI(action, objectMap, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        ApiController apiController = new ApiController()
+        URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when: "using global authentication"
-        apiController.getRequest(null, uri, action, objectMap, mockBaseObject.getHeaderParams(action))
+        apiController.getRequest(null, uri, action, objectMap, headerMap)
 
         then: "global authentication is called"
         mockAuthentication.called == true
@@ -355,7 +361,7 @@ class ApiControllerSpec extends Specification {
         providedAuthentication = new MockAuthentication()
         mockAuthentication = new MockAuthentication()
         ApiConfig.authentication = mockAuthentication
-        apiController.getRequest(providedAuthentication, uri, action, objectMap, mockBaseObject.getHeaderParams(action))
+        apiController.getRequest(providedAuthentication, uri, action, objectMap, headerMap)
 
         then: "provided authentication is called"
         mockAuthentication.called == false
@@ -365,16 +371,17 @@ class ApiControllerSpec extends Specification {
     def "test getRequest create | update" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
-        String basePath = mockBaseObject.getBasePath()
         Action action = Action.create
         Map<String, Object> objectMap = [a: "a", b: "b", id: 1, 'x-sdk-mock-header': "x-sdk-mock-value"]
         List<String> headersList = ['x-sdk-mock-header' ]
+        Map<String, Object> headerMap = ApiController.subMap(objectMap, headersList);
 
-        ApiController apiController = new ApiController(basePath)
-        URI uri = apiController.getURI(action, objectMap, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+
+        ApiController apiController = new ApiController()
+        URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when: "getRequest for create"
-        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headersList)
+        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
 
         then:
         httpRequestBase instanceof HttpPost
@@ -385,7 +392,7 @@ class ApiControllerSpec extends Specification {
 
         when: "getRequest for update"
         action = Action.update
-        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headersList)
+        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
 
         then:
         httpRequestBase instanceof HttpPut
@@ -398,16 +405,16 @@ class ApiControllerSpec extends Specification {
     def "test getRequest read | list | delete" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
-        String basePath = mockBaseObject.getBasePath()
         Action action = Action.read
         Map<String, Object> objectMap = [a: "a", b: "b", id: 1, 'x-sdk-mock-header': "x-sdk-mock-value"]
         List<String> headersList = ['x-sdk-mock-header' ]
+        Map<String, Object> headerMap = ApiController.subMap(objectMap, headersList);
 
-        ApiController apiController = new ApiController(basePath)
-        URI uri = apiController.getURI(action, objectMap.clone(), mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        ApiController apiController = new ApiController()
+        URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap.clone())
 
         when: "getRequest for read"
-        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headersList)
+        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
 
         then:
         httpRequestBase instanceof HttpGet
@@ -417,7 +424,7 @@ class ApiControllerSpec extends Specification {
 
         when: "getRequest for list"
         action = Action.list
-        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headersList)
+        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
 
         then:
         httpRequestBase instanceof HttpGet
@@ -427,7 +434,7 @@ class ApiControllerSpec extends Specification {
 
         when: "getRequest for delete"
         action = Action.delete
-        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headersList)
+        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
 
         then:
         httpRequestBase instanceof HttpDelete
@@ -441,16 +448,17 @@ class ApiControllerSpec extends Specification {
         ApiController.USER_AGENT = "mock"
 
         MockBaseObject mockBaseObject = new MockBaseObject()
-        String basePath = mockBaseObject.getBasePath()
+
         Action action = Action.read
         Map<String, Object> objectMap = [a: "a", b: "b", id: 1, 'x-sdk-mock-header': "x-sdk-mock-value"]
-        List<String> headerList = ['x-sdk-mock-header']
+        List<String> headersList = ['x-sdk-mock-header' ]
+        Map<String, Object> headerMap = ApiController.subMap(objectMap, headersList);
 
-        ApiController apiController = new ApiController(basePath)
-        URI uri = apiController.getURI(action, objectMap, mockBaseObject.getObjectType(action), mockBaseObject.getHeaderParams(action))
+        ApiController apiController = new ApiController()
+        URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when:
-        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerList)
+        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
 
         then:
         httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/$Constants.VERSION mock" as String
@@ -471,7 +479,7 @@ class ApiControllerSpec extends Specification {
 
     def "test getAction exceptions" () {
         given:
-        ApiController apiController = new ApiController("/mock")
+        ApiController apiController = new ApiController()
 
         when:
         apiController.getAction(null)
@@ -491,7 +499,7 @@ class ApiControllerSpec extends Specification {
     @Unroll
     def "test getAction #actionStr #action" () {
         given:
-        ApiController apiController = new ApiController("/mock")
+        ApiController apiController = new ApiController();
 
         when:
         Action result = apiController.getAction(actionStr)
@@ -511,12 +519,11 @@ class ApiControllerSpec extends Specification {
     def "test execute IllegalStateException when urlEncode throws exception" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
-        String basePath = mockBaseObject.getBasePath()
         String  action = "read"
-        String type = mockBaseObject.getObjectType()
+        String type = mockBaseObject.getResourcePath()
         Map<String, Object> objectMap = [id: 1]
 
-        ApiController apiController = Spy(ApiController, constructorArgs: [basePath]) {
+        ApiController apiController = Spy(ApiController, constructorArgs: []) {
             urlEncode(_) >> { throw new UnsupportedEncodingException("mock encoding") }
         }
 
@@ -531,13 +538,12 @@ class ApiControllerSpec extends Specification {
     def "test execute mockHttpResponse #mockHttpResponse executeResult #executeResult" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
-        String basePath = mockBaseObject.getBasePath()
         String  action = "create"
-        String type = mockBaseObject.getObjectType()
+        String type = mockBaseObject.getResourcePath()
         Map<String, Object> objectMap = [a: 1]
         MockHttpClient mockHttpClient = new MockHttpClient(mockHttpResponse)
 
-        ApiController apiController = Spy(ApiController, constructorArgs: [basePath]) {
+        ApiController apiController = Spy(ApiController, constructorArgs: []) {
             createHttpClient() >> mockHttpClient
         }
 
@@ -559,13 +565,12 @@ class ApiControllerSpec extends Specification {
     def "test execute with list mockHttpResponse #mockHttpResponse executeResult #executeResult" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
-        String basePath = mockBaseObject.getBasePath()
         String  action = "list"
-        String type = mockBaseObject.getObjectType()
+        String type = mockBaseObject.getResourcePath()
         Map<String, Object> objectMap = [a: 1]
         MockHttpClient mockHttpClient = new MockHttpClient(mockHttpResponse)
 
-        ApiController apiController = Spy(ApiController, constructorArgs: [basePath]) {
+        ApiController apiController = Spy(ApiController, constructorArgs: []) {
             createHttpClient() >> mockHttpClient
         }
 
@@ -587,13 +592,12 @@ class ApiControllerSpec extends Specification {
     def "test execute exceptions mockHttpResponse #mockHttpResponse thrownEx #thrownEx" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
-        String basePath = mockBaseObject.getBasePath()
         String  action = "create"
-        String type = mockBaseObject.getObjectType()
+        String type = mockBaseObject.getResourcePath()
         Map<String, Object> objectMap = [a: 1]
         MockHttpClient mockHttpClient = new MockHttpClient(mockHttpResponse)
 
-        ApiController apiController = Spy(ApiController, constructorArgs: [basePath]) {
+        ApiController apiController = Spy(ApiController, constructorArgs: []) {
             createHttpClient() >> mockHttpClient
         }
 
@@ -622,16 +626,15 @@ class ApiControllerSpec extends Specification {
     def "test execute content type mockHttpResponse #mockHttpResponse thrownEx #thrownEx" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()
-        String basePath = mockBaseObject.getBasePath()
         String  action = "delete"
-        String type = mockBaseObject.getObjectType()
+        String type = mockBaseObject.getResourcePath()
         Map<String, Object> objectMap = [a: 1]
 
         MockHttpResponse mockHttpResponse = new MockHttpResponse(200, MockHttpResponse.defaultJsonResponse)
         mockHttpResponse.contentType = "$ContentType.APPLICATION_JSON.mimeType; $ContentType.APPLICATION_XML.mimeType"
         MockHttpClient mockHttpClient = new MockHttpClient(mockHttpResponse)
 
-        ApiController apiController = Spy(ApiController, constructorArgs: [basePath]) {
+        ApiController apiController = Spy(ApiController, constructorArgs: []) {
             createHttpClient() >> mockHttpClient
         }
 

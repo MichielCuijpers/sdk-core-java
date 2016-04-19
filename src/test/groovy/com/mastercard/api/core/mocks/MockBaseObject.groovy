@@ -7,14 +7,10 @@ import com.mastercard.api.core.BaseObject
  * Created by eamondoyle on 17/02/2016.
  */
 class MockBaseObject extends BaseObject {
-    @Override
-    protected String getBasePath() {
-        return "/mock"
-    }
 
     @Override
-    protected String getObjectType(Action action) throws IllegalArgumentException {
-        return "MockObject"
+    protected String getResourcePath(Action action) throws IllegalArgumentException {
+        return "/mock/MockObject"
     }
 
     @Override

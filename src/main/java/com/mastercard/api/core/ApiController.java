@@ -59,17 +59,8 @@ public class ApiController {
     private String apiPath;
 
     /**
-     * @param basePath - basePath for the API e.g. /fraud/loststolen/v1
      */
-    public ApiController(String basePath) {
-        if (basePath == null) {
-            throw new IllegalArgumentException("basePath cannot be null");
-        }
-
-        //arizzini: making sure that the basePath has a leading forward slash
-        if (!basePath.startsWith("/")) {
-            basePath = "/"+basePath;
-        }
+    public ApiController() {
 
         String baseUrl = API_BASE_LIVE_URL;
 
@@ -77,7 +68,7 @@ public class ApiController {
             baseUrl = API_BASE_SANDBOX_URL;
         }
 
-        this.apiPath = baseUrl + basePath;
+        this.apiPath = baseUrl;
     }
 
     private void checkState() throws RuntimeException {
@@ -127,7 +118,7 @@ public class ApiController {
      * @param objectMap - map containing the values which can be replace.
      * @return formatted string
      */
-    String getTypeWithReplacedPathParams(String url, Map<String, Object> objectMap) {
+    String getTypeWithReplacedPathParams(String url, Map<String, Object> objectMap) throws IllegalStateException {
 
         String regexToRemovePathParameters = "\\{(.*?)\\}";
         Pattern pattern = Pattern.compile(regexToRemovePathParameters);
@@ -140,7 +131,7 @@ public class ApiController {
             if (objectMap.containsKey(group)) {
                 matcher.appendReplacement(sb, objectMap.remove(group).toString());
             } else {
-                matcher.appendReplacement(sb, "");
+                throw new IllegalStateException("Error: required parameter='"+group+"' was not found in the RequestMap ");
             }
         }
         matcher.appendTail(sb);
@@ -155,8 +146,8 @@ public class ApiController {
         return tmpResult;
     }
 
-    private URI getURI(Action action, Map<String, Object> objectMap, String type, List<String> headerParams)
-            throws UnsupportedEncodingException {
+    private URI getURI(Action action, String type, Map<String, Object> objectMap)
+            throws UnsupportedEncodingException, IllegalStateException {
         URI uri;
 
         //arizzini: need to replace all the path variables
@@ -192,13 +183,9 @@ public class ApiController {
             Iterator it = objectMap.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry entry = (Map.Entry) it.next();
-
-                //arizzini: do no append parameters which should be header parameters
-                if(! headerParams.contains(entry.getKey())) {
-                    s = appendToQueryString(s, "%s=%s");
-                    objectList.add(urlEncode(entry.getKey().toString()));
-                    objectList.add(urlEncode(entry.getValue().toString()));
-                }
+                s = appendToQueryString(s, "%s=%s");
+                objectList.add(urlEncode(entry.getKey().toString()));
+                objectList.add(urlEncode(entry.getValue().toString()));
             }
 
             break;
@@ -220,7 +207,7 @@ public class ApiController {
     }
 
     private HttpRequestBase getRequest(Authentication authentication, URI uri, Action action,
-            Map<String, Object> objectMap, List<String> headerList)
+            Map<String, Object> objectMap, Map<String,Object> headerMap)
             throws InvalidRequestException, MessageSignerException {
 
         HttpRequestBase message = null;
@@ -233,13 +220,6 @@ public class ApiController {
             }
 
             authentication = ApiConfig.getAuthentication();
-        }
-
-        Map<String, String> headerMap = new LinkedHashMap<>();
-        for (String headerName : headerList) {
-            if (objectMap.containsKey(headerName)) {
-                headerMap.put(headerName, objectMap.remove(headerName).toString());
-            }
         }
 
         String payload = null;
@@ -294,8 +274,8 @@ public class ApiController {
         message.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
 
         // Set other headers
-        for (Map.Entry<String, String> entry : headerMap.entrySet()) {
-            message.setHeader(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, Object> entry : headerMap.entrySet()) {
+            message.setHeader(entry.getKey(), entry.getValue().toString());
         }
 
         // Add user agent
@@ -327,7 +307,7 @@ public class ApiController {
         return act;
     }
 
-    public Map<? extends String, ? extends Object> execute(Authentication auth, Action action, String type,
+    public Map<? extends String, ? extends Object> execute(Authentication auth, Action action, String resourcePath,
             List<String> headerList, Map<String, Object> objectMap)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
@@ -336,14 +316,19 @@ public class ApiController {
 
         URI uri = null;
 
-
+        Map<String,Object> headerMap = null;
 
         if (objectMap == null) {
             objectMap = new LinkedHashMap<String, Object>();
+            headerMap = new LinkedHashMap<String, Object>();
+        } else {
+            headerMap = subMap(objectMap, headerList);
         }
 
+
+
         try {
-            uri = getURI(action, objectMap, type, headerList);
+            uri = getURI(action, resourcePath, objectMap);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
@@ -356,7 +341,7 @@ public class ApiController {
 
         try {
 
-            HttpRequestBase message = getRequest(auth, uri, action, objectMap, headerList);
+            HttpRequestBase message = getRequest(auth, uri, action, objectMap, headerMap);
 
             ResponseHandler<ApiControllerResponse> responseHandler = createResponseHandler();
 
@@ -425,6 +410,23 @@ public class ApiController {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    public static Map subMap(Map<String,Object> inputMap, List<String> keyList)
+    {
+        LinkedHashMap<String, Object> resultMap = new LinkedHashMap<>();
+        for (Map.Entry entry : inputMap.entrySet())
+        {
+            if (keyList.contains(entry.getKey())) {
+                resultMap.put(entry.getKey().toString(), entry.getValue());
+            }
+        }
+
+        //arizzini: removing the values which have been filtered
+        inputMap.keySet().removeAll(keyList);
+
+        return resultMap;
     }
 
     /**

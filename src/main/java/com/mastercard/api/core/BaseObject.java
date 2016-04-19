@@ -42,9 +42,7 @@ public abstract class BaseObject extends RequestMap {
 
     private static final ApiControllerFactory apiControllerFactory = new ApiControllerFactory();
 
-    protected abstract String getBasePath();
-
-    protected abstract String getObjectType(Action action) throws IllegalArgumentException;
+    protected abstract String getResourcePath(Action action) throws IllegalArgumentException;
 
     protected abstract List<String> getHeaderParams(Action action) throws IllegalArgumentException;
 
@@ -107,8 +105,8 @@ public abstract class BaseObject extends RequestMap {
         Action list = Action.list;
 
         Map<? extends String, ? extends Object> response = apiControllerFactory
-                .createApiController(template.getBasePath())
-                .execute(authentication, list, template.getObjectType(list), template.getHeaderParams(list),
+                .createApiController()
+                .execute(authentication, list, template.getResourcePath(list), template.getHeaderParams(list),
                         criteria);
 
         listResults.putAll(response);
@@ -138,12 +136,8 @@ public abstract class BaseObject extends RequestMap {
      */
     private static BaseObject createResponseBaseObject(final BaseObject bo) {
         return new BaseObject() {
-            @Override protected String getObjectType(Action action) {
-                return bo.getObjectType(action);
-            }
-
-            @Override protected String getBasePath() {
-                return bo.getBasePath();
+            @Override protected String getResourcePath(Action action) {
+                return bo.getResourcePath(action);
             }
 
             @Override protected List<String> getHeaderParams(Action action) {
@@ -156,10 +150,10 @@ public abstract class BaseObject extends RequestMap {
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController apiController = apiControllerFactory.createApiController(requestObject.getBasePath());
+        ApiController apiController = apiControllerFactory.createApiController();
 
         Map<? extends String, ? extends Object> response = apiController
-                .execute(authentication, action, requestObject.getObjectType(action),
+                .execute(authentication, action, requestObject.getResourcePath(action),
                         requestObject.getHeaderParams(action), requestObject);
 
         BaseObject responseObject = createResponseBaseObject(requestObject);
