@@ -319,8 +319,8 @@ public class ApiController {
         Map<String,Object> headerMap = null;
 
         if (objectMap == null) {
-            objectMap = new LinkedHashMap<String, Object>();
-            headerMap = new LinkedHashMap<String, Object>();
+            objectMap = new LinkedHashMap<>();
+            headerMap = new LinkedHashMap<>();
         } else {
             headerMap = subMap(objectMap, headerList);
         }
