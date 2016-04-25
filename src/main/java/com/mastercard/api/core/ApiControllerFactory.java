@@ -33,8 +33,8 @@ package com.mastercard.api.core;
  */
 public class ApiControllerFactory {
 
-    public ApiController createApiController(String basePath) {
-        return new ApiController(basePath);
+    public ApiController createApiController() {
+        return new ApiController();
     }
 
 }

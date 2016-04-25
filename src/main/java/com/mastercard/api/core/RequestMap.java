@@ -27,7 +27,6 @@
 
 package com.mastercard.api.core;
 
-import org.json.simple.JSONAware;
 import org.json.simple.JSONValue;
 
 import java.util.ArrayList;

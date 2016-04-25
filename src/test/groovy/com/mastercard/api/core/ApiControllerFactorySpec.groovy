@@ -13,10 +13,10 @@ class ApiControllerFactorySpec extends Specification {
         ApiControllerFactory apiControllerFactory = new ApiControllerFactory()
 
         when:
-        ApiController apiController = apiControllerFactory.createApiController("/mock")
+        ApiController apiController = apiControllerFactory.createApiController()
 
         then:
-        apiController.apiPath == Constants.API_BASE_SANDBOX_URL + "/mock"
+        apiController.apiPath == Constants.API_BASE_SANDBOX_URL
     }
 
     def "test api controller factory with prod"() {
@@ -25,10 +25,10 @@ class ApiControllerFactorySpec extends Specification {
         ApiControllerFactory apiControllerFactory = new ApiControllerFactory()
 
         when:
-        ApiController apiController = apiControllerFactory.createApiController("/mock")
+        ApiController apiController = apiControllerFactory.createApiController()
 
         then:
-        apiController.apiPath == Constants.API_BASE_LIVE_URL + "/mock"
+        apiController.apiPath == Constants.API_BASE_LIVE_URL
     }
 
 }

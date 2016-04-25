@@ -17,7 +17,7 @@ class BaseObjectSpec extends Specification {
     ApiControllerFactory mockApiControllerFactory
 
     def setup() {
-        mockApiController = Mock(ApiController, constructorArgs: ['/BARNEY'])
+        mockApiController = Mock(ApiController, constructorArgs: [])
         mockApiControllerFactory = Mock(ApiControllerFactory)
 
         Field field = BaseObject.getDeclaredField("apiControllerFactory")
@@ -36,11 +36,11 @@ class BaseObjectSpec extends Specification {
         MockAuthentication auth = new MockAuthentication()
 
         when:
-        MockBaseObject response = MockBaseObject.readObject(auth, value.getObjectType(), value)
+        MockBaseObject response = MockBaseObject.readObject(auth, value)
 
         then:
-        1 * mockApiControllerFactory.createApiController(_) >> mockApiController
-        1 * mockApiController.execute(_, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * mockApiControllerFactory.createApiController() >> mockApiController
+        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -55,8 +55,8 @@ class BaseObjectSpec extends Specification {
         ResourceList<MockBaseObject> response = MockBaseObject.listObjects(auth, value)
 
         then:
-        1 * mockApiControllerFactory.createApiController(_) >> mockApiController
-        1 * mockApiController.execute(_, _, _, _)  >> {
+        1 * mockApiControllerFactory.createApiController() >> mockApiController
+        1 * mockApiController.execute(_, _, _, _, _)  >> {
             [
                 list: [
                     [a: 1, b: "2", c: true],
@@ -87,8 +87,8 @@ class BaseObjectSpec extends Specification {
         ResourceList<MockBaseObject> response = MockBaseObject.listObjects(auth, value, [max: 2])
 
         then:
-        1 * mockApiControllerFactory.createApiController(_) >> mockApiController
-        1 * mockApiController.execute(_, _, _, _)  >> {
+        1 * mockApiControllerFactory.createApiController() >> mockApiController
+        1 * mockApiController.execute(_, _, _, _, _)  >> {
             [
                 list: [
                     [a: 1, b: "2", c: true],
@@ -114,8 +114,8 @@ class BaseObjectSpec extends Specification {
         MockBaseObject response = MockBaseObject.createObject(auth, value)
 
         then:
-        1 * mockApiControllerFactory.createApiController(_) >> mockApiController
-        1 * mockApiController.execute(_, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * mockApiControllerFactory.createApiController() >> mockApiController
+        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -130,8 +130,8 @@ class BaseObjectSpec extends Specification {
         MockBaseObject response = MockBaseObject.createObject(auth, value)
 
         then:
-        1 * mockApiControllerFactory.createApiController(_) >> mockApiController
-        1 * mockApiController.execute(_, _, _, _)  >> null
+        1 * mockApiControllerFactory.createApiController() >> mockApiController
+        1 * mockApiController.execute(_, _, _, _, _)  >> null
         response != null
         response.size() == 0
     }
@@ -145,8 +145,8 @@ class BaseObjectSpec extends Specification {
         MockBaseObject response = value.updateObject(auth, value)
 
         then:
-        1 * mockApiControllerFactory.createApiController(_) >> mockApiController
-        1 * mockApiController.execute(_, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * mockApiControllerFactory.createApiController() >> mockApiController
+        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -161,8 +161,8 @@ class BaseObjectSpec extends Specification {
         MockBaseObject response = value.updateObject(value)
 
         then:
-        1 * mockApiControllerFactory.createApiController(_) >> mockApiController
-        1 * mockApiController.execute(_, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * mockApiControllerFactory.createApiController() >> mockApiController
+        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -177,8 +177,8 @@ class BaseObjectSpec extends Specification {
         MockBaseObject response = value.deleteObject(auth, value)
 
         then:
-        1 * mockApiControllerFactory.createApiController(_) >> mockApiController
-        1 * mockApiController.execute(_, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * mockApiControllerFactory.createApiController() >> mockApiController
+        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -193,8 +193,8 @@ class BaseObjectSpec extends Specification {
         MockBaseObject response = value.deleteObject(value)
 
         then:
-        1 * mockApiControllerFactory.createApiController(_) >> mockApiController
-        1 * mockApiController.execute(_, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * mockApiControllerFactory.createApiController() >> mockApiController
+        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -208,8 +208,7 @@ class BaseObjectSpec extends Specification {
         BaseObject response = MockBaseObject.createResponseBaseObject(value)
 
         then:
-        response.getBasePath() == "/mock"
-        response.getObjectType() == "MockObject"
+        response.getResourcePath() == "/mock/MockObject"
         response.size() == 0
     }
 
