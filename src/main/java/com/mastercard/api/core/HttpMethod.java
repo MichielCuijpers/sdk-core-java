@@ -46,6 +46,9 @@ public enum HttpMethod {
         HttpMethod httpMethod = null;
 
         switch (action) {
+            case query:
+                httpMethod = GET;
+                break;
             case read:
                 httpMethod = GET;
                 break;

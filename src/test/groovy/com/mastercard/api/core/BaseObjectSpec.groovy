@@ -46,6 +46,23 @@ class BaseObjectSpec extends Specification {
         response.get("c") == true
     }
 
+
+    def 'test query object' () {
+        given:
+        MockBaseObject value = new MockBaseObject()
+        MockAuthentication auth = new MockAuthentication()
+
+        when:
+        MockBaseObject response = MockBaseObject.queryObject(auth, value)
+
+        then:
+        1 * mockApiControllerFactory.createApiController() >> mockApiController
+        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        response.get("a") == 1
+        response.get("b") == "2"
+        response.get("c") == true
+    }
+
     def 'test list objects' () {
         given:
         MockBaseObject value = new MockBaseObject()

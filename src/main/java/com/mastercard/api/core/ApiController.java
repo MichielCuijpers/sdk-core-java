@@ -180,6 +180,7 @@ public class ApiController {
         case read:
         case delete:
         case list:
+        case query:
             Iterator it = objectMap.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry entry = (Map.Entry) it.next();
@@ -259,11 +260,8 @@ public class ApiController {
             break;
 
         case read:
-            payload = "";
-            message = new HttpGet(uri);
-            break;
-
         case list:
+        case query:
             payload = "";
             message = new HttpGet(uri);
             break;
@@ -290,21 +288,6 @@ public class ApiController {
                 .sign(uri, HttpMethod.fromAction(action), ContentType.APPLICATION_JSON, payload, message);
 
         return message;
-    }
-
-    private Action getAction(String action) throws InvalidRequestException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
-        }
-
-        Action act;
-        try {
-            act = Action.valueOf(action);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid action supplied: " + action);
-        }
-
-        return act;
     }
 
     public Map<? extends String, ? extends Object> execute(Authentication auth, Action action, String resourcePath,

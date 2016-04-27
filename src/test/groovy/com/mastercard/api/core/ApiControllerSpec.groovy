@@ -477,45 +477,6 @@ class ApiControllerSpec extends Specification {
         }
     }
 
-    def "test getAction exceptions" () {
-        given:
-        ApiController apiController = new ApiController()
-
-        when:
-        apiController.getAction(null)
-
-        then:
-        def ex = thrown(IllegalArgumentException)
-        ex.message == "Action cannot be null"
-
-        when:
-        apiController.getAction("invalid")
-
-        then:
-        ex = thrown(IllegalArgumentException)
-        ex.message == "Invalid action supplied: invalid"
-    }
-
-    @Unroll
-    def "test getAction #actionStr #action" () {
-        given:
-        ApiController apiController = new ApiController();
-
-        when:
-        Action result = apiController.getAction(actionStr)
-
-        then:
-        result == action
-
-        where:
-        actionStr | action
-        "create" | Action.create
-        "delete" | Action.delete
-        "list" | Action.list
-        "read" | Action.read
-        "update" | Action.update
-    }
-
     def "test execute IllegalStateException when urlEncode throws exception" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject()

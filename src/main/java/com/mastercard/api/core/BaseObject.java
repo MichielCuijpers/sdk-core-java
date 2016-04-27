@@ -53,6 +53,13 @@ public abstract class BaseObject extends RequestMap {
         return execute(authentication, Action.read, value);
     }
 
+    protected static BaseObject queryObject(final Authentication authentication, final BaseObject value)
+            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
+            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
+
+        return execute(authentication, Action.query, value);
+    }
+
     protected static BaseObject createObject(final Authentication authentication,
             final BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,

@@ -39,6 +39,7 @@ class HttpMethodSpec extends Specification {
         Action.list | HttpMethod.GET
         Action.read | HttpMethod.GET
         Action.update | HttpMethod.PUT
+        Action.query | HttpMethod.GET
     }
 
     @Unroll

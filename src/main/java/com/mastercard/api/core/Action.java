@@ -33,6 +33,7 @@ package com.mastercard.api.core;
 public enum Action {
     create,
     read,
+    query,
     list,
     update,
     delete
