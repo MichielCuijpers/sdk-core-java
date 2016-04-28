@@ -25,10 +25,11 @@
  *
  */
 
-package com.mastercard.api.core;
+package com.mastercard.api.core.model;
 
+import com.mastercard.api.core.ApiController;
+import com.mastercard.api.core.ApiControllerFactory;
 import com.mastercard.api.core.exception.*;
-import com.mastercard.api.core.model.ResourceList;
 import com.mastercard.api.core.security.Authentication;
 
 import java.util.ArrayList;

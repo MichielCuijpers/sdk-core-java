@@ -1,7 +1,7 @@
 package com.mastercard.api.core.security.oauth
 
 import com.mastercard.api.core.Constants
-import com.mastercard.api.core.HttpMethod
+import com.mastercard.api.core.model.HttpMethod
 import oauth.signpost.OAuth
 import oauth.signpost.basic.DefaultOAuthConsumer
 import org.apache.http.Header

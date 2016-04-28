@@ -29,7 +29,7 @@ package com.mastercard.api.core.security.oauth;
 
 import com.mastercard.api.core.exception.MessageSignerException;
 import com.mastercard.api.core.security.Authentication;
-import com.mastercard.api.core.HttpMethod;
+import com.mastercard.api.core.model.HttpMethod;
 import oauth.signpost.OAuth;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.basic.DefaultOAuthConsumer;

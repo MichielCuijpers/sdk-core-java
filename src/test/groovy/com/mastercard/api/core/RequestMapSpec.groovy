@@ -1,5 +1,6 @@
 package com.mastercard.api.core
 
+import com.mastercard.api.core.model.RequestMap
 import spock.lang.Specification
 
 /**

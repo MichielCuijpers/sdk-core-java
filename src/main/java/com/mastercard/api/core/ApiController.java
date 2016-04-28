@@ -28,6 +28,8 @@
 package com.mastercard.api.core;
 
 import com.mastercard.api.core.exception.*;
+import com.mastercard.api.core.model.Action;
+import com.mastercard.api.core.model.HttpMethod;
 import com.mastercard.api.core.security.Authentication;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;

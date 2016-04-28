@@ -1,11 +1,10 @@
 package com.mastercard.api.core.security.oauth
 
-import com.mastercard.api.core.HttpMethod
+import com.mastercard.api.core.model.HttpMethod
 import org.apache.http.entity.ContentType;
 import spock.lang.Specification
 
 import java.nio.charset.Charset
-import java.util.stream.IntStream
 
 public class OAuthRequestSpec extends Specification {
 

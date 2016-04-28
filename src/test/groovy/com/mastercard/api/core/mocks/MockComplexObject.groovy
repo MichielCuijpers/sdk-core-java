@@ -1,7 +1,7 @@
 package com.mastercard.api.core.mocks
 
-import com.mastercard.api.core.Action
-import com.mastercard.api.core.BaseObject
+import com.mastercard.api.core.model.Action
+import com.mastercard.api.core.model.BaseObject
 
 /**
  * Created by eamondoyle on 17/02/2016.

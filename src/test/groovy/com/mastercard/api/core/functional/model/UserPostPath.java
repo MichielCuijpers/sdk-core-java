@@ -27,7 +27,6 @@
 
 package com.mastercard.api.core.functional.model;
 
-import com.mastercard.api.core.*;
 import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.*;

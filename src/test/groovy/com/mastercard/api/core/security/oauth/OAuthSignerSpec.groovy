@@ -1,6 +1,6 @@
 package com.mastercard.api.core.security.oauth
 
-import com.mastercard.api.core.HttpMethod
+import com.mastercard.api.core.model.HttpMethod
 import oauth.signpost.exception.OAuthMessageSignerException
 import oauth.signpost.http.HttpParameters
 import oauth.signpost.http.HttpRequest

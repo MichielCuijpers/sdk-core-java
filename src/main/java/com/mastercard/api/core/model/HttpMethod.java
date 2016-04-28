@@ -1,4 +1,4 @@
-package com.mastercard.api.core;
+package com.mastercard.api.core.model;
 
 import org.apache.http.client.methods.*;
 

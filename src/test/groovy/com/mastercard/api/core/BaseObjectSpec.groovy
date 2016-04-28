@@ -2,6 +2,7 @@ package com.mastercard.api.core
 
 import com.mastercard.api.core.mocks.MockAuthentication
 import com.mastercard.api.core.mocks.MockBaseObject
+import com.mastercard.api.core.model.BaseObject
 import com.mastercard.api.core.model.ResourceList
 import spock.lang.Specification
 

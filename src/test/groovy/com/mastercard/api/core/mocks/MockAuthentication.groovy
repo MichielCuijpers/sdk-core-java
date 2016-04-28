@@ -1,9 +1,8 @@
 package com.mastercard.api.core.mocks
 
-import com.mastercard.api.core.HttpMethod
+import com.mastercard.api.core.model.HttpMethod
 import com.mastercard.api.core.exception.MessageSignerException
 import com.mastercard.api.core.security.Authentication
-import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.entity.ContentType
 

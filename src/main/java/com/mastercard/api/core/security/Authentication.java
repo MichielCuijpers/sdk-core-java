@@ -27,7 +27,7 @@
 
 package com.mastercard.api.core.security;
 
-import com.mastercard.api.core.HttpMethod;
+import com.mastercard.api.core.model.HttpMethod;
 import com.mastercard.api.core.exception.MessageSignerException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;

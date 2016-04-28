@@ -25,7 +25,7 @@
  *
  */
 
-package com.mastercard.api.core;
+package com.mastercard.api.core.model;
 
 /**
  * SDK Object Action
