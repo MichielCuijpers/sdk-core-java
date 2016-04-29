@@ -1,80 +1,59 @@
 package com.mastercard.api.core
-
 import com.mastercard.api.core.mocks.MockAuthentication
 import com.mastercard.api.core.mocks.MockBaseObject
 import com.mastercard.api.core.model.BaseObject
 import com.mastercard.api.core.model.ResourceList
 import spock.lang.Specification
-
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
-
 /**
  * Created by eamondoyle on 16/02/2016.
  */
 class BaseObjectSpec extends Specification {
 
-    ApiController mockApiController
-    ApiControllerFactory mockApiControllerFactory
+    def apiController
 
     def setup() {
-        mockApiController = Mock(ApiController, constructorArgs: [])
-        mockApiControllerFactory = Mock(ApiControllerFactory)
-
-        Field field = BaseObject.getDeclaredField("apiControllerFactory")
-        field.setAccessible(true)
-
-        Field modifiersField = Field.class.getDeclaredField("modifiers")
-        modifiersField.setAccessible(true)
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL)
-
-        field.set(null, mockApiControllerFactory)
+        apiController = Mock(ApiController)
+        MockBaseObject.setApiController(apiController)
     }
 
+    def cleanup() {
+        apiController = null;
+        MockBaseObject.setApiController(new ApiController())
+    }
+
+
     def 'test read object' () {
-        given:
-        MockBaseObject value = new MockBaseObject()
-        MockAuthentication auth = new MockAuthentication()
 
         when:
-        MockBaseObject response = MockBaseObject.readObject(auth, value)
+        MockBaseObject response = MockBaseObject.readObject(new MockAuthentication(), new MockBaseObject());
 
         then:
-        1 * mockApiControllerFactory.createApiController() >> mockApiController
-        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
     }
 
-
     def 'test query object' () {
-        given:
-        MockBaseObject value = new MockBaseObject()
-        MockAuthentication auth = new MockAuthentication()
 
         when:
-        MockBaseObject response = MockBaseObject.queryObject(auth, value)
+        MockBaseObject response = MockBaseObject.queryObject(new MockAuthentication(), new MockBaseObject());
 
         then:
-        1 * mockApiControllerFactory.createApiController() >> mockApiController
-        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
     }
 
     def 'test list objects' () {
-        given:
-        MockBaseObject value = new MockBaseObject()
-        MockAuthentication auth = new MockAuthentication()
+
 
         when:
-        ResourceList<MockBaseObject> response = MockBaseObject.listObjects(auth, value)
+        ResourceList<MockBaseObject> response = MockBaseObject.listObjects(new MockAuthentication(), new MockBaseObject());
 
         then:
-        1 * mockApiControllerFactory.createApiController() >> mockApiController
-        1 * mockApiController.execute(_, _, _, _, _)  >> {
+        1 * apiController.execute(_, _, _, _, _)  >> {
             [
                 list: [
                     [a: 1, b: "2", c: true],
@@ -97,16 +76,13 @@ class BaseObjectSpec extends Specification {
     }
 
     def 'test list objects with criteria' () {
-        given:
-        MockBaseObject value = new MockBaseObject()
-        MockAuthentication auth = new MockAuthentication()
+
 
         when:
-        ResourceList<MockBaseObject> response = MockBaseObject.listObjects(auth, value, [max: 2])
+        ResourceList<MockBaseObject> response = MockBaseObject.listObjects(new MockAuthentication(), new MockBaseObject(), [max: 2])
 
         then:
-        1 * mockApiControllerFactory.createApiController() >> mockApiController
-        1 * mockApiController.execute(_, _, _, _, _)  >> {
+        1 * apiController.execute(_, _, _, _, _)  >> {
             [
                 list: [
                     [a: 1, b: "2", c: true],
@@ -124,95 +100,77 @@ class BaseObjectSpec extends Specification {
     }
 
     def 'test create object' () {
-        given:
-        MockBaseObject value = new MockBaseObject()
-        MockAuthentication auth = new MockAuthentication()
+
 
         when:
-        MockBaseObject response = MockBaseObject.createObject(auth, value)
+        MockBaseObject response = MockBaseObject.createObject(new MockAuthentication(), new MockBaseObject())
 
         then:
-        1 * mockApiControllerFactory.createApiController() >> mockApiController
-        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
     }
 
     def 'test create object with 204' () {
-        given:
-        MockBaseObject value = new MockBaseObject()
-        MockAuthentication auth = new MockAuthentication()
+
 
         when:
-        MockBaseObject response = MockBaseObject.createObject(auth, value)
+        MockBaseObject response = MockBaseObject.createObject(new MockAuthentication(), new MockBaseObject())
 
         then:
-        1 * mockApiControllerFactory.createApiController() >> mockApiController
-        1 * mockApiController.execute(_, _, _, _, _)  >> null
+        1 * apiController.execute(_, _, _, _, _)  >> null
         response != null
         response.size() == 0
     }
 
     def 'test update object with auth' () {
-        given:
-        MockBaseObject value = new MockBaseObject()
-        MockAuthentication auth = new MockAuthentication()
+
 
         when:
-        MockBaseObject response = value.updateObject(auth, value)
+        MockBaseObject response = new MockBaseObject().updateObject(new MockAuthentication(), new MockBaseObject())
 
         then:
-        1 * mockApiControllerFactory.createApiController() >> mockApiController
-        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
     }
 
     def 'test update object' () {
-        given:
-        MockBaseObject value = new MockBaseObject()
-        MockAuthentication auth = new MockAuthentication()
+
 
         when:
-        MockBaseObject response = value.updateObject(value)
+        MockBaseObject response = new MockBaseObject().updateObject(new MockBaseObject())
 
         then:
-        1 * mockApiControllerFactory.createApiController() >> mockApiController
-        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
     }
 
     def 'test delete object with auth' () {
-        given:
-        MockBaseObject value = new MockBaseObject()
-        MockAuthentication auth = new MockAuthentication()
+
 
         when:
-        MockBaseObject response = value.deleteObject(auth, value)
+        MockBaseObject response = new MockBaseObject().deleteObject(new MockAuthentication(), new MockBaseObject())
 
         then:
-        1 * mockApiControllerFactory.createApiController() >> mockApiController
-        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
     }
 
     def 'test delete object' () {
-        given:
-        MockBaseObject value = new MockBaseObject()
-        MockAuthentication auth = new MockAuthentication()
+
 
         when:
-        MockBaseObject response = value.deleteObject(value)
+        MockBaseObject response = new MockBaseObject().deleteObject(new MockBaseObject())
 
         then:
-        1 * mockApiControllerFactory.createApiController() >> mockApiController
-        1 * mockApiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_, _, _, _, _)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true

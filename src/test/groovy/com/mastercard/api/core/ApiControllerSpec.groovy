@@ -1,31 +1,15 @@
 package com.mastercard.api.core
-
-import com.mastercard.api.core.exception.ApiCommunicationException
-import com.mastercard.api.core.exception.AuthenticationException
-import com.mastercard.api.core.exception.InvalidRequestException
-import com.mastercard.api.core.exception.MessageSignerException
-import com.mastercard.api.core.exception.NotAllowedException
-import com.mastercard.api.core.exception.ObjectNotFoundException
-import com.mastercard.api.core.exception.SystemException
-import com.mastercard.api.core.mocks.MockAuthentication
-import com.mastercard.api.core.mocks.MockBaseObject
-import com.mastercard.api.core.mocks.MockComplexObject
-import com.mastercard.api.core.mocks.MockHttpClient
-import com.mastercard.api.core.mocks.MockHttpResponse
+import com.mastercard.api.core.exception.*
+import com.mastercard.api.core.mocks.*
 import com.mastercard.api.core.model.Action
 import org.apache.http.client.ClientProtocolException
 import org.apache.http.client.HttpResponseException
-import org.apache.http.client.methods.HttpDelete
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.client.methods.HttpPut
-import org.apache.http.client.methods.HttpRequestBase
+import org.apache.http.client.methods.*
 import org.apache.http.entity.ContentType
 import org.json.simple.JSONValue
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
-
 /**
  * Created by eamondoyle on 11/02/2016.
  */
@@ -39,6 +23,11 @@ class ApiControllerSpec extends Specification {
     def setup() {
         mockAuthentication = new MockAuthentication()
         ApiConfig.authentication = mockAuthentication
+    }
+
+    def cleanupSpec() {
+        mockAuthentication = null;
+        ApiConfig.authentication = null;
     }
 
     def "test constructor: ApiController(String basePath)" () {

@@ -452,6 +452,7 @@ public class Post extends BaseObject  {
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
         BaseObject object = this.deleteObject(this);
+        this.clear();
         this.putAll(object);
         return this;
     }
