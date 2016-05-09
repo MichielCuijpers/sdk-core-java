@@ -52,6 +52,17 @@ class RequestMapSpec extends Specification {
     }
 
 
+    def 'test RequestMap and list of string'() {
+        given:
+        RequestMap requestMap = new RequestMap("{\"Categories\":{\"Category\":[\"1Apparel\",\"2Automotive\",\"3Beauty\",\"4Book Stores\" ]}}");
+
+        expect:
+        requestMap.get("Categories.Category[0]") == "1Apparel"
+
+    }
+
+
+
     def 'test RequestMap as list throw exception' () {
         given:
         Map<String, Object> map = ["a": 1, "b": "2", c: true, d: ["aa": 11, "bb": "22"], e:[ [ "one": 1, "two": 2, "three": 3 ]]]

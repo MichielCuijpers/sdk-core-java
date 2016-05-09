@@ -204,7 +204,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
             }
         }
 
-        Map<String, Object> map = findLastMapInKeyPath((String) keyPath);     // handles keyPaths beyond 'root' keyPath. i.e. "x.y OR x.y[].z, etc."
+        RequestMap map = findLastMapInKeyPath((String) keyPath);     // handles keyPaths beyond 'root' keyPath. i.e. "x.y OR x.y[].z, etc."
         if (map == null) {
             return null;
         }
@@ -245,7 +245,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
             }
         }
 
-        Map<String, Object> map = findLastMapInKeyPath((String) keyPath);
+        RequestMap map = findLastMapInKeyPath((String) keyPath);
         if (map == null) {
             return false;
         }
@@ -285,7 +285,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
             }
         }
 
-        Map<String, Object> map = findLastMapInKeyPath((String) keyPath);
+        RequestMap map = findLastMapInKeyPath((String) keyPath);
         if (map == null) {
             return null;
         }
@@ -293,7 +293,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
         return map.remove(keys[keys.length - 1]);
     }
 
-    private Map<String, Object> findLastMapInKeyPath(String keyPath) throws  IllegalArgumentException {
+    private RequestMap findLastMapInKeyPath(String keyPath) throws  IllegalArgumentException {
         String[] keys = ((String) keyPath).split("\\.");
 
         Map<String, Object> map = null;
@@ -353,7 +353,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
 
         }
 
-        return map;
+        return new RequestMap(map);
     }
 
     private Map<String, Object> getDestinationMap(String property, Map<String, Object> destinationObject, boolean createMap) {
