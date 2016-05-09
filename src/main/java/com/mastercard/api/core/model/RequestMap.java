@@ -205,6 +205,9 @@ public class RequestMap extends LinkedHashMap<String, Object> {
         }
 
         Map<String, Object> map = findLastMapInKeyPath((String) keyPath);     // handles keyPaths beyond 'root' keyPath. i.e. "x.y OR x.y[].z, etc."
+        if (map == null) {
+            return null;
+        }
 
         // retrieve the value at the end of the object path i.e. x.y.z, this retrieves whatever is in 'z'
         return map.get(keys[keys.length - 1]);
@@ -246,6 +249,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
         if (map == null) {
             return false;
         }
+
         return map.containsKey(keys[keys.length - 1]);
     }
 
@@ -282,11 +286,14 @@ public class RequestMap extends LinkedHashMap<String, Object> {
         }
 
         Map<String, Object> map = findLastMapInKeyPath((String) keyPath);
+        if (map == null) {
+            return null;
+        }
 
         return map.remove(keys[keys.length - 1]);
     }
 
-    private Map<String, Object> findLastMapInKeyPath(String keyPath) {
+    private Map<String, Object> findLastMapInKeyPath(String keyPath) throws  IllegalArgumentException {
         String[] keys = ((String) keyPath).split("\\.");
 
         Map<String, Object> map = null;
@@ -318,9 +325,28 @@ public class RequestMap extends LinkedHashMap<String, Object> {
 
             } else {
                 if (null == map) {
-                    map = (Map<String, Object>) super.get(thisKey);
+                    if (super.containsKey(thisKey)) {
+                        Object tmpObject = super.get(thisKey);
+                        if (tmpObject instanceof Map) {
+                            map = (Map<String, Object>) super.get(thisKey);
+                        } else {
+                            throw new IllegalArgumentException("Property '" + thisKey + "' is not a map");
+                        }
+                    } else {
+                        return null;
+                    }
+
                 } else {
-                    map = (Map<String, Object>) map.get(thisKey);
+                    if (map.containsKey(thisKey)) {
+                        Object tmpObject = map.get(thisKey);
+                        if (tmpObject instanceof Map) {
+                            map = (Map<String, Object>) map.get(thisKey);
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        return null;
+                    }
                 }
 
             }
