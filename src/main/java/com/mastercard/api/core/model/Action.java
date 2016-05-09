@@ -25,16 +25,16 @@
  *
  */
 
-package com.mastercard.api.core;
+package com.mastercard.api.core.model;
 
 /**
- * Factory for create ApiController
- * Makes unit testing easy to mock ApiController as collaborator
+ * SDK Object Action
  */
-public class ApiControllerFactory {
-
-    public ApiController createApiController() {
-        return new ApiController();
-    }
-
+public enum Action {
+    create,
+    read,
+    query,
+    list,
+    update,
+    delete
 }

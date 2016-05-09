@@ -27,7 +27,7 @@
 
 package com.mastercard.api.core.exception;
 
-import com.mastercard.api.core.RequestMap;
+import com.mastercard.api.core.model.RequestMap;
 
 import java.util.ArrayList;
 import java.util.List;

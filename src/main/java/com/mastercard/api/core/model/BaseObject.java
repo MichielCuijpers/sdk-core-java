@@ -25,10 +25,10 @@
  *
  */
 
-package com.mastercard.api.core;
+package com.mastercard.api.core.model;
 
+import com.mastercard.api.core.ApiController;
 import com.mastercard.api.core.exception.*;
-import com.mastercard.api.core.model.ResourceList;
 import com.mastercard.api.core.security.Authentication;
 
 import java.util.ArrayList;
@@ -40,17 +40,24 @@ import java.util.Map;
  */
 public abstract class BaseObject extends RequestMap {
 
-    private static final ApiControllerFactory apiControllerFactory = new ApiControllerFactory();
-
     protected abstract String getResourcePath(Action action) throws IllegalArgumentException;
 
     protected abstract List<String> getHeaderParams(Action action) throws IllegalArgumentException;
+
+    protected static ApiController apiController = new ApiController();
 
     protected static BaseObject readObject(final Authentication authentication, final BaseObject value)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
         return execute(authentication, Action.read, value);
+    }
+
+    protected static BaseObject queryObject(final Authentication authentication, final BaseObject value)
+            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
+            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
+
+        return execute(authentication, Action.query, value);
     }
 
     protected static BaseObject createObject(final Authentication authentication,
@@ -96,6 +103,7 @@ public abstract class BaseObject extends RequestMap {
         return listObjects(authentication, template, null);
     }
 
+
     protected static <T extends BaseObject> ResourceList<T> listObjects(final Authentication authentication,
             T template, Map criteria)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
@@ -104,8 +112,7 @@ public abstract class BaseObject extends RequestMap {
         ResourceList<T> listResults = new ResourceList<T>();
         Action list = Action.list;
 
-        Map<? extends String, ? extends Object> response = apiControllerFactory
-                .createApiController()
+        Map<? extends String, ? extends Object> response = apiController
                 .execute(authentication, list, template.getResourcePath(list), template.getHeaderParams(list),
                         criteria);
 
@@ -146,11 +153,10 @@ public abstract class BaseObject extends RequestMap {
         };
     }
 
+
     private static BaseObject execute(Authentication authentication, Action action, BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
-
-        ApiController apiController = apiControllerFactory.createApiController();
 
         Map<? extends String, ? extends Object> response = apiController
                 .execute(authentication, action, requestObject.getResourcePath(action),

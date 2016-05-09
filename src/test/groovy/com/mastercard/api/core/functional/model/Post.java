@@ -27,7 +27,6 @@
 
 package com.mastercard.api.core.functional.model;
 
-import com.mastercard.api.core.*;
 import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.*;
@@ -453,6 +452,7 @@ public class Post extends BaseObject  {
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
         BaseObject object = this.deleteObject(this);
+        this.clear();
         this.putAll(object);
         return this;
     }

@@ -1,27 +1,36 @@
 package com.mastercard.api.core.functional
 import com.mastercard.api.core.ApiConfig
 import com.mastercard.api.core.ApiController
-import com.mastercard.api.core.RequestMap
 import com.mastercard.api.core.exception.ApiCommunicationException
 import com.mastercard.api.core.functional.model.Post
 import com.mastercard.api.core.functional.model.UserPostHeader
 import com.mastercard.api.core.functional.model.UserPostPath
 import com.mastercard.api.core.mocks.MockAuthentication
+import com.mastercard.api.core.mocks.MockBaseObject
+import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.model.ResourceList
-import spock.lang.Ignore
 import spock.lang.Specification
 /**
  * Created by andrearizzini on 12/04/2016.
  */
-@Ignore
 class NodeJSMockServerSpec extends Specification {
 
 
     def setupSpec() {
         ApiConfig.setSandbox(true)
         ApiConfig.authentication = new MockAuthentication()
-        ApiController.API_BASE_SANDBOX_URL = "http://localhost:8080"
+        ApiController.API_BASE_SANDBOX_URL = "http://localhost:8080";
+        ApiController.API_BASE_LIVE_URL = "http://localhost:8080";
+        MockBaseObject.setApiController(new ApiController())
 
+
+    }
+
+    def cleanupSpec() {
+        ApiConfig.authentication = null;
+        ApiController.API_BASE_SANDBOX_URL = "https://sandbox.api.mastercard.com";
+        ApiController.API_BASE_LIVE_URL = "https://api.mastercard.com";
+        MockBaseObject.setApiController(new ApiController())
     }
 
 

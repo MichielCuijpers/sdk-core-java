@@ -1,5 +1,7 @@
 package com.mastercard.api.core
 
+import com.mastercard.api.core.model.Action
+import com.mastercard.api.core.model.HttpMethod
 import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpHead
@@ -39,6 +41,7 @@ class HttpMethodSpec extends Specification {
         Action.list | HttpMethod.GET
         Action.read | HttpMethod.GET
         Action.update | HttpMethod.PUT
+        Action.query | HttpMethod.GET
     }
 
     @Unroll

@@ -1,4 +1,4 @@
-package com.mastercard.api.core;
+package com.mastercard.api.core.model;
 
 import org.apache.http.client.methods.*;
 
@@ -46,6 +46,9 @@ public enum HttpMethod {
         HttpMethod httpMethod = null;
 
         switch (action) {
+            case query:
+                httpMethod = GET;
+                break;
             case read:
                 httpMethod = GET;
                 break;

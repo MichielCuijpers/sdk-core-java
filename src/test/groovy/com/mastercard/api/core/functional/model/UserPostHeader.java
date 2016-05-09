@@ -27,7 +27,6 @@
 
 package com.mastercard.api.core.functional.model;
 
-import com.mastercard.api.core.*;
 import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.*;
@@ -69,7 +68,7 @@ public class UserPostHeader extends BaseObject  {
             throw new IllegalArgumentException("Action cannot be null");
         }
         if (action == Action.list) {
-           return Arrays.asList("userId");
+           return Arrays.asList("user_id");
         }
         throw new IllegalArgumentException("Invalid action supplied: " + action);
     }

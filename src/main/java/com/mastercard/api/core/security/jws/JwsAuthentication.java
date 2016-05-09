@@ -28,7 +28,7 @@
 package com.mastercard.api.core.security.jws;
 
 import com.mastercard.api.core.security.Authentication;
-import com.mastercard.api.core.HttpMethod;
+import com.mastercard.api.core.model.HttpMethod;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 

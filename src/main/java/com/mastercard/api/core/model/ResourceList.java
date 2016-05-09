@@ -27,8 +27,6 @@
 
 package com.mastercard.api.core.model;
 
-import com.mastercard.api.core.RequestMap;
-
 import java.util.List;
 
 /**
