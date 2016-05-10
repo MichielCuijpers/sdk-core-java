@@ -362,8 +362,6 @@ public class RequestMap extends LinkedHashMap<String, Object> {
      *
      * @param keyPath key path whose associated value is to be tested
      * @return true if this map contains an value associated with the specified key path
-     * @throws IllegalArgumentException  if part of the key path does not match the expected type.
-     * @throws IndexOutOfBoundsException if using an array index in the key path is out of bounds.
      */
     @Override
     public boolean containsKey(Object keyPath) {
@@ -388,7 +386,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
             if (_get(keys[keys.length - 1], map) !=  null){
                 return true;
             }
-        } catch (IndexOutOfBoundsException e) {
+        } catch (Exception e) {
         }
         return false;
     }
