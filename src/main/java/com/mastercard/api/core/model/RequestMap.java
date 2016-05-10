@@ -29,10 +29,7 @@ package com.mastercard.api.core.model;
 
 import org.json.simple.JSONValue;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -125,36 +122,29 @@ public class RequestMap extends LinkedHashMap<String, Object> {
      */
     @Override
     public Object put(String keyPath, Object value) {
-        String[] properties = keyPath.split("\\.");
-        Map<String, Object> destinationObject = this;
+        String[] keys = ((String) keyPath).split("\\.");
 
-        if (properties.length > 1) {
-            for (int i = 0; i < (properties.length - 1); i++) {
-                String property = properties[i];
-                if (property.contains("[")) {
-                    destinationObject = getDestinationMap(property, destinationObject, i == properties.length - 1);
+        Map<String, Object> map = null;
+        for (int i = 0; i <= (keys.length - 2); i++) {
+            String thisKey = keys[i];
+            Object tmpObject = _get(thisKey, map);
+            if (tmpObject == null) {
+                tmpObject = _create(thisKey, null, map);
+                if (tmpObject instanceof Map) {
+                    map = (Map<String, Object>) tmpObject;
                 } else {
-                    destinationObject = getPropertyMapFrom(property, destinationObject);
+                    throw new IllegalArgumentException("Property '" + thisKey + "' is not a map");
+                }
+            } else {
+                if (tmpObject instanceof Map) {
+                    map = (Map<String, Object>) tmpObject;
+                } else {
+                    throw new IllegalArgumentException("Property '" + thisKey + "' is not a map");
                 }
             }
-        } else if (keyPath.contains("[")) {
-            destinationObject = getDestinationMap(keyPath, this, true);
         }
 
-        // TODO: need to take care of the case where we are inserting a value into an array rather than
-        // map ( eg map.put("a[2]", 123);
-
-        if (destinationObject == this) {
-            return super.put(keyPath, value);
-        } else if (value instanceof Map) {     // if putting a map, call put all
-            destinationObject.clear();
-            RequestMap m = new RequestMap();
-            m.putAll((Map<? extends String, ? extends Object>) value);
-            destinationObject.put(properties[properties.length - 1], m);
-            return destinationObject;
-        } else {
-            return destinationObject.put(properties[properties.length - 1], value);
-        }
+        return _create(keys[keys.length-1], value, map);
     }
 
     /**
@@ -173,6 +163,176 @@ public class RequestMap extends LinkedHashMap<String, Object> {
     }
 
     /**
+     * This is the private method which is used internally to create the map / lit structure if
+     * it doesn't exists. For example the User.Address[0].Name will invoke 3 times this method, one
+     * for User, one for Address[0] and one for Name
+     * @param key
+     * @param value
+     * @param map
+     * @return
+     */
+    private Object _create(String key, Object value, Map<String,Object> map) {
+        Matcher m = arrayIndexPattern.matcher(key);
+        boolean hasValue = (value == null) ? false : true;
+
+        if (!m.matches()) {
+            //this could return any object
+            if (map == null) {
+                if (hasValue) {
+                    super.put(key, value);
+                    return value;
+                } else {
+                    Map<String,Object> tmpMap = new LinkedHashMap();
+                    super.put(key, tmpMap);
+                    return  tmpMap;
+                }
+
+            } else {
+                if (hasValue) {
+                    map.put(key, value);
+                    return value;
+                } else {
+                    Map<String,Object> tmpMap = new LinkedHashMap();
+                    map.put(key, tmpMap);
+                    return tmpMap;
+                }
+            }
+        } else {
+            // handle the keyPath: "x[]"
+            String keyName = m.group(1);
+            // gets the key to retrieve from the matcher
+
+            Object tmpObject = null;
+
+            if (map == null) {
+                tmpObject = super.get(keyName);  // get the list from the map
+                if (tmpObject == null) {
+                    tmpObject = new ArrayList<>();
+                    super.put(keyName, tmpObject);
+
+                }
+            } else {
+                tmpObject = map.get(keyName);
+                if (tmpObject == null) {
+                    tmpObject = new ArrayList<>();
+                    map.put(keyName, tmpObject);
+                }
+            }
+
+            if (!(tmpObject instanceof List)) {
+                throw new IllegalArgumentException("Property '" + key + "' is not an array");
+            }
+
+            // get the list from the map
+            List<Object> tmpList = (List<Object>) tmpObject;
+
+            //get last item if none specified
+            Integer index = tmpList.size() - 1;
+            if (!"".equals(m.group(2))) {
+                index = Integer.parseInt(m.group(2));
+            }
+
+            if (hasValue) {
+                // this is the assignment
+                tmpList.add(index, value);
+                return value;
+            } else {
+                Map<String,Object> tmpMap = new LinkedHashMap<>();
+                tmpList.add(index, tmpMap);
+                return tmpMap;
+            }
+        }
+    }
+
+    /**
+     * this is the main method which is used for the recursive iteration.
+     * It evaluates the key and returns the correct an element in a map or list.
+     * @param key
+     * @param map
+     * @return
+     * @throws IllegalArgumentException
+     */
+    private Object _get(String key, Map<String, Object> map) throws IllegalArgumentException {
+        Matcher m = arrayIndexPattern.matcher(key);
+        if (!m.matches()) {
+            //this could return any object
+            if (map == null) {
+                return super.get(key);
+            } else {
+                return map.get(key);
+            }
+
+        } else {
+            // handle the keyPath: "x[]"
+            String keyName = m.group(1);
+            // gets the key to retrieve from the matcher
+
+            Object tmpObject = null;
+            if (map == null) {
+                 tmpObject = super.get(keyName);  // get the list from the map
+            } else {
+                tmpObject = map.get(keyName);
+            }
+
+            if (!(tmpObject instanceof List)) {
+                throw new IllegalArgumentException("Property '" + key + "' is not an array");
+            }
+
+            List<Map<String, Object>> tmpList = (List<Map<String, Object>>) tmpObject;  // get the list from the map
+
+            Integer index = tmpList.size() - 1;                                        //get last item if none specified
+            if (!"".equals(m.group(2))) {
+                index = Integer.parseInt(m.group(2));
+            }
+
+            return tmpList.get(index);
+        }
+    }
+
+    /**
+     * this is the main method which is used for the recursive iteration.
+     * It evaluates the key and returns the correct an element in a map or list.
+     * @param key
+     * @param map
+     * @return
+     * @throws IllegalArgumentException
+     */
+    private Object _remove(String key, Map<String, Object> map) throws IllegalArgumentException {
+        Matcher m = arrayIndexPattern.matcher(key);
+        if (!m.matches()) {
+            //this could return any object
+            if (map == null) {
+                return super.remove(key);
+            } else {
+                return map.remove(key);
+            }
+
+        } else {
+            // handle the keyPath: "x[]"
+            String keyName = m.group(1);
+            // gets the key to retrieve from the matcher
+            Object tmpObject = null;
+            if (map == null) {
+                tmpObject = super.get(keyName);
+            }  else {
+                tmpObject = map.get(keyName);  // get the list from the map
+            }
+            if (!(tmpObject instanceof List)) {
+                throw new IllegalArgumentException("Property '" + key + "' is not an array");
+            }
+
+            List<Map<String, Object>> tmpList = (List<Map<String, Object>>) tmpObject;  // get the list from the map
+
+            int index = tmpList.size() - 1;                                        //get last item if none specified
+            if (!"".equals(m.group(2))) {
+                index = Integer.parseInt(m.group(2));
+            }
+
+            return tmpList.remove(index);
+        }
+    }
+
+    /**
      * Returns the value associated with the specified key path or null if there is no associated value.
      *
      * @param keyPath key path whose associated value is to be returned
@@ -185,32 +345,16 @@ public class RequestMap extends LinkedHashMap<String, Object> {
         String[] keys = ((String) keyPath).split("\\.");
 
         if (keys.length <= 1) {
-            Matcher m = arrayIndexPattern.matcher(keys[0]);
-            if (!m.matches()) {             // handles keyPath: "x"
-                return super.get(keys[0]);
-            } else {                                                                                        // handle the keyPath: "x[]"
-                String key = m.group(1);                                                                    // gets the key to retrieve from the matcher
-                Object o = super.get(key);  // get the list from the map
-                if (!(o instanceof List)) {
-                    throw new IllegalArgumentException("Property '" + key + "' is not an array");
-                }
-                List<Map<String, Object>> l = (List<Map<String, Object>>) o;  // get the list from the map
-
-                Integer index = l.size() - 1;                                        //get last item if none specified
-                if (!"".equals(m.group(2))) {
-                    index = Integer.parseInt(m.group(2));
-                }
-                return l.get(index);        // retrieve the map from the list
-            }
+            return _get(keys[0], null);
         }
 
-        RequestMap map = findLastMapInKeyPath((String) keyPath);     // handles keyPaths beyond 'root' keyPath. i.e. "x.y OR x.y[].z, etc."
+        Map<String, Object> map = findLastMapInKeyPath((String) keyPath);     // handles keyPaths beyond 'root' keyPath. i.e. "x.y OR x.y[].z, etc."
         if (map == null) {
             return null;
         }
 
         // retrieve the value at the end of the object path i.e. x.y.z, this retrieves whatever is in 'z'
-        return map.get(keys[keys.length - 1]);
+        return _get(keys[keys.length - 1], map);
     }
 
     /**
@@ -226,31 +370,27 @@ public class RequestMap extends LinkedHashMap<String, Object> {
         String[] keys = ((String) keyPath).split("\\.");
 
         if (keys.length <= 1) {
-            Matcher m = arrayIndexPattern.matcher(keys[0]);
-            if (!m.matches()) {             // handles keyPath: "x"
-                return super.containsKey(keys[0]);
-            } else {                                                                                        // handle the keyPath: "x[]"
-                String key = m.group(1);
-                Object o = super.get(key);  // get the list from the map
-                if (!(o instanceof List)) {
-                    throw new IllegalArgumentException("Property '" + key + "' is not an array");
+            try {
+                if (_get(keys[0], null) != null) {
+                    return true;
                 }
-                List<Map<String, Object>> l = (List<Map<String, Object>>) o;  // get the list from the map
-
-                Integer index = l.size() - 1;
-                if (!"".equals(m.group(2))) {
-                    index = Integer.parseInt(m.group(2));
-                }
-                return index >= 0 && index < l.size();
+            } catch (Exception e ) {
             }
+            return false;
         }
 
-        RequestMap map = findLastMapInKeyPath((String) keyPath);
+        Map<String, Object> map = findLastMapInKeyPath((String) keyPath);
         if (map == null) {
             return false;
         }
 
-        return map.containsKey(keys[keys.length - 1]);
+        try {
+            if (_get(keys[keys.length - 1], map) !=  null){
+                return true;
+            }
+        } catch (IndexOutOfBoundsException e) {
+        }
+        return false;
     }
 
     /**
@@ -262,165 +402,38 @@ public class RequestMap extends LinkedHashMap<String, Object> {
      */
     @Override
     public Object remove(Object keyPath) {
-
         String[] keys = ((String) keyPath).split("\\.");
 
         if (keys.length <= 1) {
-            Matcher m = arrayIndexPattern.matcher(keys[0]);
-            if (!m.matches()) {
-                return super.remove(keys[0]);
-            } else {                                                                                        // handle the keyPath: "x[]"
-                String key = m.group(1);                                                                    // gets the key to retrieve from the matcher
-                Object o = super.get(key);  // get the list from the map
-                if (!(o instanceof List)) {
-                    throw new IllegalArgumentException("Property '" + key + "' is not an array");
-                }
-                List<Map<String, Object>> l = (List<Map<String, Object>>) o;  // get the list from the map
-
-                Integer index = l.size() - 1;                                        //get last item if none specified
-                if (!"".equals(m.group(2))) {
-                    index = Integer.parseInt(m.group(2));
-                }
-                return l.remove(index.intValue());
-            }
+            return _remove(keys[0], null);
         }
 
-        RequestMap map = findLastMapInKeyPath((String) keyPath);
+        Map<String, Object> map = findLastMapInKeyPath((String) keyPath);
         if (map == null) {
             return null;
         }
 
-        return map.remove(keys[keys.length - 1]);
+        return _remove(keys[keys.length - 1], map);
     }
 
-    private RequestMap findLastMapInKeyPath(String keyPath) throws  IllegalArgumentException {
+    private Map<String, Object> findLastMapInKeyPath(String keyPath) throws  IllegalArgumentException {
         String[] keys = ((String) keyPath).split("\\.");
 
         Map<String, Object> map = null;
         for (int i = 0; i <= (keys.length - 2); i++) {
-            Matcher m = arrayIndexPattern.matcher(keys[i]);
             String thisKey = keys[i];
-            if (m.matches()) {
-                thisKey = m.group(1);
-
-                Object o = null;
-                if (null == map) {    // if we are at the "root" of the object path
-                    o = super.get(thisKey);
-                } else {
-                    o = map.get(thisKey);
-                }
-
-                if (!(o instanceof List)) {
-                    throw new IllegalArgumentException("Property '" + thisKey + "' is not an array");
-                }
-                List<Map<String, Object>> l = (List<Map<String, Object>>) o;
-
-                Integer index = l.size() - 1;                                        //get last item if none specified
-
-                if (!"".equals(m.group(2))) {
-                    index = Integer.parseInt(m.group(2));
-                }
-
-                map = (Map<String, Object>) l.get(index);
-
+            Object tmpObject = _get(thisKey, map);
+            if (tmpObject == null) {
+                return null;
             } else {
-                if (null == map) {
-                    if (super.containsKey(thisKey)) {
-                        Object tmpObject = super.get(thisKey);
-                        if (tmpObject instanceof Map) {
-                            map = (Map<String, Object>) super.get(thisKey);
-                        } else {
-                            throw new IllegalArgumentException("Property '" + thisKey + "' is not a map");
-                        }
-                    } else {
-                        return null;
-                    }
-
+                if (tmpObject instanceof Map) {
+                    map = (Map<String, Object>) tmpObject;
                 } else {
-                    if (map.containsKey(thisKey)) {
-                        Object tmpObject = map.get(thisKey);
-                        if (tmpObject instanceof Map) {
-                            map = (Map<String, Object>) map.get(thisKey);
-                        } else {
-                            return null;
-                        }
-                    } else {
-                        return null;
-                    }
+                    throw new IllegalArgumentException("Property '" + thisKey + "' is not a map");
                 }
-
-            }
-
-        }
-
-        return new RequestMap(map);
-    }
-
-    private Map<String, Object> getDestinationMap(String property, Map<String, Object> destinationObject, boolean createMap) {
-
-        Matcher m = arrayIndexPattern.matcher(property);
-        if (m.matches()) {
-            String propName = m.group(1);
-            Integer index = null;
-            if (!"".equals(m.group(2))) {
-                index = Integer.parseInt(m.group(2));
-            }
-            return findOrAddToList(destinationObject, propName, index, createMap);
-        }
-
-        return destinationObject;
-
-    }
-
-    private Map<String, Object> findOrAddToList(Map<String, Object> destinationObject, String propName, Integer index, boolean createMap) {
-        //
-
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-        // find existing list or put the new list
-        if (destinationObject.containsKey(propName)) {
-            Object o = destinationObject.get(propName);
-            if (!(o instanceof List)) {
-                throw new IllegalArgumentException("Property '" + propName + "' is not an array");
-            }
-            list = (List<Map<String, Object>>) o;
-        } else {
-            destinationObject.put(propName, list);
-        }
-
-        // get the existing object in the list at the index
-        Map<String, Object> propertyValue = null;
-        if (index != null && list.size() > index) {
-            propertyValue = list.get(index);
-        }
-
-        // no object at the index, create a new map and add it
-        if (null == propertyValue) {
-            propertyValue = new LinkedHashMap<String, Object>();
-            if (null == index) {
-                list.add(propertyValue);
-            } else {
-                list.add(index, propertyValue);
             }
         }
-
-        // return the map retrieved from or added to the list
-        destinationObject = propertyValue;
-
-        return destinationObject;
+        return map;
     }
 
-    private Map<String, Object> getPropertyMapFrom(String property, Map<String, Object> object) {
-        // create a new map at the key specified if it doesnt already exist
-        if (!object.containsKey(property)) {
-            Map<String, Object> val = new LinkedHashMap<String, Object>();
-            object.put(property, val);
-        }
-
-        Object o = object.get(property);
-        if (o instanceof Map) {
-            return (Map<String, Object>) o;
-        } else {
-            throw new IllegalArgumentException("cannot change nested property to map");
-        }
-    }
 }
