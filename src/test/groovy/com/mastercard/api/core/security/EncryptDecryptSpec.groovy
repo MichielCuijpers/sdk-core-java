@@ -1,23 +1,23 @@
 package com.mastercard.api.core.security
+import com.mastercard.api.core.security.util.CryptUtil
 import groovy.json.JsonBuilder
 import spock.lang.Specification
 
 import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
-import java.security.*
+import java.security.Key
+import java.security.KeyStore
+import java.security.PrivateKey
+import java.security.PublicKey
 import java.security.cert.X509Certificate
-
 /**
  * Created by eamondoyle on 16/02/2016.
  */
 class EncryptDecryptSpec extends Specification {
 
     def 'Test MDES token creation' () {
-
-
 
         when: 'serilized content payload and serialize json'
         Map cardInfo = [ accountNumber: "5123456789012345",
@@ -41,37 +41,22 @@ class EncryptDecryptSpec extends Specification {
         cardInfoJsonEscape.contains("\n") == false
 
         when: 'creating iv'
-        SecureRandom randomSecureRandom = SecureRandom.getInstance("SHA1PRNG");
-        byte[] ivBytes = new byte[16]; //cipher.getBlockSize()
-        randomSecureRandom.nextBytes(ivBytes);
-        IvParameterSpec iv = new IvParameterSpec(ivBytes);
+        IvParameterSpec iv = CryptUtil.generateIv();
 
         then:
         iv != null
 
         when: 'create a random private key (SK)'
-        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-        keyGen.init(256);
-        SecretKey secretKey = keyGen.generateKey();
+        SecretKey secretKey = CryptUtil.generateSecretKey("AES")
 
         then:
         secretKey != null
 
-        when: "create a ciper for PKCS5 padding"
-        Cipher encryptDataCyper = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        // Initialize the Cipher with key and parameters
-        encryptDataCyper.init(Cipher.ENCRYPT_MODE, secretKey, iv);
+        when: "encryptData"
+        byte[] encryptedData = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "AES/CBC/PKCS5Padding", secretKey, iv, cardInfoJsonEscape.getBytes());
 
         then:
-        encryptDataCyper != null
-        encryptDataCyper.algorithm == "AES/CBC/PKCS5Padding"
-
-
-        when: "encrypt the stripped json"
-        byte[] ecryptedData = encryptDataCyper.doFinal(cardInfoJsonEscape.getBytes());
-
-        then:
-        ecryptedData != null
+        encryptedData != null
 
 
         when: "load issuer public key"
@@ -89,49 +74,23 @@ class EncryptDecryptSpec extends Specification {
         publicKey != null
 
 
-        when: "create a cipher for the RSA";
-        Cipher encryptKeyCipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
-        encryptKeyCipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        when: "encryptKey";
+        byte[] encryptedSecretKey = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", publicKey, secretKey.getEncoded());
 
         then:
-        encryptKeyCipher != null
-        encryptKeyCipher.algorithm == "RSA/ECB/OAEPWithSHA-1AndMGF1Padding"
+        encryptedSecretKey != null
 
-
-        when: "encrypt secret key"
-        byte[] encrypedKey = encryptKeyCipher.doFinal(secretKey.getEncoded())
-
-        then:
-        encrypedKey != null
-
-        when: "create a decipher for RSA (decryption)"
-        Cipher descryptKeyCipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
-        descryptKeyCipher.init(Cipher.DECRYPT_MODE, privateKey);
+        when: "decryptKey"
+        byte[] decryptedKeyByteArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", privateKey, encryptedSecretKey);
+        SecretKey originalKey = new SecretKeySpec(decryptedKeyByteArray, 0, decryptedKeyByteArray.length, "AES");
 
         then:
-        descryptKeyCipher != null
-        descryptKeyCipher.algorithm == "RSA/ECB/OAEPWithSHA-1AndMGF1Padding"
-
-        when: "extract secret key from encryptedKey"
-        byte[] decrypedKeyByteArray = descryptKeyCipher.doFinal(encrypedKey);
-        SecretKey originalKey = new SecretKeySpec(decrypedKeyByteArray, 0, decrypedKeyByteArray.length, "AES");
-
-        then:
+        originalKey != null
         originalKey.algorithm == "AES"
 
 
-        when: "create a deciper for PKCS5 padding"
-        // Decryption cipher
-        Cipher decryptCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        // Initialize PBE Cipher with key and parameters
-        decryptCipher.init(Cipher.DECRYPT_MODE, originalKey, iv);
-
-        then:
-        decryptCipher != null
-        decryptCipher.algorithm == "AES/CBC/PKCS5Padding"
-
-        when: "descrypt text"
-        byte[] decryptedBytesArray = decryptCipher.doFinal(ecryptedData);
+        when: "decryptData"
+        byte[] decryptedBytesArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "AES/CBC/PKCS5Padding", originalKey, iv, encryptedData);
 
         then: "check if decrypted text matches the input text"
         cardInfoJsonEscape == new String(decryptedBytesArray);
