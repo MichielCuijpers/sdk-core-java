@@ -3,16 +3,15 @@ package com.mastercard.api.core.security.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
 
 public class EncryptionUtils {
 
@@ -21,32 +20,32 @@ public class EncryptionUtils {
   /**
    *  - Encrypts data in base 64 using an RSA public key
    *  
-   * @param cipherText64
-   * @param privateKey
+   * @param data
+   * @param pubk
    * @return
    */
   public byte[] encryptUsingRSA(byte[] data, PublicKey pubk){
     try {
-      Cipher cipher = Cipher.getInstance(SecurityParameters.RSA_TRANSFORM.getName());
+      Cipher cipher = Cipher.getInstance(SecurityParameters.RSA_TRANSFORM.name());
       cipher.init(Cipher.ENCRYPT_MODE, pubk);
       cipher.update(data);
       return cipher.doFinal();
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage(), e);
     }
     return null;
   }
   
   public byte[] encryptUsingAES(String clearText, byte[] secretKey){
     try {
-      Cipher cipher = Cipher.getInstance(SecurityParameters.AES_TRANSFORM.getName());
+      Cipher cipher = Cipher.getInstance(SecurityParameters.AES_TRANSFORM.name());
       int offset = secretKey.length/2;
       IvParameterSpec ivParameterSpec = new IvParameterSpec(secretKey, offset, cipher.getBlockSize());
-      SecretKeySpec key = new SecretKeySpec(secretKey, 0, cipher.getBlockSize(), SecurityParameters.AES_ALGORTHM.getName());
+      SecretKeySpec key = new SecretKeySpec(secretKey, 0, cipher.getBlockSize(), SecurityParameters.AES_ALGORTHM.name());
       cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec);
       return cipher.doFinal(clearText.getBytes("UTF-8")); 
     } catch(Exception e){
-      e.printStackTrace();
+      logger.error(e.getMessage(), e);
     }
     return null;
   }
@@ -57,7 +56,7 @@ public class EncryptionUtils {
       SecureRandom secureRandomGenerator = SecureRandom.getInstance("SHA1PRNG");  // Create a secure random number generator using the SHA1PRNG algorithm
       secureRandomGenerator.nextBytes(randomBytes);  // Get 16 random bytes
     } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
+      logger.error(e.getMessage(), e);
     } 
     return randomBytes;
   }
@@ -70,8 +69,8 @@ public class EncryptionUtils {
    *        - copy the 16 byte key into the first 16 bytes
    *        - copy the IV into the second 16 bytes
    *        
-   * @param cipherText64
-   * @param privateKey
+   * @param algorithm
+   * @param keySize
    * @return
    */
   public byte[] generateSecretKeyWithIV(String algorithm, int keySize) throws UnsupportedEncodingException {
@@ -93,6 +92,8 @@ public class EncryptionUtils {
     System.arraycopy(IV, 0, secretKeywithIV, encryptionKey.length, IV.length);
     return secretKeywithIV;
   }
+
+
 
 //  private void setupKeys() throws Exception {
 //    // Override PKCS#11 private key loader and substitute with our test private key

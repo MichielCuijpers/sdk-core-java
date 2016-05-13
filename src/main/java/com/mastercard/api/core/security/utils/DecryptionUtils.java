@@ -4,11 +4,10 @@ package com.mastercard.api.core.security.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.PrivateKey;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.PrivateKey;
 
 public class DecryptionUtils {
 
@@ -41,17 +40,17 @@ public class DecryptionUtils {
 //  }
   
   public static byte[] decrypt(byte[] data, PrivateKey privateKey) throws Exception {
-    Cipher cipher = Cipher.getInstance(SecurityParameters.RSA_TRANSFORM.getName());
+    Cipher cipher = Cipher.getInstance(SecurityParameters.RSA_TRANSFORM.name());
     cipher.init(Cipher.DECRYPT_MODE, privateKey);
     logger.debug("RSA cipher successfully initialized with private key from HSM.");
     return cipher.doFinal(data);
   }
   
   public static String decrypt(byte[] cipherText, byte[] secretKey) throws Exception {
-    Cipher cipher = Cipher.getInstance(SecurityParameters.AES_TRANSFORM.getName());
+    Cipher cipher = Cipher.getInstance(SecurityParameters.AES_TRANSFORM.name());
     int offset = secretKey.length/2;
     cipher.init(Cipher.DECRYPT_MODE, 
-                  new SecretKeySpec(secretKey, 0, cipher.getBlockSize(), SecurityParameters.AES_ALGORTHM.getName()), 
+                  new SecretKeySpec(secretKey, 0, cipher.getBlockSize(), SecurityParameters.AES_ALGORTHM.name()),
                   new IvParameterSpec(secretKey, offset, cipher.getBlockSize()));
     
     logger.debug("AES cipher successfully initialized with generated key on the request.");
