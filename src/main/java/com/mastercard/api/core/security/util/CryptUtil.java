@@ -5,8 +5,11 @@ import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
-import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 
 /**
@@ -15,6 +18,8 @@ import java.security.spec.AlgorithmParameterSpec;
 public class CryptUtil {
 
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+
 
 
     /**
@@ -83,6 +88,24 @@ public class CryptUtil {
             currentCipher.init(operation, key, iv);
         }
         return currentCipher.doFinal(clearText);
+    }
+
+
+    public static Key loadKey(KeyType type, String keystore, InputStream p12, String alias, String password)
+            throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException,
+            UnrecoverableKeyException {
+        KeyStore ks = KeyStore.getInstance(keystore);
+        ks.load(p12, password.toCharArray());
+        Key key = ks.getKey(alias, password.toCharArray());
+        if (key instanceof PrivateKey) {
+            if (type.name().compareTo(KeyType.PRIVATE.name()) == 0) {
+                return key;
+            } else if (type.name().compareTo(KeyType.PUBLIC.name()) == 0){
+                X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+                return cert.getPublicKey();
+            }
+        }
+        return null;
     }
 
     /**

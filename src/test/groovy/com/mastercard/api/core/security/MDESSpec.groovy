@@ -13,7 +13,7 @@ import java.security.PublicKey
 /**
  * Created by eamondoyle on 16/02/2016.
  */
-class EncryptDecryptSpec extends Specification {
+class MDESSpec extends Specification {
 
     def 'Test MDES token creation' () {
 
@@ -63,15 +63,6 @@ class EncryptDecryptSpec extends Specification {
 
         PublicKey publicKey = CryptUtil.loadKey(KeyType.PUBLIC, "PKCS12", this.class.getClassLoader().getResourceAsStream("certificate.p12"), "1", "");
         PrivateKey privateKey = CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", this.class.getClassLoader().getResourceAsStream("certificate.p12"), "1", "");
-//        KeyStore ks = KeyStore.getInstance();
-//        ks.load(, "".toCharArray());
-//        Key privateKey = ks.getKey("1", "".toCharArray());
-//        PublicKey publicKey = null;
-//        if (privateKey instanceof PrivateKey) {
-//            X509Certificate cert = ks.getCertificate("1");
-//            publicKey = cert.getPublicKey();
-//        }
-
 
         then:
         publicKey != null

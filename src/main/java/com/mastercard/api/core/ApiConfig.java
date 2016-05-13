@@ -1,6 +1,12 @@
 package com.mastercard.api.core;
 
 import com.mastercard.api.core.security.Authentication;
+import com.mastercard.api.core.security.CryptographyInterceptor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * SDK Configuration Overrides
@@ -9,9 +15,7 @@ public final class ApiConfig {
     private static boolean sandbox = true;
     private static boolean debug = false;
     private static Authentication authentication;
-
-    private ApiConfig() {
-    }
+    private static Map<String,List<CryptographyInterceptor>> cryptographyMap = new HashMap<>();
 
     /**
      * SDK will use sanbox APIs instead of production APIs
@@ -55,5 +59,29 @@ public final class ApiConfig {
 
     public static Authentication getAuthentication() {
         return authentication;
+    }
+
+    /**
+     * add a crypto interceptor
+     * @param basePath
+     * @param cryptographyInterceptor
+     */
+    public static void addCryptographyInterceptor(String basePath, CryptographyInterceptor cryptographyInterceptor) {
+        if (!cryptographyMap.containsKey(basePath)) {
+            cryptographyMap.put(basePath, new ArrayList<CryptographyInterceptor>());
+        }
+
+        if (!cryptographyMap.get(basePath).contains(cryptographyInterceptor)){
+            cryptographyMap.get(basePath).add(cryptographyInterceptor);
+        }
+    }
+
+    /**
+     * this methid return the crypto interceptor
+     * @param basePath
+     * @return
+     */
+    public static List<CryptographyInterceptor> getCryptographyInterceptor(String basePath) {
+        return cryptographyMap.get(basePath);
     }
 }
