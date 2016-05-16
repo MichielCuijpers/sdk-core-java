@@ -43,6 +43,10 @@ dependencies {
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: httpClientVersion
 
+    // http://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk16
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk16', version: '1.46'
+
+
 }
 
 // Maven-Publishing+Artifactory.

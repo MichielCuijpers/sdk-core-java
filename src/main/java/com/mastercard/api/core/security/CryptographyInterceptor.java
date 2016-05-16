@@ -1,20 +1,15 @@
 package com.mastercard.api.core.security;
 
-import com.mastercard.api.core.model.RequestMap;
+import java.util.Map;
 
 /**
  * Created by andrearizzini on 13/05/2016.
  */
 public interface CryptographyInterceptor {
-
-    enum CryptographyContext {
-        HEADER,BODY,BOTH
-    }
-
     CryptographyContext getContext();
 
-    RequestMap encrypt(RequestMap map);
-    RequestMap decrypt(RequestMap map);
+    Map<String,Object> encrypt(Map<String,Object> map);
+    Map<String,Object> decrypt(Map<String,Object> map);
 
 
 }

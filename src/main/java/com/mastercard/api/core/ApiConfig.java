@@ -82,6 +82,11 @@ public final class ApiConfig {
      * @return
      */
     public static List<CryptographyInterceptor> getCryptographyInterceptor(String basePath) {
-        return cryptographyMap.get(basePath);
+        for (Map.Entry<String,List<CryptographyInterceptor>> entry : cryptographyMap.entrySet()) {
+            if (entry.getKey().contains(basePath) || basePath.contains(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 }

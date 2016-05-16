@@ -2,15 +2,22 @@ package com.mastercard.api.core.security.util;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.binary.StringUtils;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 /**
  * Created by andrearizzini on 13/05/2016.
@@ -18,8 +25,6 @@ import java.security.spec.AlgorithmParameterSpec;
 public class CryptUtil {
 
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
-
-
 
 
     /**
@@ -63,6 +68,15 @@ public class CryptUtil {
         return keyGen.generateKey();
     }
 
+
+    public static byte[] generateFingerprint(Key key) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        digest.reset();
+        digest.update(key.getEncoded());
+        return digest.digest();
+    }
+
+
     /**
      * This is the method to used to encrypt or decrypt
      * @param operation Cipher.ENCRYPT_MODE or Cipher.DECRYPT_MODE
@@ -78,6 +92,20 @@ public class CryptUtil {
      * @throws BadPaddingException
      * @throws IllegalBlockSizeException
      */
+
+    public static byte[] crypt(int operation, String algorithm, String securityPrivider, Key key, AlgorithmParameterSpec iv, byte[] clearText)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+            InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException,
+            NoSuchProviderException {
+        Cipher currentCipher = Cipher.getInstance(algorithm, securityPrivider);
+        if (iv == null) {
+            currentCipher.init(operation, key);
+        } else {
+            currentCipher.init(operation, key, iv);
+        }
+        return currentCipher.doFinal(clearText);
+    }
+
     public static byte[] crypt(int operation, String algorithm, Key key, AlgorithmParameterSpec iv, byte[] clearText)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException {
@@ -88,6 +116,35 @@ public class CryptUtil {
             currentCipher.init(operation, key, iv);
         }
         return currentCipher.doFinal(clearText);
+    }
+
+    public static PublicKey loadPublicKey(String instance, InputStream is) throws CertificateException {
+        CertificateFactory factory = CertificateFactory.getInstance(instance); //"X.509"
+        X509Certificate certificate = (X509Certificate) factory.generateCertificate(is);
+        return certificate.getPublicKey();
+    }
+
+    public static PrivateKey loadPrivateKey(String instance, InputStream is)
+            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        byte[] keyBytes = getBytesFromInputStream(is);
+        PKCS8EncodedKeySpec kspec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance(instance);
+        return kf.generatePrivate(kspec);
+    }
+
+    public static byte[] getBytesFromInputStream(InputStream is) throws IOException
+    {
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream();)
+        {
+            byte[] buffer = new byte[1024];
+
+            for (int len; (len = is.read(buffer)) != -1;) {
+                os.write(buffer, 0, len);
+            }
+            os.flush();
+
+            return os.toByteArray();
+        }
     }
 
 

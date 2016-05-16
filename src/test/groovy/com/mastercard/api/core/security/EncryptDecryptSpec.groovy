@@ -2,6 +2,7 @@ package com.mastercard.api.core.security
 import com.mastercard.api.core.security.util.CryptUtil
 import com.mastercard.api.core.security.util.KeyType
 import groovy.json.JsonBuilder
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import spock.lang.Specification
 
 import javax.crypto.Cipher
@@ -10,12 +11,18 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import java.security.PrivateKey
 import java.security.PublicKey
+import java.security.Security
+
 /**
  * Created by eamondoyle on 16/02/2016.
  */
 class EncryptDecryptSpec extends Specification {
 
-    def 'Test MDES token creation' () {
+
+    def 'Test MDES token creation (test)' () {
+
+        setup:
+        Security.addProvider(new BouncyCastleProvider())
 
         when: 'serilized content payload and serialize json'
         Map cardInfo = [ accountNumber: "5123456789012345",
@@ -51,7 +58,7 @@ class EncryptDecryptSpec extends Specification {
         secretKey != null
 
         when: "encryptData"
-        byte[] encryptedData = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "AES/CBC/PKCS5Padding", secretKey, iv, cardInfoJsonEscape.getBytes());
+        byte[] encryptedData = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "AES/CBC/PKCS7Padding", "BC", secretKey, iv, cardInfoJsonEscape.getBytes());
 
         then:
         encryptedData != null
@@ -93,7 +100,7 @@ class EncryptDecryptSpec extends Specification {
 
 
         when: "decryptData"
-        byte[] decryptedBytesArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "AES/CBC/PKCS5Padding", originalKey, iv, encryptedData);
+        byte[] decryptedBytesArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "AES/CBC/PKCS7Padding", "BC", originalKey, iv, encryptedData);
 
         then: "check if decrypted text matches the input text"
         cardInfoJsonEscape == new String(decryptedBytesArray);

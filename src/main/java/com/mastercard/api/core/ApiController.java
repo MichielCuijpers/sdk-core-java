@@ -31,6 +31,7 @@ import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.Action;
 import com.mastercard.api.core.model.HttpMethod;
 import com.mastercard.api.core.security.Authentication;
+import com.mastercard.api.core.security.CryptographyInterceptor;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
@@ -195,7 +196,7 @@ public class ApiController {
         }
 
         // Use JSON
-        s = appendToQueryString(s, "Format=JSON");
+        //s = appendToQueryString(s, "Format=JSON");
 
 
 
@@ -227,8 +228,15 @@ public class ApiController {
 
         String payload = null;
 
+        List<CryptographyInterceptor> interceptors = ApiConfig.getCryptographyInterceptor(uri.toString());
+
         switch (action) {
         case create:
+
+            if (interceptors != null) {
+                objectMap = interceptors.get(0).encrypt(objectMap);
+            }
+
             payload = JSONValue.toJSONString(objectMap);
             message = new HttpPost(uri);
 
@@ -248,6 +256,11 @@ public class ApiController {
             break;
 
         case update:
+
+            if (interceptors != null) {
+                objectMap = interceptors.get(0).encrypt(objectMap);
+            }
+
             payload = JSONValue.toJSONString(objectMap);
             message = new HttpPut(uri);
 
