@@ -205,10 +205,7 @@ public class ApiController {
         }
 
         // Use JSON
-        //s = appendToQueryString(s, "Format=JSON");
-
-
-
+        s = appendToQueryString(s, "Format=JSON");
 
         try {
             uri = new URI(String.format(s.toString(), objectList.toArray()));
