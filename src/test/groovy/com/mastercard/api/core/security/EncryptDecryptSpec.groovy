@@ -39,7 +39,7 @@ class EncryptDecryptSpec extends Specification {
         cardInfoJson != null
 
         when: 'stripping json'
-        String cardInfoJsonEscape = cardInfoJson.replaceAll("\n", "").replaceAll("\r", "");
+        String cardInfoJsonEscape = cardInfoJson.replaceAll("\n", "").replaceAll("\r", "").replaceAll("\t", "").replaceAll(" ", "");
         System.out.println(cardInfoJsonEscape);
 
         then:
@@ -52,13 +52,13 @@ class EncryptDecryptSpec extends Specification {
         iv != null
 
         when: 'create a random private key (SK)'
-        SecretKey secretKey = CryptUtil.generateSecretKey("AES")
+        SecretKey secretKey = CryptUtil.generateSecretKey("AES", BouncyCastleProvider.PROVIDER_NAME, 256)
 
         then:
         secretKey != null
 
         when: "encryptData"
-        byte[] encryptedData = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "AES/CBC/PKCS7Padding", "BC", secretKey, iv, cardInfoJsonEscape.getBytes());
+        byte[] encryptedData = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "AES/CBC/PKCS7Padding", BouncyCastleProvider.PROVIDER_NAME, secretKey, iv, cardInfoJsonEscape.getBytes());
 
         then:
         encryptedData != null

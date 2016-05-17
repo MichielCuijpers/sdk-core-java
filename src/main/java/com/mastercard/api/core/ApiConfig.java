@@ -15,7 +15,7 @@ public final class ApiConfig {
     private static boolean sandbox = true;
     private static boolean debug = false;
     private static Authentication authentication;
-    private static Map<String,List<CryptographyInterceptor>> cryptographyMap = new HashMap<>();
+    private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
 
     /**
      * SDK will use sanbox APIs instead of production APIs
@@ -66,13 +66,9 @@ public final class ApiConfig {
      * @param basePath
      * @param cryptographyInterceptor
      */
-    public static void addCryptographyInterceptor(String basePath, CryptographyInterceptor cryptographyInterceptor) {
-        if (!cryptographyMap.containsKey(basePath)) {
-            cryptographyMap.put(basePath, new ArrayList<CryptographyInterceptor>());
-        }
-
-        if (!cryptographyMap.get(basePath).contains(cryptographyInterceptor)){
-            cryptographyMap.get(basePath).add(cryptographyInterceptor);
+    public static void addCryptographyInterceptor(CryptographyInterceptor cryptographyInterceptor) {
+        if (!cryptographyMap.containsKey(cryptographyInterceptor.getTriggeringPath())){
+            cryptographyMap.put(cryptographyInterceptor.getTriggeringPath(), cryptographyInterceptor);
         }
     }
 
@@ -81,8 +77,8 @@ public final class ApiConfig {
      * @param basePath
      * @return
      */
-    public static List<CryptographyInterceptor> getCryptographyInterceptor(String basePath) {
-        for (Map.Entry<String,List<CryptographyInterceptor>> entry : cryptographyMap.entrySet()) {
+    public static CryptographyInterceptor getCryptographyInterceptor(String basePath) {
+        for (Map.Entry<String,CryptographyInterceptor> entry : cryptographyMap.entrySet()) {
             if (entry.getKey().contains(basePath) || basePath.contains(entry.getKey())) {
                 return entry.getValue();
             }

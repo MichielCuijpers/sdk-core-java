@@ -32,6 +32,7 @@ import com.mastercard.api.core.model.Action;
 import com.mastercard.api.core.model.HttpMethod;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.security.CryptographyInterceptor;
+import org.apache.commons.codec.DecoderException;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
@@ -45,9 +46,17 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateEncodingException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -212,7 +221,7 @@ public class ApiController {
 
     private HttpRequestBase getRequest(Authentication authentication, URI uri, Action action,
             Map<String, Object> objectMap, Map<String,Object> headerMap)
-            throws InvalidRequestException, MessageSignerException {
+            throws InvalidRequestException, MessageSignerException, NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
 
         HttpRequestBase message = null;
 
@@ -228,13 +237,13 @@ public class ApiController {
 
         String payload = null;
 
-        List<CryptographyInterceptor> interceptors = ApiConfig.getCryptographyInterceptor(uri.toString());
+        CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.toString());
 
         switch (action) {
         case create:
 
-            if (interceptors != null) {
-                objectMap = interceptors.get(0).encrypt(objectMap);
+            if (interceptor != null) {
+                objectMap = interceptor.encrypt(objectMap);
             }
 
             payload = JSONValue.toJSONString(objectMap);
@@ -257,8 +266,8 @@ public class ApiController {
 
         case update:
 
-            if (interceptors != null) {
-                objectMap = interceptors.get(0).encrypt(objectMap);
+            if (interceptor != null) {
+                objectMap = interceptor.encrypt(objectMap);
             }
 
             payload = JSONValue.toJSONString(objectMap);
@@ -367,7 +376,13 @@ public class ApiController {
                         map.put("list", list);
                         return map;
                     } else {
-                        return (Map<? extends String, ? extends Object>) response;
+                        CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.toString());
+                        if (interceptor == null) {
+                            return (Map<? extends String, ? extends Object>) response;
+                        } else {
+                            Map<String,Object> responseMap = (Map<String,Object>) response;
+                            return interceptor.decrypt(responseMap);
+                        }
                     }
                 } else {
                     int status = apiResponse.getStatus();
@@ -400,7 +415,8 @@ public class ApiController {
 
         } catch (IOException e) {
             throw new ApiCommunicationException("I/O error", e);
-
+        } catch (NoSuchAlgorithmException | CertificateEncodingException | DecoderException | NoSuchProviderException | InvalidKeyException | BadPaddingException | InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException e) {
+            throw new SystemException("Cryptography Error", e);
         } finally {
             try {
                 httpClient.close();

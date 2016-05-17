@@ -30,8 +30,8 @@ import com.mastercard.api.core.ApiConfig
 import com.mastercard.api.core.functional.model.Tokenize
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.Authentication
-import com.mastercard.api.core.security.CryptographyContext
-import com.mastercard.api.core.security.mdes.MDESFieldLevelCryptography
+
+import com.mastercard.api.core.security.mdes.MDESCryptography
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
 import spock.lang.Specification
 
@@ -46,12 +46,13 @@ public class TokenActivationSpec extends Specification {
 
         try {
             InputStream is = new FileInputStream("src/test/resources/prod_key.p12");
-            InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");
             Authentication authentication = new OAuthAuthentication(clientId, is, "test", "password");
             ApiConfig.setAuthentication(authentication);
 
-            MDESFieldLevelCryptography interceptor = new MDESFieldLevelCryptography(CryptographyContext.BODY, is2);
-            ApiConfig.addCryptographyInterceptor("/mdes/tokenization/1/0/token", interceptor);
+            InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");
+            InputStream is3 = new FileInputStream("src/test/resources/private.key");
+            MDESCryptography interceptor = new MDESCryptography(is2, is3);
+            ApiConfig.addCryptographyInterceptor(interceptor);
             //ApiConfig.addCryptographyInterceptor(new MDES())
         }
         catch (Exception e) {
@@ -64,19 +65,6 @@ public class TokenActivationSpec extends Specification {
     def 'send tokenization request'() {
         when:
 
-//        "accountNumber": "5123456789012345",
-//        "expiryMonth": "12",
-//        "expiryYear": "16",
-//        "securityCode": "123",
-//        "billingAddress": {
-//            "line1": "100 1st Street",
-//            "line2": "Apt. 4B",
-//            "city": "St. Louis",
-//            "countrySubdivision": "MO",
-//            "postalCode": "61000",
-//            "country": "USA"
-//        }
-
         RequestMap requestMap = new RequestMap();
         requestMap.set("tokenRequestorId", "12345678901" );
         requestMap.set("requestId", "123456");
@@ -88,17 +76,18 @@ public class TokenActivationSpec extends Specification {
         requestMap.set("cardInfo.billingAddress.line", "100 1st Street");
         requestMap.set("cardInfo.billingAddress.line2", "Apt. 4B");
         requestMap.set("cardInfo.billingAddress.city", "St. Louis");
-        requestMap.set("cardInfo.billingAddress.line2", "MO");
-        requestMap.set("cardInfo.billingAddress.countrySubdivision", "Apt. 4B");
+        requestMap.set("cardInfo.billingAddress.countrySubdivision", "MO");
         requestMap.set("cardInfo.billingAddress.postalCode", "61000");
         requestMap.set("cardInfo.billingAddress.country", "USA");
 
         Tokenize response = new Tokenize(requestMap).create(requestMap);
 
         then:
-        response.get("Account.Listed").toString().equalsIgnoreCase("True")
-        response.get("Account.ReasonCode").toString().equalsIgnoreCase("L")
-        response.get("Account.Reason").toString().equalsIgnoreCase("LOST")
+        response.get("decision").toString().equalsIgnoreCase("APPROVED")
+        response.get("responseId").toString().equalsIgnoreCase("123456")
+        response.get("token.accountPanSuffix").toString().equalsIgnoreCase("2345")
+        response.get("token.expiryMonth").toString().equalsIgnoreCase("12")
+        response.get("token.expiryYear").toString().equalsIgnoreCase("16")
 
     }
 
