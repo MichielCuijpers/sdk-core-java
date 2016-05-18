@@ -65,6 +65,7 @@ public class ApiController {
 
     public static String API_BASE_LIVE_URL = Constants.API_BASE_LIVE_URL;
     public static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
+    public static String API_BASE_STAGE_URL = Constants.API_BASE_STAGE_URL;
     public static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
 
@@ -78,6 +79,8 @@ public class ApiController {
 
         if (ApiConfig.isSandbox()) {
             baseUrl = API_BASE_SANDBOX_URL;
+        } else if (ApiConfig.isStage()) {
+            baseUrl = API_BASE_STAGE_URL;
         }
 
         this.apiPath = baseUrl;
@@ -217,7 +220,7 @@ public class ApiController {
     }
 
     private HttpRequestBase getRequest(Authentication authentication, URI uri, Action action,
-            Map<String, Object> objectMap, Map<String,Object> headerMap)
+            Map<String, Object> objectMap, Map<String,Object> headerMap, CryptographyInterceptor interceptor)
             throws InvalidRequestException, MessageSignerException, NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
 
         HttpRequestBase message = null;
@@ -233,8 +236,6 @@ public class ApiController {
         }
 
         String payload = null;
-
-        CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.toString());
 
         switch (action) {
         case create:
@@ -345,7 +346,8 @@ public class ApiController {
 
         try {
 
-            HttpRequestBase message = getRequest(auth, uri, action, objectMap, headerMap);
+            CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.toString());
+            HttpRequestBase message = getRequest(auth, uri, action, objectMap, headerMap, interceptor);
 
             ResponseHandler<ApiControllerResponse> responseHandler = createResponseHandler();
 
@@ -373,7 +375,6 @@ public class ApiController {
                         map.put("list", list);
                         return map;
                     } else {
-                        CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.toString());
                         if (interceptor == null) {
                             return (Map<? extends String, ? extends Object>) response;
                         } else {

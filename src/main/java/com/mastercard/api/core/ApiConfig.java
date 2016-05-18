@@ -12,8 +12,9 @@ import java.util.Map;
  * SDK Configuration Overrides
  */
 public final class ApiConfig {
-    private static boolean sandbox = true;
+    private static boolean sandbox = false;
     private static boolean debug = false;
+    private static boolean stage = false;
     private static Authentication authentication;
     private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
 
@@ -27,6 +28,19 @@ public final class ApiConfig {
 
     public static boolean isSandbox() {
         return sandbox;
+    }
+
+
+    /**
+     * SDK will use sanbox APIs instead of production APIs
+     * @param sandbox
+     */
+    public static void setStage(boolean stage) {
+        ApiConfig.stage = stage;
+    }
+
+    public static boolean isStage() {
+        return stage;
     }
 
     /**
