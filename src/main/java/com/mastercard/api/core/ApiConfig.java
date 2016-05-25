@@ -1,17 +1,22 @@
 package com.mastercard.api.core;
 
 import com.mastercard.api.core.security.Authentication;
+import com.mastercard.api.core.security.CryptographyInterceptor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * SDK Configuration Overrides
  */
 public final class ApiConfig {
-    private static boolean sandbox = true;
+    private static boolean sandbox = false;
     private static boolean debug = false;
+    private static boolean stage = false;
     private static Authentication authentication;
-
-    private ApiConfig() {
-    }
+    private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
 
     /**
      * SDK will use sanbox APIs instead of production APIs
@@ -23,6 +28,19 @@ public final class ApiConfig {
 
     public static boolean isSandbox() {
         return sandbox;
+    }
+
+
+    /**
+     * SDK will use sanbox APIs instead of production APIs
+     * @param sandbox
+     */
+    public static void setStage(boolean stage) {
+        ApiConfig.stage = stage;
+    }
+
+    public static boolean isStage() {
+        return stage;
     }
 
     /**
@@ -55,5 +73,30 @@ public final class ApiConfig {
 
     public static Authentication getAuthentication() {
         return authentication;
+    }
+
+    /**
+     * add a crypto interceptor
+     * @param basePath
+     * @param cryptographyInterceptor
+     */
+    public static void addCryptographyInterceptor(CryptographyInterceptor cryptographyInterceptor) {
+        if (!cryptographyMap.containsKey(cryptographyInterceptor.getTriggeringPath())){
+            cryptographyMap.put(cryptographyInterceptor.getTriggeringPath(), cryptographyInterceptor);
+        }
+    }
+
+    /**
+     * this methid return the crypto interceptor
+     * @param basePath
+     * @return
+     */
+    public static CryptographyInterceptor getCryptographyInterceptor(String basePath) {
+        for (Map.Entry<String,CryptographyInterceptor> entry : cryptographyMap.entrySet()) {
+            if (entry.getKey().contains(basePath) || basePath.contains(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 }

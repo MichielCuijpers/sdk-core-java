@@ -31,6 +31,8 @@ import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.Action;
 import com.mastercard.api.core.model.HttpMethod;
 import com.mastercard.api.core.security.Authentication;
+import com.mastercard.api.core.security.CryptographyInterceptor;
+import org.apache.commons.codec.DecoderException;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
@@ -44,9 +46,17 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateEncodingException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +65,7 @@ public class ApiController {
 
     public static String API_BASE_LIVE_URL = Constants.API_BASE_LIVE_URL;
     public static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
+    public static String API_BASE_STAGE_URL = Constants.API_BASE_STAGE_URL;
     public static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
 
@@ -68,6 +79,8 @@ public class ApiController {
 
         if (ApiConfig.isSandbox()) {
             baseUrl = API_BASE_SANDBOX_URL;
+        } else if (ApiConfig.isStage()) {
+            baseUrl = API_BASE_STAGE_URL;
         }
 
         this.apiPath = baseUrl;
@@ -197,9 +210,6 @@ public class ApiController {
         // Use JSON
         s = appendToQueryString(s, "Format=JSON");
 
-
-
-
         try {
             uri = new URI(String.format(s.toString(), objectList.toArray()));
         } catch (URISyntaxException e) {
@@ -210,8 +220,8 @@ public class ApiController {
     }
 
     private HttpRequestBase getRequest(Authentication authentication, URI uri, Action action,
-            Map<String, Object> objectMap, Map<String,Object> headerMap)
-            throws InvalidRequestException, MessageSignerException {
+            Map<String, Object> objectMap, Map<String,Object> headerMap, CryptographyInterceptor interceptor)
+            throws InvalidRequestException, MessageSignerException, NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
 
         HttpRequestBase message = null;
 
@@ -229,6 +239,11 @@ public class ApiController {
 
         switch (action) {
         case create:
+
+            if (interceptor != null) {
+                objectMap = interceptor.encrypt(objectMap);
+            }
+
             payload = JSONValue.toJSONString(objectMap);
             message = new HttpPost(uri);
 
@@ -248,6 +263,11 @@ public class ApiController {
             break;
 
         case update:
+
+            if (interceptor != null) {
+                objectMap = interceptor.encrypt(objectMap);
+            }
+
             payload = JSONValue.toJSONString(objectMap);
             message = new HttpPut(uri);
 
@@ -326,7 +346,8 @@ public class ApiController {
 
         try {
 
-            HttpRequestBase message = getRequest(auth, uri, action, objectMap, headerMap);
+            CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.toString());
+            HttpRequestBase message = getRequest(auth, uri, action, objectMap, headerMap, interceptor);
 
             ResponseHandler<ApiControllerResponse> responseHandler = createResponseHandler();
 
@@ -354,7 +375,12 @@ public class ApiController {
                         map.put("list", list);
                         return map;
                     } else {
-                        return (Map<? extends String, ? extends Object>) response;
+                        if (interceptor == null) {
+                            return (Map<? extends String, ? extends Object>) response;
+                        } else {
+                            Map<String,Object> responseMap = (Map<String,Object>) response;
+                            return interceptor.decrypt(responseMap);
+                        }
                     }
                 } else {
                     int status = apiResponse.getStatus();
@@ -387,7 +413,8 @@ public class ApiController {
 
         } catch (IOException e) {
             throw new ApiCommunicationException("I/O error", e);
-
+        } catch (NoSuchAlgorithmException | CertificateEncodingException | DecoderException | NoSuchProviderException | InvalidKeyException | BadPaddingException | InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException e) {
+            throw new SystemException("Cryptography Error", e);
         } finally {
             try {
                 httpClient.close();
