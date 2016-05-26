@@ -50,7 +50,7 @@ public class TokenActivationSpec extends Specification {
             ApiConfig.setAuthentication(authentication);
 
             InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");
-            InputStream is3 = new FileInputStream("src/test/resources/private.key");
+            InputStream is3 = new FileInputStream("src/test/resources/mastercard_private.key");
             MDESCryptography interceptor = new MDESCryptography(is2, is3);
             ApiConfig.addCryptographyInterceptor(interceptor);
             //ApiConfig.addCryptographyInterceptor(new MDES())
