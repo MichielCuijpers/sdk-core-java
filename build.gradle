@@ -44,7 +44,7 @@ dependencies {
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: httpClientVersion
 
     // http://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk16
-    compile group: 'org.bouncycastle', name: 'bcprov-jdk16', version: '1.46'
+    //compile group: 'org.bouncycastle', name: 'bcprov-jdk16', version: '1.46'
 
 
 }

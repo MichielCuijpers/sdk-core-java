@@ -85,13 +85,13 @@ class EncryptDecryptSpec extends Specification {
 
 
         when: "encryptKey";
-        byte[] encryptedSecretKey = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", publicKey, secretKey.getEncoded());
+        byte[] encryptedSecretKey = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", publicKey, null, secretKey.getEncoded());
 
         then:
         encryptedSecretKey != null
 
         when: "decryptKey"
-        byte[] decryptedKeyByteArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", privateKey, encryptedSecretKey);
+        byte[] decryptedKeyByteArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", privateKey, null,  encryptedSecretKey);
         SecretKey originalKey = new SecretKeySpec(decryptedKeyByteArray, 0, decryptedKeyByteArray.length, "AES");
 
         then:

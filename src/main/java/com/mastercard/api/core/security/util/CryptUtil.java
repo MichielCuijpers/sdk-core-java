@@ -21,9 +21,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
  */
 public class CryptUtil {
 
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+//    static {
+//        Security.addProvider(new BouncyCastleProvider());
+//    }
 
     /**
      *
@@ -57,11 +57,23 @@ public class CryptUtil {
      * @return
      * @throws NoSuchAlgorithmException
      */
-    public static IvParameterSpec generateIv() throws NoSuchAlgorithmException {
-        SecureRandom randomSecureRandom = SecureRandom.getInstance("SHA1PRNG");
+    public static IvParameterSpec generateIv() throws NoSuchAlgorithmException, NoSuchProviderException {
+        SecureRandom randomSecureRandom = SecureRandom.getInstance("SHA1PRNG", "SUN");
         byte[] ivBytes = new byte[16]; //cipher.getBlockSize()
         randomSecureRandom.nextBytes(ivBytes);
         return  new IvParameterSpec(ivBytes);
+    }
+
+
+    /**
+     * this is the method to generate AES secret key
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
+    public static SecretKey generateSecretKey(String algorithm, int size) throws NoSuchAlgorithmException, NoSuchProviderException {
+        KeyGenerator keyGen = KeyGenerator.getInstance(algorithm, "SunJCE");
+        keyGen.init(size);
+        return keyGen.generateKey();
     }
 
     /**
@@ -89,6 +101,41 @@ public class CryptUtil {
         messageDigest.update(certificate.getEncoded());
         return messageDigest.digest();
     }
+
+    /**
+     *
+     * @param operation
+     * @param algorithm
+     * @param key
+     * @param iv
+     * @param clearText
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws NoSuchProviderException
+     */
+
+    public static byte[] crypt(int operation, String algorithm, Key key, AlgorithmParameterSpec iv, byte[] clearText)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+            InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException {
+
+        Cipher currentCipher = null;
+
+        currentCipher = Cipher.getInstance(algorithm);
+
+        if (iv == null) {
+            currentCipher.init(operation, key);
+        } else {
+            currentCipher.init(operation, key, iv);
+        }
+
+        return currentCipher.doFinal(clearText);
+    }
+
 
 
     /**
@@ -132,10 +179,23 @@ public class CryptUtil {
     }
 
 
+    public static Certificate loadCertificate(String instance, InputStream is) throws CertificateException, NoSuchProviderException {
+        CertificateFactory factory = CertificateFactory.getInstance(instance, "SUN"); //"X.509"
+        return factory.generateCertificate(is);
+    }
+
 
     public static Certificate loadCertificate(String instance, String provider, InputStream is) throws CertificateException, NoSuchProviderException {
         CertificateFactory factory = CertificateFactory.getInstance(instance, provider); //"X.509"
         return factory.generateCertificate(is);
+    }
+
+    public static PrivateKey loadPrivateKey(String instance, InputStream is)
+            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, NoSuchProviderException {
+        byte[] keyBytes = getBytesFromInputStream(is);
+        KeyFactory kf = KeyFactory.getInstance(instance, "SunRsaSign");
+        PKCS8EncodedKeySpec kspec = new PKCS8EncodedKeySpec(keyBytes);
+        return kf.generatePrivate(kspec);
     }
 
     public static PrivateKey loadPrivateKey(String instance, String provider, InputStream is)
@@ -159,6 +219,23 @@ public class CryptUtil {
 
             return os.toByteArray();
         }
+    }
+
+    public static Key loadKey(KeyType type, String instance, InputStream p12, String alias, String password)
+            throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException,
+            UnrecoverableKeyException {
+        KeyStore ks = KeyStore.getInstance(instance);
+        ks.load(p12, password.toCharArray());
+        Key key = ks.getKey(alias, password.toCharArray());
+        if (key instanceof PrivateKey) {
+            if (type.name().compareTo(KeyType.PRIVATE.name()) == 0) {
+                return key;
+            } else if (type.name().compareTo(KeyType.PUBLIC.name()) == 0){
+                X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+                return cert.getPublicKey();
+            }
+        }
+        return null;
     }
 
 

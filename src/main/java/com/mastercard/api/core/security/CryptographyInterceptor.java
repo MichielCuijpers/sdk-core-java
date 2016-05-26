@@ -20,8 +20,6 @@ public interface CryptographyInterceptor {
     String getTriggeringPath();
     Map<String,Object> encrypt(Map<String,Object> map) throws NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException;
     Map<String,Object> decrypt(Map<String,Object> map) throws DecoderException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException;
-
-
 }
 
 

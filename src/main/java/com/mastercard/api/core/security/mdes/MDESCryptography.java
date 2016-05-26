@@ -33,8 +33,8 @@ public class MDESCryptography implements CryptographyInterceptor {
     public MDESCryptography(InputStream issuerKeyInputStream, InputStream privateKeyInputStream)
             throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException,
             KeyStoreException, IOException, NoSuchProviderException, InvalidKeySpecException {
-        this.issuerCertificate = CryptUtil.loadCertificate("X.509", BouncyCastleProvider.PROVIDER_NAME, issuerKeyInputStream);
-        this.privateKey = CryptUtil.loadPrivateKey("RSA", "BC", privateKeyInputStream);
+        this.issuerCertificate = CryptUtil.loadCertificate("X.509",  issuerKeyInputStream);
+        this.privateKey = CryptUtil.loadPrivateKey("RSA", privateKeyInputStream);
     }
 
     @Override
@@ -58,14 +58,14 @@ public class MDESCryptography implements CryptographyInterceptor {
             String hexIv = CryptUtil.byteArrayToHexString(iv.getIV());
 
             // 5) generate AES SecretKey
-            SecretKey secretKey = CryptUtil.generateSecretKey("AES", BouncyCastleProvider.PROVIDER_NAME, 256);
+            SecretKey secretKey = CryptUtil.generateSecretKey("AES",  128);
 
             // 6) encrypt payload
-            byte[] encryptedData = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "AES/CBC/PKCS7Padding", BouncyCastleProvider.PROVIDER_NAME, secretKey, iv, payload.getBytes("UTF8"));
+            byte[] encryptedData = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "AES/CBC/PKCS5Padding", "SunJCE",  secretKey, iv, payload.getBytes("UTF8"));
             String hexEncryptedData = CryptUtil.byteArrayToHexString(encryptedData);
 
             // 7) encrypt secretKey with issuer key
-            byte[] encryptedSecretKey = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", BouncyCastleProvider.PROVIDER_NAME, this.issuerCertificate.getPublicKey(), null, secretKey.getEncoded());
+            byte[] encryptedSecretKey = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", "SunJCE",  this.issuerCertificate.getPublicKey(), null, secretKey.getEncoded());
             String hexEncryptedKey = CryptUtil.byteArrayToHexString(encryptedSecretKey);
 
             byte[] certificateFingerprint = CryptUtil.generateFingerprint("SHA-1", this.issuerCertificate);
@@ -99,7 +99,7 @@ public class MDESCryptography implements CryptographyInterceptor {
                 byte[] encryptedKeyByteArray = CryptUtil.hexStringToByteArray(encryptedKey);
 
                 //need to decryt with RSA
-                byte[] decryptedKeyByteArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", BouncyCastleProvider.PROVIDER_NAME, this.privateKey, null, encryptedKeyByteArray);
+                byte[] decryptedKeyByteArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", "SunJCE",  this.privateKey, null, encryptedKeyByteArray);
 
                 //need to decrypt the key
                 SecretKey secretKey = new SecretKeySpec(decryptedKeyByteArray, 0, decryptedKeyByteArray.length, "AES");
@@ -114,7 +114,7 @@ public class MDESCryptography implements CryptographyInterceptor {
                 String encryptedData = (String) tokenMap.remove("encryptedData");
                 byte[] encryptedDataByteArray = CryptUtil.hexStringToByteArray(encryptedData);
 
-                byte[] decryptedDataArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "AES/CBC/PKCS7Padding", BouncyCastleProvider.PROVIDER_NAME, secretKey, iv, encryptedDataByteArray);
+                byte[] decryptedDataArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "AES/CBC/PKCS5Padding", "SunJCE",  secretKey, iv, encryptedDataByteArray);
                 String decryptedDataString = new String(decryptedDataArray);
 
                 // remove the field that are not required in the map
