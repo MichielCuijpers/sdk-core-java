@@ -321,7 +321,7 @@ class ApiControllerSpec extends Specification {
         ApiController apiController = new ApiController()
 
         when:
-        apiController.getRequest(null, null, null, null, null)
+        apiController.getRequest(null, null, null, null, null, null)
 
         then:
         thrown(MessageSignerException)
@@ -341,7 +341,7 @@ class ApiControllerSpec extends Specification {
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when: "using global authentication"
-        apiController.getRequest(null, uri, action, objectMap, headerMap)
+        apiController.getRequest(null, uri, action, objectMap, headerMap, null)
 
         then: "global authentication is called"
         mockAuthentication.called == true
@@ -351,7 +351,7 @@ class ApiControllerSpec extends Specification {
         providedAuthentication = new MockAuthentication()
         mockAuthentication = new MockAuthentication()
         ApiConfig.authentication = mockAuthentication
-        apiController.getRequest(providedAuthentication, uri, action, objectMap, headerMap)
+        apiController.getRequest(providedAuthentication, uri, action, objectMap, headerMap, null)
 
         then: "provided authentication is called"
         mockAuthentication.called == false
@@ -371,7 +371,7 @@ class ApiControllerSpec extends Specification {
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when: "getRequest for create"
-        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap, null)
 
         then:
         httpRequestBase instanceof HttpPost
@@ -382,7 +382,7 @@ class ApiControllerSpec extends Specification {
 
         when: "getRequest for update"
         action = Action.update
-        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap, null)
 
         then:
         httpRequestBase instanceof HttpPut
@@ -404,7 +404,7 @@ class ApiControllerSpec extends Specification {
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap.clone())
 
         when: "getRequest for read"
-        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap, null)
 
         then:
         httpRequestBase instanceof HttpGet
@@ -414,7 +414,7 @@ class ApiControllerSpec extends Specification {
 
         when: "getRequest for list"
         action = Action.list
-        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap, null)
 
         then:
         httpRequestBase instanceof HttpGet
@@ -424,7 +424,7 @@ class ApiControllerSpec extends Specification {
 
         when: "getRequest for delete"
         action = Action.delete
-        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap, null)
 
         then:
         httpRequestBase instanceof HttpDelete
@@ -448,7 +448,7 @@ class ApiControllerSpec extends Specification {
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when:
-        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap, null)
 
         then:
         httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/$Constants.VERSION mock" as String
