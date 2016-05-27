@@ -65,7 +65,6 @@ public class ApiController {
 
     public static String API_BASE_LIVE_URL = Constants.API_BASE_LIVE_URL;
     public static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
-    public static String API_BASE_STAGE_URL = Constants.API_BASE_STAGE_URL;
     public static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
 
@@ -79,8 +78,6 @@ public class ApiController {
 
         if (ApiConfig.isSandbox()) {
             baseUrl = API_BASE_SANDBOX_URL;
-        } else if (ApiConfig.isStage()) {
-            baseUrl = API_BASE_STAGE_URL;
         }
 
         this.apiPath = baseUrl;
