@@ -140,6 +140,80 @@ public class CryptUtil {
 
     /**
      *
+     * @param algorithm
+     * @param provider
+     * @param key
+     * @param keyToWrap
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws NoSuchProviderException
+     */
+    public static byte[] wrap(String algorithm, String provider, Key key, Key keyToWrap)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+            InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException,
+            NoSuchProviderException {
+
+        Cipher currentCipher = null;
+
+        if (provider != null) {
+            currentCipher = Cipher.getInstance(algorithm, provider);
+        } else {
+            currentCipher = Cipher.getInstance(algorithm);
+        }
+
+        currentCipher.init(Cipher.WRAP_MODE, key);
+
+
+        return currentCipher.wrap(keyToWrap);
+    }
+
+    /**
+     *
+     *
+     * @param decryptMode
+     * @param algorithm
+     * @param provider
+     * @param key
+     * @param keyToUnwrap
+     * @param keyAlgorithmToUnwrap
+     * @param keyTypeToUnwrap
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws NoSuchProviderException
+     */
+    public static Key unwrap(String algorithm, String provider, Key key, byte[] keyToUnwrap, String keyAlgorithmToUnwrap, int keyTypeToUnwrap)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+            InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException,
+            NoSuchProviderException {
+
+        Cipher currentCipher = null;
+
+        if (provider != null) {
+            currentCipher = Cipher.getInstance(algorithm, provider);
+        } else {
+            currentCipher = Cipher.getInstance(algorithm);
+        }
+
+        currentCipher.init(Cipher.UNWRAP_MODE, key);
+
+
+        return currentCipher.unwrap(keyToUnwrap, keyAlgorithmToUnwrap, keyTypeToUnwrap);
+    }
+
+
+
+    /**
+     *
      * @param operation
      * @param algorithm
      * @param provider

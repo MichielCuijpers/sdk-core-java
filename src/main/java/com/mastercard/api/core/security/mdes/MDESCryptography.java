@@ -65,7 +65,7 @@ public class MDESCryptography implements CryptographyInterceptor {
             String hexEncryptedData = CryptUtil.byteArrayToHexString(encryptedData);
 
             // 7) encrypt secretKey with issuer key
-            byte[] encryptedSecretKey = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", "SunJCE",  this.issuerCertificate.getPublicKey(), null, secretKey.getEncoded());
+            byte[] encryptedSecretKey = CryptUtil.wrap("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", "SunJCE",  this.issuerCertificate.getPublicKey(), secretKey);
             String hexEncryptedKey = CryptUtil.byteArrayToHexString(encryptedSecretKey);
 
             byte[] certificateFingerprint = CryptUtil.generateFingerprint("SHA-1", this.issuerCertificate);
@@ -99,10 +99,8 @@ public class MDESCryptography implements CryptographyInterceptor {
                 byte[] encryptedKeyByteArray = CryptUtil.hexStringToByteArray(encryptedKey);
 
                 //need to decryt with RSA
-                byte[] decryptedKeyByteArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", "SunJCE",  this.privateKey, null, encryptedKeyByteArray);
-
                 //need to decrypt the key
-                SecretKey secretKey = new SecretKeySpec(decryptedKeyByteArray, 0, decryptedKeyByteArray.length, "AES");
+                SecretKey secretKey = (SecretKey) CryptUtil.unwrap("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", "SunJCE",  this.privateKey, encryptedKeyByteArray, "AES", Cipher.SECRET_KEY);
 
                 //need to read the iv
                 String ivString = (String) tokenMap.remove("iv");
