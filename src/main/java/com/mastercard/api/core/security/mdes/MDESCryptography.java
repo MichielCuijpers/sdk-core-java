@@ -34,7 +34,7 @@ public class MDESCryptography implements CryptographyInterceptor {
             throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException,
             KeyStoreException, IOException, NoSuchProviderException, InvalidKeySpecException {
         this.issuerCertificate = CryptUtil.loadCertificate("X.509", BouncyCastleProvider.PROVIDER_NAME, issuerKeyInputStream);
-        this.privateKey = CryptUtil.loadPrivateKey("RSA", "BC", privateKeyInputStream);
+        this.privateKey = CryptUtil.loadPrivateKey("RSA", BouncyCastleProvider.PROVIDER_NAME, privateKeyInputStream);
     }
 
     @Override
