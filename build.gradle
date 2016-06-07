@@ -13,7 +13,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0'   // artifactory
         classpath 'net.saliman:gradle-cobertura-plugin:2.3.0'
     }
@@ -48,6 +47,7 @@ dependencies {
 
 
 }
+
 
 // Maven-Publishing+Artifactory.
 publishing {
