@@ -10,10 +10,31 @@ sourceCompatibility = 1.7
 
 buildscript {
     repositories {
+
+        maven {
+            url "http://artifactory.mastercard.com:16364/artifactory/public"
+        }
+
+        maven {
+            url "http://artifactory.mastercard.com:16364/artifactory/public-snapshots"
+        }
+
+        maven {
+            url "http://artifactory.mastercard.com:16364/artifactory/public-snapshots/"
+        }
+
+        maven {
+            url "http://artifactory.mastercard.com:16364/artifactory/public/"
+        }
+
+        maven {
+            url "http://artifactory.mastercard.com:16364/artifactory/snapshots/"
+        }
+
         mavenCentral()
     }
 
-    
+
     dependencies {
         classpath files('libs/gradle-cobertura-plugin-2.3.2.jar')
         classpath files('libs/build-info-extractor-gradle-4.3.0-uber.jar')
