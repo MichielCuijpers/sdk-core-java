@@ -68,8 +68,8 @@ class EncryptDecryptSpec extends Specification {
 
 
 
-        PublicKey publicKey = CryptUtil.loadKey(KeyType.PUBLIC, "PKCS12", this.class.getClassLoader().getResourceAsStream("certificate.p12"), "1", "");
-        PrivateKey privateKey = CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", this.class.getClassLoader().getResourceAsStream("certificate.p12"), "1", "");
+        PublicKey publicKey = CryptUtil.loadKey(KeyType.PUBLIC, "PKCS12", null, this.class.getClassLoader().getResourceAsStream("certificate.p12"), "1", "");
+        PrivateKey privateKey = CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", null, this.class.getClassLoader().getResourceAsStream("certificate.p12"), "1", "");
 //        KeyStore ks = KeyStore.getInstance();
 //        ks.load(, "".toCharArray());
 //        Key privateKey = ks.getKey("1", "".toCharArray());
@@ -85,13 +85,13 @@ class EncryptDecryptSpec extends Specification {
 
 
         when: "encryptKey";
-        byte[] encryptedSecretKey = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", publicKey, secretKey.getEncoded());
+        byte[] encryptedSecretKey = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", BouncyCastleProvider.PROVIDER_NAME, publicKey, null,  secretKey.getEncoded());
 
         then:
         encryptedSecretKey != null
 
         when: "decryptKey"
-        byte[] decryptedKeyByteArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", privateKey, encryptedSecretKey);
+        byte[] decryptedKeyByteArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", BouncyCastleProvider.PROVIDER_NAME, privateKey, null, encryptedSecretKey);
         SecretKey originalKey = new SecretKeySpec(decryptedKeyByteArray, 0, decryptedKeyByteArray.length, "AES");
 
         then:
@@ -100,7 +100,7 @@ class EncryptDecryptSpec extends Specification {
 
 
         when: "decryptData"
-        byte[] decryptedBytesArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "AES/CBC/PKCS7Padding", "BC", originalKey, iv, encryptedData);
+        byte[] decryptedBytesArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "AES/CBC/PKCS7Padding", BouncyCastleProvider.PROVIDER_NAME, originalKey, iv, encryptedData);
 
         then: "check if decrypted text matches the input text"
         cardInfoJsonEscape == new String(decryptedBytesArray);

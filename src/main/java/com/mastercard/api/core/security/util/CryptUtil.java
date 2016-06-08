@@ -242,7 +242,15 @@ public class CryptUtil {
     public static Key loadKey(KeyType type, String instance, String provider, InputStream p12, String alias, String password)
             throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException,
             UnrecoverableKeyException, NoSuchProviderException {
-        KeyStore ks = KeyStore.getInstance(instance,provider);
+
+        KeyStore ks;
+        if (provider == null)
+        {
+          ks = KeyStore.getInstance(instance);
+        } else {
+            ks = KeyStore.getInstance(instance,provider);
+        }
+
         ks.load(p12, password.toCharArray());
         Key key = ks.getKey(alias, password.toCharArray());
         if (key instanceof PrivateKey) {
