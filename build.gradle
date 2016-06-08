@@ -10,21 +10,10 @@ sourceCompatibility = 1.7
 
 buildscript {
     repositories {
-
-        maven {
-            url 'http://labs.mastercard.com/artifactory/repo1-cache/'
-        }
-
-        maven {
-            url 'http://public.psddev.com/psddev'
-        }
-
         mavenCentral()
-
-
-
-
     }
+
+    
     dependencies {
         classpath files('libs/gradle-cobertura-plugin-2.3.2.jar')
         classpath files('libs/build-info-extractor-gradle-4.3.0-uber.jar')
