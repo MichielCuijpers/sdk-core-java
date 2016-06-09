@@ -26,7 +26,7 @@ public class MDESCryptography implements CryptographyInterceptor {
     private Certificate issuerCertificate;
     private PrivateKey privateKey;
     private List<String> fieldsToHide = Arrays.asList("publicKeyFingerprint","oaepHashingAlgorithm","iv","encryptedData","encryptedKey");
-    public  final String triggeringPath = "/mdes/tokenization/";
+    public  final String triggeringPath = "/tokenization";
 
 
 
