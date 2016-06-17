@@ -69,10 +69,13 @@ public class ApiController {
     private static String HEADER_SEPARATOR = ";";
 
     private String apiPath;
+    private String apiVersion;
 
     /**
      */
-    public ApiController() {
+    public ApiController(String apiVersion) {
+
+        this.apiVersion = apiVersion;
 
         String baseUrl = API_BASE_LIVE_URL;
 
@@ -296,7 +299,7 @@ public class ApiController {
         }
 
         // Add user agent
-        String userAgent = "Java-SDK/" + Constants.VERSION;
+        String userAgent = "Java-SDK/" + this.apiVersion;
         if (USER_AGENT != null) {
             userAgent = userAgent + " " + USER_AGENT;
         }

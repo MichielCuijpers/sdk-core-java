@@ -12,13 +12,13 @@ class BaseObjectSpec extends Specification {
     def apiController
 
     def setup() {
-        apiController = Mock(ApiController)
+        apiController = Mock(ApiController, constructorArgs: ["0.0.1"])
         MockBaseObject.setApiController(apiController)
     }
 
     def cleanup() {
         apiController = null;
-        MockBaseObject.setApiController(new ApiController())
+        MockBaseObject.setApiController(new ApiController("0.0.1"))
     }
 
 

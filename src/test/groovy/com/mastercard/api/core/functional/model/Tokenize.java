@@ -74,6 +74,10 @@ public class Tokenize extends BaseObject  {
         throw new IllegalArgumentException("Invalid action supplied: " + action);
     }
 
+    @Override protected String getApiVersion() {
+        return "0.0.1";
+    }
+
     
     
     /**

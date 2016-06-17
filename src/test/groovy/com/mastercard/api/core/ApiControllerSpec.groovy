@@ -367,7 +367,7 @@ class ApiControllerSpec extends Specification {
         Map<String, Object> headerMap = ApiController.subMap(objectMap, headersList);
 
 
-        ApiController apiController = new ApiController()
+        ApiController apiController = new ApiController(mockBaseObject.getApiVersion());
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when: "getRequest for create"
@@ -400,7 +400,7 @@ class ApiControllerSpec extends Specification {
         List<String> headersList = ['x-sdk-mock-header' ]
         Map<String, Object> headerMap = ApiController.subMap(objectMap, headersList);
 
-        ApiController apiController = new ApiController()
+        ApiController apiController = new ApiController(mockBaseObject.getApiVersion())
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap.clone())
 
         when: "getRequest for read"
@@ -444,14 +444,14 @@ class ApiControllerSpec extends Specification {
         List<String> headersList = ['x-sdk-mock-header' ]
         Map<String, Object> headerMap = ApiController.subMap(objectMap, headersList);
 
-        ApiController apiController = new ApiController()
+        ApiController apiController = new ApiController(mockBaseObject.getApiVersion())
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when:
         HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap, null)
 
         then:
-        httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/$Constants.VERSION mock" as String
+        httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/0.0.1 mock" as String
 
         cleanup:
         ApiController.USER_AGENT = null
@@ -459,7 +459,7 @@ class ApiControllerSpec extends Specification {
 
     private void assertHeaders(HttpRequestBase httpRequestBase, Map<String, String> customHeaders) {
         assert httpRequestBase.getFirstHeader("Accept").value == "application/json"
-        assert httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/$Constants.VERSION" as String
+        assert httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/0.0.1" as String
         assert httpRequestBase.getFirstHeader("MockAuthentication").value == "MockValue"
 
         customHeaders.each {

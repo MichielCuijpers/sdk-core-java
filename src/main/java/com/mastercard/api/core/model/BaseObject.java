@@ -40,11 +40,13 @@ import java.util.Map;
  */
 public abstract class BaseObject extends RequestMap {
 
+    protected static ApiController apiController = null;
+
     protected abstract String getResourcePath(Action action) throws IllegalArgumentException;
 
     protected abstract List<String> getHeaderParams(Action action) throws IllegalArgumentException;
 
-    protected static ApiController apiController = new ApiController();
+    protected abstract String getApiVersion();
 
     protected static BaseObject readObject(final Authentication authentication, final BaseObject value)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
@@ -112,7 +114,9 @@ public abstract class BaseObject extends RequestMap {
         ResourceList<T> listResults = new ResourceList<T>();
         Action list = Action.list;
 
-        Map<? extends String, ? extends Object> response = apiController
+        ApiController tmpApiController = (apiController == null) ? new ApiController(template.getApiVersion()) : apiController;
+
+        Map<? extends String, ? extends Object> response = tmpApiController
                 .execute(authentication, list, template.getResourcePath(list), template.getHeaderParams(list),
                         criteria);
 
@@ -150,6 +154,10 @@ public abstract class BaseObject extends RequestMap {
             @Override protected List<String> getHeaderParams(Action action) {
                 return bo.getHeaderParams(action);
             }
+
+            @Override protected String getApiVersion() {
+                return bo.getApiVersion();
+            }
         };
     }
 
@@ -158,7 +166,9 @@ public abstract class BaseObject extends RequestMap {
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        Map<? extends String, ? extends Object> response = apiController
+        ApiController tmpApiController = (apiController == null) ? new ApiController(requestObject.getApiVersion()) : apiController;
+
+        Map<? extends String, ? extends Object> response = tmpApiController
                 .execute(authentication, action, requestObject.getResourcePath(action),
                         requestObject.getHeaderParams(action), requestObject);
 

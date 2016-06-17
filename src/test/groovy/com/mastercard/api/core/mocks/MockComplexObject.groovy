@@ -18,6 +18,10 @@ class MockComplexObject extends BaseObject {
         return Arrays.asList("header-param")
     }
 
+    @Override protected String getApiVersion() {
+        return "0.0.1";
+    }
+
     public static void setApiController(ApiController apiController) {
         this.apiController = apiController;
     }

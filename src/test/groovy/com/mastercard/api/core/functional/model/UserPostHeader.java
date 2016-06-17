@@ -73,6 +73,10 @@ public class UserPostHeader extends BaseObject  {
         throw new IllegalArgumentException("Invalid action supplied: " + action);
     }
 
+    @Override protected String getApiVersion() {
+        return "0.0.1";
+    }
+
     // userId:(query:, param:, header:true, cookie:, body:)
     
     
