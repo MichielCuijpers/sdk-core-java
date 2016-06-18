@@ -19,10 +19,10 @@ import java.util.regex.Pattern
 
 public class OAuthAuthenticationSpec extends Specification {
 
-    String clientId = "gVaoFbo86jmTfOB4NUyGKaAchVEU8ZVPalHQRLTxeaf750b6!414b543630362f426b4f6636415a5973656c33735661383d"
+    String clientId = "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d"
     String alias = "test"
     String password = "password"
-    static final keystoreName = "test_key.p12"
+    static final keystoreName = "mcapi_sandbox_key.p12"
 
     static final Pattern AUTHORIZATION = Pattern.compile("\\s*(\\w*)\\s+(.*)");
     static final Pattern NVP = Pattern.compile("(\\S*)\\s*\\=\\s*\"([^\"]*)\"");
@@ -39,7 +39,7 @@ public class OAuthAuthenticationSpec extends Specification {
         PrivateKey privateKey = (PrivateKey) ks.getKey(alias, password.toCharArray());
 
         expect:
-        authentication.clientId == "gVaoFbo86jmTfOB4NUyGKaAchVEU8ZVPalHQRLTxeaf750b6!414b543630362f426b4f6636415a5973656c33735661383d"
+        authentication.clientId == "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d"
         authentication.privateKey == privateKey
     }
 

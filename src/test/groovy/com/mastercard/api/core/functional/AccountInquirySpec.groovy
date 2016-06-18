@@ -36,14 +36,14 @@ import spock.lang.Specification
 public class AccountInquirySpec extends Specification {
 
 
-    public static final String clientId = "gVaoFbo86jmTfOB4NUyGKaAchVEU8ZVPalHQRLTxeaf750b6!414b543630362f426b4f6636415a5973656c33735661383d";
+    public static final String clientId = "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d";
 
     def setupSpec() {
         ApiConfig.setDebug(true);
         ApiConfig.setSandbox(true);
 
         try {
-            InputStream is = new FileInputStream("src/test/resources/prod_key.p12");
+            InputStream is = new FileInputStream("src/test/resources/mcapi_sandbox_key.p12");
             Authentication authentication = new OAuthAuthentication(clientId, is, "test", "password");
             ApiConfig.setAuthentication(authentication);
         }
