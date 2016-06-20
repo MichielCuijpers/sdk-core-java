@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public abstract class BaseObject extends RequestMap {
 
-    protected static ApiController apiController = null;
+    protected static ApiController apiController = new ApiController();
 
     protected abstract String getResourcePath(Action action) throws IllegalArgumentException;
 
@@ -114,11 +114,10 @@ public abstract class BaseObject extends RequestMap {
         ResourceList<T> listResults = new ResourceList<T>();
         Action list = Action.list;
 
-        ApiController tmpApiController = (apiController == null) ? new ApiController(template.getApiVersion()) : apiController;
 
-        Map<? extends String, ? extends Object> response = tmpApiController
-                .execute(authentication, list, template.getResourcePath(list), template.getHeaderParams(list),
-                        criteria);
+        Map<? extends String, ? extends Object> response = apiController
+                .execute(authentication, list, template.getResourcePath(list), template.getApiVersion(),
+                        template.getHeaderParams(list), criteria);
 
         listResults.putAll(response);
 
@@ -166,10 +165,8 @@ public abstract class BaseObject extends RequestMap {
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        ApiController tmpApiController = (apiController == null) ? new ApiController(requestObject.getApiVersion()) : apiController;
-
-        Map<? extends String, ? extends Object> response = tmpApiController
-                .execute(authentication, action, requestObject.getResourcePath(action),
+        Map<? extends String, ? extends Object> response = apiController
+                .execute(authentication, action, requestObject.getResourcePath(action), requestObject.getApiVersion(),
                         requestObject.getHeaderParams(action), requestObject);
 
         BaseObject responseObject = createResponseBaseObject(requestObject);

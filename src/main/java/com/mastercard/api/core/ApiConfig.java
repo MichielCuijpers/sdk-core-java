@@ -32,6 +32,7 @@ public final class ApiConfig {
      * @param debug
      */
     public static void setDebug(boolean debug) {
+
         ApiConfig.debug = debug;
     }
 
