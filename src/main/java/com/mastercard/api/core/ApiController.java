@@ -217,7 +217,8 @@ public class ApiController {
     }
 
     private HttpRequestBase getRequest(Authentication authentication, URI uri, Action action,
-            Map<String, Object> objectMap, Map<String,Object> headerMap, CryptographyInterceptor interceptor)
+            String apiVersion, Map<String, Object> objectMap, Map<String, Object> headerMap,
+            CryptographyInterceptor interceptor)
             throws InvalidRequestException, MessageSignerException, NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
 
         HttpRequestBase message = null;
@@ -296,7 +297,7 @@ public class ApiController {
         }
 
         // Add user agent
-        String userAgent = "Java-SDK/" + Constants.VERSION;
+        String userAgent = "Java-SDK/" + apiVersion;
         if (USER_AGENT != null) {
             userAgent = userAgent + " " + USER_AGENT;
         }
@@ -310,7 +311,7 @@ public class ApiController {
     }
 
     public Map<? extends String, ? extends Object> execute(Authentication auth, Action action, String resourcePath,
-            List<String> headerList, Map<String, Object> objectMap)
+            String apiVersion, List<String> headerList, Map<String, Object> objectMap)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -344,7 +345,7 @@ public class ApiController {
         try {
 
             CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.toString());
-            HttpRequestBase message = getRequest(auth, uri, action, objectMap, headerMap, interceptor);
+            HttpRequestBase message = getRequest(auth, uri, action, apiVersion, objectMap, headerMap, interceptor);
 
             ResponseHandler<ApiControllerResponse> responseHandler = createResponseHandler();
 
