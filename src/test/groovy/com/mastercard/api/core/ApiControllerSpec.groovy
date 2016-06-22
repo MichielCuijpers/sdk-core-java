@@ -617,4 +617,33 @@ class ApiControllerSpec extends Specification {
 
     }
 
+    @Unroll
+    def "test getPathWithReplacedPath #path #expectedPath #params #expectedParams" () {
+        given:
+        ApiController apiController = new ApiController()
+
+        when:
+        String result = apiController.getPathWithReplacedPath(path, params)
+
+        then:
+        result == expectedPath
+        params == expectedParams
+
+        where:
+        path | expectedPath | params | expectedParams
+        "/api/{id}" | "/api/1" | [id: 1] | [:]
+        "/api/consumer/{consumer-id}/account/{account-id}" | "/api/consumer/1/account/a" | ['consumer-id': 1, 'account-id': "a"] | [:]
+    }
+
+    def "test getPathWithReplacedPath throws exception" () {
+        given:
+        ApiController apiController = new ApiController()
+
+        when:
+        apiController.getPathWithReplacedPath("/api/{consumer-id}", [id: 1])
+
+        then:
+        thrown(IllegalStateException)
+    }
+
 }
