@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
  * A key path consists of a sequence of key values separated by '.' characters.  Each part of the key path
  * consists of a separate map.  For example a key path of 'k1.k2.k3' is a map containing a key 'k1' whose
  * value is a map containing a key 'k2' whose values is a map containing a key 'k3'.   A key path can also
- * contain an array notation '[<number'] in which case the value of 'a' in the map is a list containing
+ * contain an array notation ['number'] in which case the value of 'a' in the map is a list containing
  * a map.  For example 'a[1].k2' refers to the key value 'k2' in the 2nd element of the list referred to by
  * the value of key 'a' in the map.  If no index value is given (i.e., '[]') then a put() method appends
  * to the list while a get() method returns the last value in the list.

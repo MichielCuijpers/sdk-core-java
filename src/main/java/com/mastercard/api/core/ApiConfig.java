@@ -32,7 +32,6 @@ public final class ApiConfig {
      * @param debug
      */
     public static void setDebug(boolean debug) {
-
         ApiConfig.debug = debug;
     }
 
@@ -62,7 +61,6 @@ public final class ApiConfig {
 
     /**
      * add a crypto interceptor
-     * @param basePath
      * @param cryptographyInterceptor
      */
     public static void addCryptographyInterceptor(CryptographyInterceptor cryptographyInterceptor) {
