@@ -68,6 +68,8 @@ public class TokenActivationSpec extends Specification {
         RequestMap requestMap = new RequestMap();
         requestMap.set("tokenRequestorId", "12345678901" );
         requestMap.set("requestId", "123456");
+        requestMap.set("tokenType", "CLOUD");
+        requestMap.set("taskId", "123456");
 
         requestMap.set("cardInfo.accountNumber", "5123456789012345");
         requestMap.set("cardInfo.expiryMonth", "12");
@@ -85,9 +87,8 @@ public class TokenActivationSpec extends Specification {
         then:
         response.get("decision").toString().equalsIgnoreCase("APPROVED")
         response.get("responseId").toString().equalsIgnoreCase("123456")
-        response.get("token.accountPanSuffix").toString().equalsIgnoreCase("2345")
-        response.get("token.expiryMonth").toString().equalsIgnoreCase("12")
-        response.get("token.expiryYear").toString().equalsIgnoreCase("16")
+        response.get("tokenInfo.accountPanSuffix").toString().equalsIgnoreCase("2345")
+        response.get("tokenInfo.tokenExpiry").toString().equalsIgnoreCase("1216")
 
     }
 

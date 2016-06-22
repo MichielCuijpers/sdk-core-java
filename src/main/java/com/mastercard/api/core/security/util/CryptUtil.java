@@ -2,7 +2,6 @@ package com.mastercard.api.core.security.util;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -20,10 +19,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
  * Created by andrearizzini on 13/05/2016.
  */
 public class CryptUtil {
-
-//    static {
-//        Security.addProvider(new BouncyCastleProvider());
-//    }
 
     /**
      *
@@ -254,40 +249,6 @@ public class CryptUtil {
         }
 
         return currentCipher.doFinal(clearText);
-    }
-
-    /**
-     *
-     * @param algorithm
-     * @param provider
-     * @param key
-     * @param keyToWrap
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws InvalidAlgorithmParameterException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws NoSuchProviderException
-     */
-    public static byte[] wrap(String algorithm, String provider, Key key, Key keyToWrap)
-            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
-            InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException,
-            NoSuchProviderException {
-
-        Cipher currentCipher = null;
-
-        if (provider != null) {
-            currentCipher = Cipher.getInstance(algorithm, provider);
-        } else {
-            currentCipher = Cipher.getInstance(algorithm);
-        }
-
-        currentCipher.init(Cipher.WRAP_MODE, key);
-
-
-        return currentCipher.wrap(keyToWrap);
     }
 
     /**

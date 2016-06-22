@@ -56,7 +56,7 @@ public class Tokenize extends BaseObject  {
             throw new IllegalArgumentException("Action cannot be null");
         }
         if (action == Action.create) {
-            return "/mdes/tokenization/1/0/token/tokenize";
+            return "/mdes/static/digitization/1/0/tokenize";
         }
         throw new IllegalArgumentException("Invalid action supplied: " + action);
     }

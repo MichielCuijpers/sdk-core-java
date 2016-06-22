@@ -3,12 +3,10 @@ package com.mastercard.api.core.security.mdes;
 import com.mastercard.api.core.security.CryptographyInterceptor;
 import com.mastercard.api.core.security.util.CryptUtil;
 import org.apache.commons.codec.DecoderException;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.json.simple.JSONValue;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -65,7 +63,7 @@ public class MDESCryptography implements CryptographyInterceptor {
             String hexEncryptedData = CryptUtil.byteArrayToHexString(encryptedData);
 
             // 7) encrypt secretKey with issuer key
-            byte[] encryptedSecretKey = CryptUtil.wrap("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", "SunJCE",  this.issuerCertificate.getPublicKey(), secretKey);
+            byte[] encryptedSecretKey = CryptUtil.wrap("RSA/ECB/PKCS1Padding", "SunJCE", this.issuerCertificate.getPublicKey(), secretKey);
             String hexEncryptedKey = CryptUtil.byteArrayToHexString(encryptedSecretKey);
 
             byte[] certificateFingerprint = CryptUtil.generateFingerprint("SHA-1", this.issuerCertificate);
@@ -74,7 +72,7 @@ public class MDESCryptography implements CryptographyInterceptor {
             HashMap encryptedMap = new HashMap();
             encryptedMap.put("publicKeyFingerprint", fingerprintHexString);
             encryptedMap.put("encryptedKey", hexEncryptedKey);
-            encryptedMap.put("oaepHashingAlgorithm", "SHA256");
+//            encryptedMap.put("oaepHashingAlgorithm", "PKCS1");
             encryptedMap.put("iv", hexIv);
             encryptedMap.put("encryptedData", hexEncryptedData);
             map.put("cardInfo", encryptedMap);
@@ -100,7 +98,7 @@ public class MDESCryptography implements CryptographyInterceptor {
 
                 //need to decryt with RSA
                 //need to decrypt the key
-                SecretKey secretKey = (SecretKey) CryptUtil.unwrap("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", "SunJCE",  this.privateKey, encryptedKeyByteArray, "AES", Cipher.SECRET_KEY);
+                SecretKey secretKey = (SecretKey) CryptUtil.unwrap("RSA/ECB/PKCS1Padding", "SunJCE", this.privateKey, encryptedKeyByteArray, "AES", Cipher.SECRET_KEY);
 
                 //need to read the iv
                 String ivString = (String) tokenMap.remove("iv");
