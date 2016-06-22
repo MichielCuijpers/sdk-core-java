@@ -111,9 +111,7 @@ public class CryptUtil {
      * @throws InvalidAlgorithmParameterException
      * @throws BadPaddingException
      * @throws IllegalBlockSizeException
-     * @throws NoSuchProviderException
      */
-
     public static byte[] crypt(int operation, String algorithm, Key key, AlgorithmParameterSpec iv, byte[] clearText)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException {
@@ -170,7 +168,6 @@ public class CryptUtil {
     /**
      *
      *
-     * @param decryptMode
      * @param algorithm
      * @param provider
      * @param key
