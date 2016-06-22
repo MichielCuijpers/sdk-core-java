@@ -13,10 +13,10 @@ import java.security.PrivateKey;
 
 public class OAuthSignerSpec extends Specification {
 
-    String clientId = "gVaoFbo86jmTfOB4NUyGKaAchVEU8ZVPalHQRLTxeaf750b6!414b543630362f426b4f6636415a5973656c33735661383d"
+    String consumerKey = "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d"
     String alias = "test"
     String password = "password"
-    static final keystoreName = "test_key.p12"
+    static final keystoreName = "mcapi_sandbox_key.p12"
 
     def 'test sign' () {
         given:
@@ -37,7 +37,7 @@ public class OAuthSignerSpec extends Specification {
 
         HttpParameters httpParameters = new HttpParameters()
         httpParameters.put("oauth_body_hash", "u0JWorwmuzHq%2B83yrTJkjURYjUo%3D")
-        httpParameters.put("oauth_consumer_key", clientId)
+        httpParameters.put("oauth_consumer_key", consumerKey)
         httpParameters.put("oauth_nonce", "6517064390040109503")
         httpParameters.put("oauth_signature_method", "RSA-SHA1")
         httpParameters.put("oauth_timestamp", "1455820772")
@@ -49,7 +49,7 @@ public class OAuthSignerSpec extends Specification {
         String signature = oAuthSigner.sign(request, httpParameters)
 
         then:
-        signature == "L/PqLaTp2TV/oGTZPwT0gGy/kMtBEXCqWtgyGsfR3SAmDWLuxIElUgMraBXdFvgKq+yCfWrsVE9N3exbPbmUFahb5nL7d//26SXQY2Vgwp6SY46w5liqpm9Pa4yZNgn2WaYawifPkbzmnZ1193VasffVIahrKcTPWUMAs9lZnhh1HForrAJYuv+4743RxbvRIQjMnZiVP0q+mfK2IHx+0hVLIDhzYb1+D8ammnAGBDzCs3be5gXtxM3pE5MrxfF8bQfdbKRz9w3auyx+vF56p5qMLujkUVF+WTOP0acOav1LFSySXf7bWXeHv/G0XzrS/e3VG4TzC1G/iPoHqPsNgw=="
+        signature == "xBm4TRRWUEy3Msfo+iuqTdoLiAyA0TZPpWZuNARR1/JA+PkVXvfCSeiOyBrqOlYSVBQxZlvx533Ei/JqMMuHg44vJ4pPI/+uKnXNFToWKW7o1REKUxm/bQxrjglRs8ksY72f2O9IpPrd/WQFCxxep5JePNwNtph4MkpFiFmQldOd6a2N0d5kuCFksTC3linuUKXfJ9+Lbwb3vp2/UA8IDBb+eNBgorAY+1C2hcnCdgaJsET5DVpdvpLRc6fVQDrxda7W/XZnZVcVHsgG462u/ZubKtfNSZVbP4xmjZkb4X1d0loF0sccPYH9mgInXzfDlcdOA8rbPK9VmzCuyG3ggQ=="
     }
 
     def 'test sign with null key throws InvalidKeyException' () {

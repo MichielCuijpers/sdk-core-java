@@ -321,7 +321,7 @@ class ApiControllerSpec extends Specification {
         ApiController apiController = new ApiController()
 
         when:
-        apiController.getRequest(null, null, null, null, null)
+        apiController.getRequest(null, null, null, null, null, null, null)
 
         then:
         thrown(MessageSignerException)
@@ -341,7 +341,7 @@ class ApiControllerSpec extends Specification {
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when: "using global authentication"
-        apiController.getRequest(null, uri, action, objectMap, headerMap)
+        apiController.getRequest(null, uri, action, mockBaseObject.getApiVersion(), objectMap, headerMap, null)
 
         then: "global authentication is called"
         mockAuthentication.called == true
@@ -351,7 +351,7 @@ class ApiControllerSpec extends Specification {
         providedAuthentication = new MockAuthentication()
         mockAuthentication = new MockAuthentication()
         ApiConfig.authentication = mockAuthentication
-        apiController.getRequest(providedAuthentication, uri, action, objectMap, headerMap)
+        apiController.getRequest(providedAuthentication, uri, action, mockBaseObject.getApiVersion(),objectMap, headerMap, null)
 
         then: "provided authentication is called"
         mockAuthentication.called == false
@@ -367,11 +367,11 @@ class ApiControllerSpec extends Specification {
         Map<String, Object> headerMap = ApiController.subMap(objectMap, headersList);
 
 
-        ApiController apiController = new ApiController()
+        ApiController apiController = new ApiController();
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when: "getRequest for create"
-        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, mockBaseObject.getApiVersion(), objectMap, headerMap, null)
 
         then:
         httpRequestBase instanceof HttpPost
@@ -382,7 +382,7 @@ class ApiControllerSpec extends Specification {
 
         when: "getRequest for update"
         action = Action.update
-        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        httpRequestBase = apiController.getRequest(null, uri, action, mockBaseObject.getApiVersion(), objectMap, headerMap, null)
 
         then:
         httpRequestBase instanceof HttpPut
@@ -404,7 +404,7 @@ class ApiControllerSpec extends Specification {
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap.clone())
 
         when: "getRequest for read"
-        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, mockBaseObject.getApiVersion(), objectMap, headerMap, null)
 
         then:
         httpRequestBase instanceof HttpGet
@@ -414,7 +414,7 @@ class ApiControllerSpec extends Specification {
 
         when: "getRequest for list"
         action = Action.list
-        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        httpRequestBase = apiController.getRequest(null, uri, action, mockBaseObject.getApiVersion(), objectMap, headerMap, null)
 
         then:
         httpRequestBase instanceof HttpGet
@@ -424,7 +424,7 @@ class ApiControllerSpec extends Specification {
 
         when: "getRequest for delete"
         action = Action.delete
-        httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        httpRequestBase = apiController.getRequest(null, uri, action, mockBaseObject.getApiVersion(), objectMap, headerMap, null)
 
         then:
         httpRequestBase instanceof HttpDelete
@@ -448,10 +448,10 @@ class ApiControllerSpec extends Specification {
         URI uri = apiController.getURI(action, mockBaseObject.getResourcePath(), objectMap)
 
         when:
-        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, objectMap, headerMap)
+        HttpRequestBase httpRequestBase = apiController.getRequest(null, uri, action, mockBaseObject.getApiVersion(), objectMap, headerMap, null)
 
         then:
-        httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/$Constants.VERSION mock" as String
+        httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/0.0.1 mock" as String
 
         cleanup:
         ApiController.USER_AGENT = null
@@ -459,7 +459,7 @@ class ApiControllerSpec extends Specification {
 
     private void assertHeaders(HttpRequestBase httpRequestBase, Map<String, String> customHeaders) {
         assert httpRequestBase.getFirstHeader("Accept").value == "application/json"
-        assert httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/$Constants.VERSION" as String
+        assert httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/0.0.1" as String
         assert httpRequestBase.getFirstHeader("MockAuthentication").value == "MockValue"
 
         customHeaders.each {
@@ -479,7 +479,7 @@ class ApiControllerSpec extends Specification {
         }
 
         when:
-        apiController.execute(null, Action.valueOf(action), type, [], objectMap)
+        apiController.execute(null, Action.valueOf(action), type, mockBaseObject.getApiVersion() , [], objectMap)
 
         then:
         thrown(IllegalStateException)
@@ -499,7 +499,7 @@ class ApiControllerSpec extends Specification {
         }
 
         when:
-        Map<String, Object> response = apiController.execute(null, Action.valueOf(action), type, [], objectMap)
+        Map<String, Object> response = apiController.execute(null, Action.valueOf(action), type, mockBaseObject.getApiVersion(), [], objectMap)
 
         then:
         response == executeResult
@@ -526,7 +526,7 @@ class ApiControllerSpec extends Specification {
         }
 
         when:
-        Map<String, Object> response = apiController.execute(null, Action.valueOf(action), type, [], objectMap)
+        Map<String, Object> response = apiController.execute(null, Action.valueOf(action), type, mockBaseObject.getApiVersion(), [], objectMap)
 
         then:
         response == executeResult
@@ -553,7 +553,7 @@ class ApiControllerSpec extends Specification {
         }
 
         when:
-        apiController.execute(null, Action.valueOf(action), type, [], objectMap)
+        apiController.execute(null, Action.valueOf(action), type, mockBaseObject.getApiVersion(), [], objectMap)
 
         then:
         thrown(thrownEx)
@@ -590,31 +590,60 @@ class ApiControllerSpec extends Specification {
         }
 
         when:
-        def response = apiController.execute(null, Action.valueOf(action), type, [], objectMap)
+        def response = apiController.execute(null, Action.valueOf(action), type, mockBaseObject.getApiVersion(), [], objectMap)
 
         then:
         response
 
         when:
-        response = apiController.execute(null, Action.valueOf(action), type, [], null)
+        response = apiController.execute(null, Action.valueOf(action), type, mockBaseObject.getApiVersion(), [], null)
 
         then:
         response
 
         when:
         mockHttpResponse.contentType = "$ContentType.APPLICATION_XML.mimeType; $ContentType.APPLICATION_JSON.mimeType"
-        apiController.execute(null, Action.valueOf(action), type, [], objectMap)
+        apiController.execute(null, Action.valueOf(action), type, mockBaseObject.getApiVersion(), [], objectMap)
 
         then:
         thrown(ApiCommunicationException)
 
         when:
         mockHttpResponse.contentType = null
-        apiController.execute(null, Action.valueOf(action), type, [], objectMap)
+        apiController.execute(null, Action.valueOf(action), type, mockBaseObject.getApiVersion(), [], objectMap)
 
         then:
         thrown(IllegalStateException)
 
+    }
+
+    @Unroll
+    def "test getPathWithReplacedPath #path #expectedPath #params #expectedParams" () {
+        given:
+        ApiController apiController = new ApiController()
+
+        when:
+        String result = apiController.getPathWithReplacedPath(path, params)
+
+        then:
+        result == expectedPath
+        params == expectedParams
+
+        where:
+        path | expectedPath | params | expectedParams
+        "/api/{id}" | "/api/1" | [id: 1] | [:]
+        "/api/consumer/{consumer-id}/account/{account-id}" | "/api/consumer/1/account/a" | ['consumer-id': 1, 'account-id': "a"] | [:]
+    }
+
+    def "test getPathWithReplacedPath throws exception" () {
+        given:
+        ApiController apiController = new ApiController()
+
+        when:
+        apiController.getPathWithReplacedPath("/api/{consumer-id}", [id: 1])
+
+        then:
+        thrown(IllegalStateException)
     }
 
 }

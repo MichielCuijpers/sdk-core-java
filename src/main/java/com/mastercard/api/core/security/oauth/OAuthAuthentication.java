@@ -45,19 +45,32 @@ import java.security.cert.CertificateException;
 
 public class OAuthAuthentication implements Authentication {
 
-    private String clientId;
+    private String consumerKey;
     private PrivateKey privateKey;
 
-    public OAuthAuthentication(String clientId, InputStream is, String alias, String password) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
-        if(clientId == null) {
-            throw new IllegalArgumentException("ClientId cannot null");
+    /**
+     *
+     * @param consumerKey consumer key for your project
+     * @param is InputStream for the .p12 private key file
+     * @param alias alias of the private key
+     * @param password password for private key
+     *
+     * @throws UnrecoverableKeyException
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws IOException
+     */
+    public OAuthAuthentication(String consumerKey, InputStream is, String alias, String password) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        if(consumerKey == null) {
+            throw new IllegalArgumentException("ConsumerKey cannot null");
         }
 
         if(is == null) {
             throw new IllegalArgumentException("InputStream cannot null");
         }
 
-        this.clientId = clientId;
+        this.consumerKey = consumerKey;
         setP12(is, alias, password);
     }
 
@@ -93,7 +106,7 @@ public class OAuthAuthentication implements Authentication {
         OAuthSigner oAuthSigner = new OAuthSigner(privateKey);
 
         // Create OAuthConsumer
-        OAuthConsumer oAuthConsumer = new DefaultOAuthConsumer(clientId, "");
+        OAuthConsumer oAuthConsumer = new DefaultOAuthConsumer(consumerKey, "");
         oAuthConsumer.setMessageSigner(oAuthSigner);
         oAuthConsumer.setAdditionalParameters(params);
 

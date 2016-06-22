@@ -24,9 +24,7 @@ class RequestMapSpec extends Specification {
         requestMap.remove("d.aa") == 11
 
         requestMap.get("d.bb") == "22"
-
     }
-
 
     def 'test RequestMap as list' () {
         given:
@@ -47,10 +45,7 @@ class RequestMapSpec extends Specification {
         requestMap.get("e[]") == [three:3]
         requestMap.containsKey("e[]") == true
         requestMap.remove("e[]") == [three:3]
-
-
     }
-
 
     def 'test RequestMap and list of string'() {
         given:
@@ -58,10 +53,7 @@ class RequestMapSpec extends Specification {
 
         expect:
         requestMap.get("Categories.Category[0]") == "1Apparel"
-
     }
-
-
 
     def 'test RequestMap as list throw exception' () {
         given:
@@ -85,10 +77,7 @@ class RequestMapSpec extends Specification {
 
         then:
         thrown IllegalArgumentException
-
     }
-
-
 
     def 'test RequestMap(String jsonMapString)' () {
         given:
@@ -100,7 +89,6 @@ class RequestMapSpec extends Specification {
         requestMap.get("AccountInquiry.AccountNumber") == "5343434343434343"
         requestMap.get("Account.Status") == "true"
     }
-
 
     def 'test where value does not exists' () {
         given:
@@ -191,6 +179,70 @@ class RequestMapSpec extends Specification {
         then:
         !requestMap.containsKey("d")
         !requestMap.containsKey("d.bb")
+    }
+
+    def 'test set arrays' () {
+        given:
+        RequestMap rm1 = new RequestMap()
+        def cards = [[pan: "pan1"],[pan: "pan2"]]
+
+        when: "directly set an array of cards"
+        rm1.set("user.cards", cards)
+
+        then:
+        rm1.get("user.cards") instanceof List
+        rm1.get("user.cards").size() == 2
+        rm1.get("user.cards[0].pan") == "pan1"
+        rm1.get("user.cards[1].pan") == "pan2"
+
+        when: "setting an index"
+        RequestMap rm2 = new RequestMap()   // reset requestMap
+        RequestMap card1 = new RequestMap()
+                .set("pan", "initialize1")
+        RequestMap card2 = new RequestMap()
+                .set("pan", "initialize2")
+        rm2.set("user.cards[0]", card1)
+        rm2.set("user.cards[1]", card2)
+
+        then:
+        rm2.get("user.cards") instanceof List
+        rm2.get("user.cards").size() == 2
+        rm2.get("user.cards[0].pan") == "initialize1"
+        rm2.get("user.cards[1].pan") == "initialize2"
+
+        when: "overwrite existing using index"
+        rm2.set("user.cards[0].pan", "pan1")
+        rm2.set("user.cards[1].pan", "pan2")
+
+        then:
+        rm2.get("user.cards") instanceof List
+        rm2.get("user.cards").size() == 2
+        rm2.get("user.cards[0].pan") == "pan1"
+        rm2.get("user.cards[1].pan") == "pan2"
+
+        when: "set a value using the index"
+        RequestMap rm3 = new RequestMap();
+        rm3.set("user.cards[0].pan", "pan1")
+        rm3.set("user.cards[1].pan", "pan2")
+
+        then:
+        rm3.get("user.cards") instanceof List
+        rm3.get("user.cards").size() == 2
+        rm3.get("user.cards[0].pan") == "pan1"
+        rm3.get("user.cards[1].pan") == "pan2"
+    }
+
+    def 'test set multiple array' () {
+        given:
+        RequestMap requestMap = new RequestMap()
+
+        when:
+        requestMap.set("user.cards[0].addresses[0].line1", "1")
+
+        then:
+        requestMap.get("user.cards") instanceof List
+        requestMap.get("user.cards[0].addresses") instanceof List
+        requestMap.get("user.cards[0].addresses[0].line1") == "1"
     }
 
 }

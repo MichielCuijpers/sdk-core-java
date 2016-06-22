@@ -127,7 +127,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
         Map<String, Object> map = null;
         for (int i = 0; i <= (keys.length - 2); i++) {
             String thisKey = keys[i];
-            Object tmpObject = _get(thisKey, map);
+            Object tmpObject = _get(thisKey, map, false);
             if (tmpObject == null) {
                 tmpObject = _create(thisKey, null, map);
                 if (tmpObject instanceof Map) {
@@ -253,6 +253,18 @@ public class RequestMap extends LinkedHashMap<String, Object> {
      * @throws IllegalArgumentException
      */
     private Object _get(String key, Map<String, Object> map) throws IllegalArgumentException {
+        return _get(key, map, true);
+    }
+
+    /**
+     *
+     * @param key
+     * @param map
+     * @param retrievalMode (if calling _get from put then retrievalMode is false)
+     * @return
+     * @throws IllegalArgumentException
+     */
+    private Object _get(String key, Map<String, Object> map, boolean retrievalMode) throws IllegalArgumentException {
         Matcher m = arrayIndexPattern.matcher(key);
         if (!m.matches()) {
             //this could return any object
@@ -269,13 +281,20 @@ public class RequestMap extends LinkedHashMap<String, Object> {
 
             Object tmpObject = null;
             if (map == null) {
-                 tmpObject = super.get(keyName);  // get the list from the map
+                tmpObject = super.get(keyName);  // get the list from the map
             } else {
                 tmpObject = map.get(keyName);
             }
 
             if (!(tmpObject instanceof List)) {
-                throw new IllegalArgumentException("Property '" + key + "' is not an array");
+                // Only if we are retrieving from the map
+                if (retrievalMode) {
+                    throw new IllegalArgumentException("Property '" + key + "' is not an array");
+                }
+                // If we are not retrieving i.e. put was called then return null and the array will be created
+                else {
+                    return null;
+                }
             }
 
             List<Map<String, Object>> tmpList = (List<Map<String, Object>>) tmpObject;  // get the list from the map
@@ -285,7 +304,13 @@ public class RequestMap extends LinkedHashMap<String, Object> {
                 index = Integer.parseInt(m.group(2));
             }
 
-            return tmpList.get(index);
+            // Code against IndexOutOfBoundsException
+            if (tmpList.size() > index) {
+                return tmpList.get(index);
+            }
+            else {
+                return null;
+            }
         }
     }
 

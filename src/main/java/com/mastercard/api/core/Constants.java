@@ -27,9 +27,7 @@
 
 package com.mastercard.api.core;
 
-public final class Constants {
-    public static final String VERSION = "1.0.0";
+final class Constants {
     public static final String API_BASE_LIVE_URL = "https://api.mastercard.com";
-    public static final String API_BASE_STAGE_URL = "https://stage.api.mastercard.com";
     public static final String API_BASE_SANDBOX_URL = "https://sandbox.api.mastercard.com";
 }

@@ -23,4 +23,8 @@ class MockBaseObject extends BaseObject {
     public static void setApiController(ApiController apiController) {
         BaseObject.apiController = apiController;
     }
+
+    @Override protected String getApiVersion() {
+        return "0.0.1";
+    }
 }

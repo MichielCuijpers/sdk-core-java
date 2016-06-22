@@ -26,14 +26,14 @@ public class MDESCryptography implements CryptographyInterceptor {
     private Certificate issuerCertificate;
     private PrivateKey privateKey;
     private List<String> fieldsToHide = Arrays.asList("publicKeyFingerprint","oaepHashingAlgorithm","iv","encryptedData","encryptedKey");
-    public  final String triggeringPath = "/mdes/tokenization/";
+    public  final String triggeringPath = "/tokenize";
 
 
 
     public MDESCryptography(InputStream issuerKeyInputStream, InputStream privateKeyInputStream)
             throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException,
             KeyStoreException, IOException, NoSuchProviderException, InvalidKeySpecException {
-        this.issuerCertificate = CryptUtil.loadCertificate("X.509",  issuerKeyInputStream);
+        this.issuerCertificate = CryptUtil.loadCertificate("X.509", issuerKeyInputStream);
         this.privateKey = CryptUtil.loadPrivateKey("RSA", privateKeyInputStream);
     }
 

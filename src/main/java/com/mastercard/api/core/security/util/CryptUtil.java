@@ -235,6 +235,10 @@ public class CryptUtil {
             InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException,
             NoSuchProviderException {
 
+        if (operation == Cipher.UNWRAP_MODE || operation == Cipher.WRAP_MODE) {
+            throw new InvalidAlgorithmParameterException("Cannot use Wrap/UnWrap in a crypt method");
+        }
+
         Cipher currentCipher = null;
 
         if (provider != null) {
@@ -251,6 +255,79 @@ public class CryptUtil {
 
         return currentCipher.doFinal(clearText);
     }
+
+    /**
+     *
+     * @param algorithm
+     * @param provider
+     * @param key
+     * @param keyToWrap
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws NoSuchProviderException
+     */
+    public static byte[] wrap(String algorithm, String provider, Key key, Key keyToWrap)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+            InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException,
+            NoSuchProviderException {
+
+        Cipher currentCipher = null;
+
+        if (provider != null) {
+            currentCipher = Cipher.getInstance(algorithm, provider);
+        } else {
+            currentCipher = Cipher.getInstance(algorithm);
+        }
+
+        currentCipher.init(Cipher.WRAP_MODE, key);
+
+
+        return currentCipher.wrap(keyToWrap);
+    }
+
+    /**
+     *
+     *
+     * @param decryptMode
+     * @param algorithm
+     * @param provider
+     * @param key
+     * @param keyToUnwrap
+     * @param keyAlgorithmToUnwrap
+     * @param keyTypeToUnwrap
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws NoSuchProviderException
+     */
+    public static Key unwrap(int decryptMode, String algorithm, String provider, Key key, byte[] keyToUnwrap, String keyAlgorithmToUnwrap, int keyTypeToUnwrap)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+            InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException,
+            NoSuchProviderException {
+
+        Cipher currentCipher = null;
+
+        if (provider != null) {
+            currentCipher = Cipher.getInstance(algorithm, provider);
+        } else {
+            currentCipher = Cipher.getInstance(algorithm);
+        }
+
+        currentCipher.init(Cipher.UNWRAP_MODE, key);
+
+
+        return currentCipher.unwrap(keyToUnwrap, keyAlgorithmToUnwrap, keyTypeToUnwrap);
+    }
+
 
 
     public static Certificate loadCertificate(String instance, InputStream is) throws CertificateException, NoSuchProviderException {
@@ -316,7 +393,15 @@ public class CryptUtil {
     public static Key loadKey(KeyType type, String instance, String provider, InputStream p12, String alias, String password)
             throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException,
             UnrecoverableKeyException, NoSuchProviderException {
-        KeyStore ks = KeyStore.getInstance(instance,provider);
+
+        KeyStore ks;
+        if (provider == null)
+        {
+          ks = KeyStore.getInstance(instance);
+        } else {
+            ks = KeyStore.getInstance(instance,provider);
+        }
+
         ks.load(p12, password.toCharArray());
         Key key = ks.getKey(alias, password.toCharArray());
         if (key instanceof PrivateKey) {

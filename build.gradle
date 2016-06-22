@@ -1,9 +1,9 @@
 apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'net.saliman.cobertura'
+apply plugin: 'com.jfrog.artifactory'
 //apply plugin: 'cobertura'
 
 sourceCompatibility = 1.7
@@ -12,16 +12,44 @@ buildscript {
     repositories {
         jcenter()
     }
+
+
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0'   // artifactory
-        classpath 'net.saliman:gradle-cobertura-plugin:2.3.0'
+        classpath files('libs/gradle-cobertura-plugin-2.3.2.jar')
+        classpath files('libs/build-info-extractor-gradle-4.3.0-uber.jar')
     }
 }
 
 repositories {
-    mavenCentral()
-    maven { url 'http://labs.mastercard.com/artifactory/repo' }
+    //arizzini: wait of time, bamboo outbound connections are blocked.
+    //mavenCentral()
+    maven {
+        url "http://artifactory.mastercard.com:16364/artifactory/public"
+    }
+
+    maven {
+        url "http://artifactory.mastercard.com:16364/artifactory/public-snapshots"
+    }
+
+    maven {
+        url "http://artifactory.mastercard.com:16364/artifactory/public-snapshots/"
+    }
+
+    maven {
+        url "http://artifactory.mastercard.com:16364/artifactory/public/"
+    }
+
+    maven {
+        url "http://artifactory.mastercard.com:16364/artifactory/snapshots/"
+    }
+
+    maven {
+        url 'http://labs.mastercard.com/artifactory/repo'
+
+    }
+    maven {
+        url 'http://labs.mastercard.com/artifactory/local-repos'
+    }
 }
 
 ext {
@@ -49,6 +77,7 @@ dependencies {
 
 }
 
+
 // Maven-Publishing+Artifactory.
 publishing {
     publications {
@@ -59,7 +88,7 @@ publishing {
 }
 
 artifactory {
-    contextUrl = 'http://tools.labs.mastercard.com/artifactory/'
+    contextUrl = 'http://labs.mastercard.com/artifactory/'
 
     publish {
         repository {
