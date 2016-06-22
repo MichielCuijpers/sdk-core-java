@@ -507,7 +507,8 @@ public class ApiController {
                 } else {
                     throw new IOException(
                             "Response was not " + ContentType.APPLICATION_JSON.getMimeType() + ", it was: "
-                                    + responseContentType + ". Unable to process payload.");
+                                    + responseContentType + ". Unable to process payload. " +
+                                    "\nResponse: [ " + payload + " + ]");
                 }
 
                 return apiResponse;
