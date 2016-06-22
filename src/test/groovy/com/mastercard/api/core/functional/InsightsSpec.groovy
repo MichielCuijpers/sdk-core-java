@@ -36,7 +36,7 @@ import spock.lang.Specification
 
 public class InsightsSpec extends Specification {
 
-    public static final String clientId = "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d";
+    public static final String consumerKey = "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d";
 
     def setupSpec() {
         ApiConfig.setDebug(true)
@@ -44,7 +44,7 @@ public class InsightsSpec extends Specification {
 
         try {
             InputStream is = new FileInputStream("src/test/resources/mcapi_sandbox_key.p12")
-            Authentication authentication = new OAuthAuthentication(clientId, is, "test", "password")
+            Authentication authentication = new OAuthAuthentication(consumerKey, is, "test", "password")
             ApiConfig.setAuthentication(authentication)
         }
         catch (Exception e) {

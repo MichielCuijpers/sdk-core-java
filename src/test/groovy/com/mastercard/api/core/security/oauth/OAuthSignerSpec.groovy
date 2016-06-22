@@ -13,7 +13,7 @@ import java.security.PrivateKey;
 
 public class OAuthSignerSpec extends Specification {
 
-    String clientId = "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d"
+    String consumerKey = "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d"
     String alias = "test"
     String password = "password"
     static final keystoreName = "mcapi_sandbox_key.p12"
@@ -37,7 +37,7 @@ public class OAuthSignerSpec extends Specification {
 
         HttpParameters httpParameters = new HttpParameters()
         httpParameters.put("oauth_body_hash", "u0JWorwmuzHq%2B83yrTJkjURYjUo%3D")
-        httpParameters.put("oauth_consumer_key", clientId)
+        httpParameters.put("oauth_consumer_key", consumerKey)
         httpParameters.put("oauth_nonce", "6517064390040109503")
         httpParameters.put("oauth_signature_method", "RSA-SHA1")
         httpParameters.put("oauth_timestamp", "1455820772")
