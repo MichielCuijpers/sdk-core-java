@@ -110,8 +110,13 @@ task javadocJar(type: Jar) {
     from javadoc
 }
 
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 artifacts {
-    archives javadocJar
+    archives javadocJar, sourcesJar
 }
 
 signing {
