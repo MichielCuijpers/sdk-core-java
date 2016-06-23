@@ -33,6 +33,7 @@ import com.mastercard.api.core.security.Authentication
 
 import com.mastercard.api.core.security.mdes.MDESCryptography
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
+import spock.lang.Ignore
 import spock.lang.Specification
 
 public class TokenActivationSpec extends Specification {
@@ -61,7 +62,7 @@ public class TokenActivationSpec extends Specification {
 
     }
 
-
+    @Ignore
     def 'send tokenization request'() {
         when:
 
