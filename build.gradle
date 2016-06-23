@@ -4,6 +4,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'net.saliman.cobertura'
 apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'signing'
 //apply plugin: 'cobertura'
 
 sourceCompatibility = 1.7
@@ -62,10 +63,11 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.4'
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.4'
-    compile 'org.slf4j:slf4j-api:1.7.16'
+
     testRuntime 'cglib:cglib-nodep:3.2.0'
-    runtime 'log4j:log4j:1.2.17'
     testRuntime 'org.objenesis:objenesis:2.2'
+
+    runtime 'log4j:log4j:1.2.17'
 
     compile group: 'oauth.signpost', name: 'signpost-core', version: signpostVersion
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
@@ -102,3 +104,63 @@ artifactory {
         repoKey = 'jcenter'
     }
 }
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'MasterCard Java SDK Core'
+                packaging 'jar'
+                description 'Java Core SDK for use with SDKs availabe on MasterCard Developer Zone (https://developer.mastercard.com)'
+                url 'https://developer.mastercard.com'
+
+                scm {
+                    connection 'scm:git:git://github.com/MasterCard/mastercard-java-sdk-core.git'
+                    developerConnection 'scm:git:git@github.com:MasterCard/mastercard-java-sdk-core.git'
+                    url 'https://github.com/MasterCard/mastercard-java-sdk-core'
+                }
+
+                licenses {
+                    license {
+                        name 'BSD-2 License'
+                    }
+                }
+
+                developers {
+                    developer {
+                        email 'APISupport@mastercard.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
