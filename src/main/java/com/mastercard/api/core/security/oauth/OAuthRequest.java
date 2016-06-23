@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class OAuthRequest implements HttpRequest {
@@ -25,8 +25,8 @@ public class OAuthRequest implements HttpRequest {
 
     public OAuthRequest() {
         super();
-        headers = new HashMap<String, String>();
-        formParams = new HashMap<String, String>();
+        headers = new LinkedHashMap<>();
+        formParams = new LinkedHashMap<String, String>();
     }
 
     public Map<String, String> getFormParams() {
