@@ -173,20 +173,6 @@ public class ApiController {
         //arizzini: removing last slash (/)
         objectList.add(updatedType.replaceAll("/$", ""));
 
-        // Handle Id
-        switch (action) {
-            case read:
-            case update:
-            case delete:
-                if (objectMap.containsKey("id")) {
-                    s.append("/%s");
-                    objectList.add(urlEncode(objectMap.get("id")));
-                    objectMap.remove("id");
-                }
-
-                break;
-        }
-
         // Add Query Params
         switch (action) {
             case read:
