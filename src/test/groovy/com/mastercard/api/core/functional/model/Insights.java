@@ -74,6 +74,19 @@ public class Insights extends BaseObject  {
         throw new IllegalArgumentException("Invalid action supplied: " + action);
     }
 
+    @Override
+    protected List<String> getQueryParams(Action action) throws IllegalArgumentException {
+        if (action == null) {
+            throw new IllegalArgumentException("Action cannot be null");
+        }
+        if (action == Action.query) {
+            return Arrays.asList();
+        }
+
+        throw new IllegalArgumentException("Invalid action supplied: " + action);
+    }
+
+
     @Override protected String getApiVersion() {
         return "0.0.1";
     }

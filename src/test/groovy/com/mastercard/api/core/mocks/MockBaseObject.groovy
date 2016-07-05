@@ -19,6 +19,10 @@ class MockBaseObject extends BaseObject {
         return Arrays.asList("header-param")
     }
 
+    @Override
+    protected List<String> getQueryParams(Action action) throws IllegalArgumentException {
+        return Arrays.asList("query-param")
+    }
 
     public static void setApiController(ApiController apiController) {
         BaseObject.apiController = apiController;
