@@ -31,7 +31,7 @@ import java.util.Map;
 
 /**
  * Thrown to indicate that a communication error has occurred processing an API request.
- *
+ * HTTP 503
  * @see com.mastercard.api.core.exception.ApiException
  */
 public class ApiCommunicationException extends ApiException {

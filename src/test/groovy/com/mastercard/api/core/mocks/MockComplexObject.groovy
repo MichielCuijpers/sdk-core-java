@@ -18,6 +18,11 @@ class MockComplexObject extends BaseObject {
         return Arrays.asList("header-param")
     }
 
+    @Override
+    protected List<String> getQueryParams(Action action) throws IllegalArgumentException {
+        return Arrays.asList("query-param")
+    }
+
     @Override protected String getApiVersion() {
         return "0.0.1";
     }

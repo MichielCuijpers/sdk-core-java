@@ -46,6 +46,8 @@ public abstract class BaseObject extends RequestMap {
 
     protected abstract List<String> getHeaderParams(Action action) throws IllegalArgumentException;
 
+    protected abstract List<String> getQueryParams(Action action) throws IllegalArgumentException;
+
     protected abstract String getApiVersion();
 
     protected static BaseObject readObject(final Authentication authentication, final BaseObject value)
@@ -117,7 +119,7 @@ public abstract class BaseObject extends RequestMap {
 
         Map<? extends String, ? extends Object> response = apiController
                 .execute(authentication, list, template.getResourcePath(list), template.getApiVersion(),
-                        template.getHeaderParams(list), criteria);
+                        template.getHeaderParams(list), template.getQueryParams(list), criteria);
 
         listResults.putAll(response);
 
@@ -154,6 +156,11 @@ public abstract class BaseObject extends RequestMap {
                 return bo.getHeaderParams(action);
             }
 
+            @Override
+            protected List<String> getQueryParams(Action action) throws IllegalArgumentException {
+                return bo.getQueryParams(action);
+            }
+
             @Override protected String getApiVersion() {
                 return bo.getApiVersion();
             }
@@ -167,7 +174,7 @@ public abstract class BaseObject extends RequestMap {
 
         Map<? extends String, ? extends Object> response = apiController
                 .execute(authentication, action, requestObject.getResourcePath(action), requestObject.getApiVersion(),
-                        requestObject.getHeaderParams(action), requestObject);
+                        requestObject.getHeaderParams(action), requestObject.getQueryParams(action), requestObject);
 
         BaseObject responseObject = createResponseBaseObject(requestObject);
 

@@ -33,6 +33,7 @@ import java.util.Map;
 
 /**
  * Thrown to indicate that an error occured processing an API request.
+ * HTTP 400
  *
  * @see com.mastercard.api.core.exception.ApiException
  */

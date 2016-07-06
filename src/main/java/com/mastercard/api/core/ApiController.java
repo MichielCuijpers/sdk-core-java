@@ -158,12 +158,12 @@ public class ApiController {
         return tmpResult;
     }
 
-    private URI getURI(Action action, String type, Map<String, Object> objectMap)
+    private URI getURI(Action action, String resourcePath, Map<String, Object> objectMap, List<String> additionalQueryParametersList)
             throws UnsupportedEncodingException, IllegalStateException {
         URI uri;
 
         //arizzini: need to replace all the path variables
-        String updatedType = getPathWithReplacedPath(type, objectMap);
+        String updatedType = getPathWithReplacedPath(resourcePath, objectMap);
 
         StringBuilder s = new StringBuilder("%s%s");
 
@@ -173,35 +173,40 @@ public class ApiController {
         //arizzini: removing last slash (/)
         objectList.add(updatedType.replaceAll("/$", ""));
 
-        // Handle Id
-        switch (action) {
-        case read:
-        case update:
-        case delete:
-            if (objectMap.containsKey("id")) {
-                s.append("/%s");
-                objectList.add(urlEncode(objectMap.get("id")));
-                objectMap.remove("id");
-            }
-
-            break;
-        }
-
         // Add Query Params
         switch (action) {
-        case read:
-        case delete:
-        case list:
-        case query:
-            Iterator it = objectMap.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry entry = (Map.Entry) it.next();
-                s = appendToQueryString(s, "%s=%s");
-                objectList.add(urlEncode(entry.getKey().toString()));
-                objectList.add(urlEncode(entry.getValue().toString()));
-            }
+            case read:
+            case delete:
+            case list:
+            case query:
+                Iterator it = objectMap.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry entry = (Map.Entry) it.next();
+                    s = appendToQueryString(s, "%s=%s");
+                    objectList.add(urlEncode(entry.getKey().toString()));
+                    objectList.add(urlEncode(entry.getValue().toString()));
+                }
+                break;
+        }
 
-            break;
+        // create and update may have Query and Body parameters as part of the request.
+        // Check additionalQueryParametersList
+        if (additionalQueryParametersList.size() > 0) {
+            switch (action) {
+                case create:
+                case update:
+                    // Get the submap of query parameters which also removes the values from objectMap
+                    Map<String,Object> queryMap = subMap(objectMap, additionalQueryParametersList);
+                    Iterator it = queryMap.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry entry = (Map.Entry) it.next();
+                        s = appendToQueryString(s, "%s=%s");
+                        objectList.add(urlEncode(entry.getKey().toString()));
+                        objectList.add(urlEncode(entry.getValue().toString()));
+                    }
+
+                    break;
+            }
         }
 
         // Use JSON
@@ -311,7 +316,7 @@ public class ApiController {
     }
 
     public Map<? extends String, ? extends Object> execute(Authentication auth, Action action, String resourcePath,
-            String apiVersion, List<String> headerList, Map<String, Object> objectMap)
+            String apiVersion, List<String> headerList, List<String> queryList, Map<String, Object> objectMap)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
@@ -328,10 +333,8 @@ public class ApiController {
             headerMap = subMap(objectMap, headerList);
         }
 
-
-
         try {
-            uri = getURI(action, resourcePath, objectMap);
+            uri = getURI(action, resourcePath, objectMap, queryList);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
@@ -423,7 +426,7 @@ public class ApiController {
     }
 
 
-    public static Map subMap(Map<String,Object> inputMap, List<String> keyList)
+    protected static Map subMap(Map<String,Object> inputMap, List<String> keyList)
     {
         LinkedHashMap<String, Object> resultMap = new LinkedHashMap<>();
         for (Map.Entry entry : inputMap.entrySet())
@@ -517,7 +520,7 @@ public class ApiController {
         };
     }
 
-    public class ApiControllerResponse {
+    protected class ApiControllerResponse {
         private HttpResponse httpResponse;
         private String payload;
         private int status;

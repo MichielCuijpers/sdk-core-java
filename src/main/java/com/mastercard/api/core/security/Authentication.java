@@ -34,6 +34,9 @@ import org.apache.http.entity.ContentType;
 
 import java.net.URI;
 
+/**
+ * Interface for authentication implementations
+ */
 public interface Authentication {
     /**
      *

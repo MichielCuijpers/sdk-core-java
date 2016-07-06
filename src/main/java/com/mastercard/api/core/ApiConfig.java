@@ -16,7 +16,7 @@ public final class ApiConfig {
     private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
 
     /**
-     * SDK will use sanbox APIs instead of production APIs
+     * SDK will use sandbox APIs instead of production APIs
      * @param sandbox
      */
     public static void setSandbox(boolean sandbox) {
@@ -45,9 +45,10 @@ public final class ApiConfig {
      * e.g.
      * <code>Object.create()</code>
      * <code>Object.read()</code>
+     * <code>Object.query()</code>
      * <code>Object.list()</code>
-     * <code>Object.update()</code>
-     * <code>Object.delete()</code>
+     * <code>object.update()</code>
+     * <code>object.delete()</code>
      *
      * @param authentication
      */

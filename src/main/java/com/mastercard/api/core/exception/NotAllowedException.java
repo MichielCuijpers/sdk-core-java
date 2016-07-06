@@ -31,6 +31,7 @@ import java.util.Map;
 
 /**
  * Thrown to indicate that a request was not allowed.
+ * HTTP 403
  *
  * @see com.mastercard.api.core.exception.ApiException
  */
