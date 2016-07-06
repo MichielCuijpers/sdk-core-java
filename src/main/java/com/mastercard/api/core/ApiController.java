@@ -426,7 +426,7 @@ public class ApiController {
     }
 
 
-    public static Map subMap(Map<String,Object> inputMap, List<String> keyList)
+    protected static Map subMap(Map<String,Object> inputMap, List<String> keyList)
     {
         LinkedHashMap<String, Object> resultMap = new LinkedHashMap<>();
         for (Map.Entry entry : inputMap.entrySet())
@@ -520,7 +520,7 @@ public class ApiController {
         };
     }
 
-    public class ApiControllerResponse {
+    protected class ApiControllerResponse {
         private HttpResponse httpResponse;
         private String payload;
         private int status;

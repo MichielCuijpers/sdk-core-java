@@ -31,6 +31,7 @@ import java.util.Map;
 
 /**
  * Thrown to indicate that an API object cannot be found.
+ * HTTP 500
  *
  * @see com.mastercard.api.core.exception.ApiException
  */

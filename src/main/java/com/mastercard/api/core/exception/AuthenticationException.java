@@ -31,7 +31,7 @@ import java.util.Map;
 
 /**
  * Thrown to indicate that an authentication error has occurred processing an API request.
- *
+ * HTTP 401
  * @see com.mastercard.api.core.exception.ApiException
  */
 public class AuthenticationException extends ApiException {

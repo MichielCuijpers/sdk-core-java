@@ -43,6 +43,9 @@ import java.net.URI;
 import java.security.*;
 import java.security.cert.CertificateException;
 
+/**
+ * Implementation of OAuth security
+ */
 public class OAuthAuthentication implements Authentication {
 
     private String consumerKey;
