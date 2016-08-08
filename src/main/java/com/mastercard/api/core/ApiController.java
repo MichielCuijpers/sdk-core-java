@@ -70,7 +70,7 @@ public class ApiController {
     public static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
     public static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
-    private static String[] SUPPORTED_TLS = new String[] { "TLSv1.2" };
+    private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
 
     private String apiPath;
 
@@ -481,13 +481,8 @@ public class ApiController {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();;
         httpClientBuilder.useSystemProperties();
 
-        String[] supportedProtocols = split(System.getProperty("https.protocols")); // Allow developer to override using standard system property
-
         // TLSv1.1 and TLSv1.2 are disabled by default in Java 7, we want to enforce TLSv1.2
-        if (supportedProtocols == null) {
-            supportedProtocols = SUPPORTED_TLS;
-        }
-
+        final String[] supportedProtocols = SUPPORTED_TLS;
         final String[] supportedCipherSuites = split(System.getProperty("https.cipherSuites"));
 
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
