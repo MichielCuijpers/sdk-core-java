@@ -6,6 +6,7 @@ import org.apache.http.client.ClientProtocolException
 import org.apache.http.client.HttpResponseException
 import org.apache.http.client.methods.*
 import org.apache.http.entity.ContentType
+import org.apache.http.impl.client.CloseableHttpClient
 import org.json.simple.JSONValue
 import spock.lang.Shared
 import spock.lang.Specification
@@ -739,6 +740,17 @@ class ApiControllerSpec extends Specification {
 
         then:
         thrown(IllegalStateException)
+    }
+
+    def "test createHttpClient supports TLSv1.2" () {
+        given:
+        ApiController apiController = new ApiController()
+
+        when:
+        CloseableHttpClient httpClient = apiController.createHttpClient()
+
+        then:
+        httpClient != null
     }
 
 }

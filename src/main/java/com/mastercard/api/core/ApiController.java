@@ -38,17 +38,20 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.*;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.http.util.TextUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
@@ -67,6 +70,7 @@ public class ApiController {
     public static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
     public static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
+    private static String[] SUPPORTED_TLS = new String[] { "TLSv1.2" };
 
     private String apiPath;
 
@@ -466,8 +470,34 @@ public class ApiController {
         return list;
     }
 
+    private static String[] split(final String s) {
+        if (TextUtils.isBlank(s)) {
+            return null;
+        }
+        return s.split(" *, *");
+    }
+
     CloseableHttpClient createHttpClient() {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();;
+        httpClientBuilder.useSystemProperties();
+
+        String[] supportedProtocols = split(System.getProperty("https.protocols")); // Allow developer to override using standard system property
+
+        // TLSv1.1 and TLSv1.2 are disabled by default in Java 7, we want to enforce TLSv1.2
+        if (supportedProtocols == null) {
+            supportedProtocols = SUPPORTED_TLS;
+        }
+
+        final String[] supportedCipherSuites = split(System.getProperty("https.cipherSuites"));
+
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                (SSLSocketFactory) SSLSocketFactory.getDefault(),
+                supportedProtocols,
+                supportedCipherSuites,
+                SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+
+        httpClientBuilder.setSSLSocketFactory(sslsf);
+
         return httpClientBuilder.build();
     }
 
