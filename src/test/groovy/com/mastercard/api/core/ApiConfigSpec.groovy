@@ -9,6 +9,7 @@ import spock.lang.Specification
  */
 class ApiConfigSpec extends Specification {
 
+    @spock.lang.Ignore
     def 'test default values' () {
         expect:
         ApiConfig.authentication == null
