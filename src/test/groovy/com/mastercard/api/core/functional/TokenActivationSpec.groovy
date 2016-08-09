@@ -30,10 +30,8 @@ import com.mastercard.api.core.ApiConfig
 import com.mastercard.api.core.functional.model.Tokenize
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.Authentication
-
 import com.mastercard.api.core.security.mdes.MDESCryptography
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
-import spock.lang.Ignore
 import spock.lang.Specification
 
 public class TokenActivationSpec extends Specification {
@@ -62,7 +60,6 @@ public class TokenActivationSpec extends Specification {
 
     }
 
-    @Ignore
     def 'send tokenization request'() {
         when:
 
@@ -72,6 +69,7 @@ public class TokenActivationSpec extends Specification {
         requestMap.set("tokenType", "CLOUD");
         requestMap.set("taskId", "123456");
 
+        requestMap.set("cardInfo.source", "CARD_ON_FILE");
         requestMap.set("cardInfo.accountNumber", "5123456789012345");
         requestMap.set("cardInfo.expiryMonth", "12");
         requestMap.set("cardInfo.expiryYear", "16");
