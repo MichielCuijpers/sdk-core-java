@@ -66,13 +66,13 @@ import java.util.regex.Pattern;
 
 public class ApiController {
 
-    public static String API_BASE_LIVE_URL = Constants.API_BASE_LIVE_URL;
-    public static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
-    public static String USER_AGENT = null; // User agent string sent with requests.
+    private static String API_BASE_LIVE_URL = Constants.API_BASE_LIVE_URL;
+    private static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
+    private static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
     private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
 
-    private String apiPath;
+    private final String apiPath;
 
     /**
      */
@@ -162,7 +162,7 @@ public class ApiController {
         return tmpResult;
     }
 
-    private URI getURI(Action action, String resourcePath, Map<String, Object> objectMap, List<String> additionalQueryParametersList)
+    private URI getURI(Action action, String resourcePath, Map<String, Object> objectMap, List<String> additionalQueryParametersList, String host)
             throws UnsupportedEncodingException, IllegalStateException {
         URI uri;
 
@@ -172,8 +172,22 @@ public class ApiController {
         StringBuilder s = new StringBuilder("%s%s");
 
         List<Object> objectList = new ArrayList<Object>();
-        //arizzini: removing last slash (/)
-        objectList.add(apiPath.replaceAll("/$", ""));
+
+        //arizzini: host override, this takes precedence over all other scenarios.
+        if (ApiConfig.getHostOverride() != null) {
+            //arizzini: removing last slash (/)
+            objectList.add(ApiConfig.getHostOverride().replaceAll("/$", ""));
+        } else {
+            if (host == null) {
+                //arizzini: removing last slash (/)
+                objectList.add(apiPath.replaceAll("/$", ""));
+            } else {
+                //arizzini: removing last slash (/)
+                objectList.add(host.replaceAll("/$", ""));
+            }
+        }
+
+
         //arizzini: removing last slash (/)
         objectList.add(updatedType.replaceAll("/$", ""));
 
@@ -319,17 +333,22 @@ public class ApiController {
         return message;
     }
 
-    public Map<? extends String, ? extends Object> execute(Authentication auth, Action action, String resourcePath,
-            String apiVersion, List<String> headerList, List<String> queryList, Map<String, Object> objectMap)
+    public Map<? extends String, ? extends Object> execute(Authentication auth, Action action, BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            MessageSignerException, NotAllowedException, ObjectNotFoundException, IllegalArgumentException, SystemException {
+
+        //arizzini: these are variables
+        String resourceHost = requestObject.getHost();
+        String resourcePath = requestObject.getResourcePath(action);
+        String apiVersion = requestObject.getApiVersion();
+        List<String> headerList = requestObject.getHeaderParams(action);
+        List<String> queryList = requestObject.getQueryParams(action);
+        Map<String, Object> objectMap = requestObject;
+
 
         checkState();
-
         URI uri = null;
-
         Map<String,Object> headerMap = null;
-
         if (objectMap == null) {
             objectMap = new LinkedHashMap<>();
             headerMap = new LinkedHashMap<>();
@@ -338,7 +357,7 @@ public class ApiController {
         }
 
         try {
-            uri = getURI(action, resourcePath, objectMap, queryList);
+            uri = getURI(action, resourcePath, objectMap, queryList, resourceHost);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }

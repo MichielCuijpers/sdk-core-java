@@ -25,10 +25,12 @@
  *
  */
 
-package com.mastercard.api.core.model;
+package com.mastercard.api.core;
 
-import com.mastercard.api.core.ApiController;
 import com.mastercard.api.core.exception.*;
+import com.mastercard.api.core.model.Action;
+import com.mastercard.api.core.model.RequestMap;
+import com.mastercard.api.core.model.ResourceList;
 import com.mastercard.api.core.security.Authentication;
 
 import java.util.ArrayList;
@@ -49,6 +51,12 @@ public abstract class BaseObject extends RequestMap {
     protected abstract List<String> getQueryParams(Action action) throws IllegalArgumentException;
 
     protected abstract String getApiVersion();
+
+    protected String getHost() {
+        return null;
+    }
+
+
 
     protected static BaseObject readObject(final Authentication authentication, final BaseObject value)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
@@ -116,10 +124,13 @@ public abstract class BaseObject extends RequestMap {
         ResourceList<T> listResults = new ResourceList<T>();
         Action list = Action.list;
 
+        if (criteria != null) {
+            template.putAll(criteria);
+        }
+
 
         Map<? extends String, ? extends Object> response = apiController
-                .execute(authentication, list, template.getResourcePath(list), template.getApiVersion(),
-                        template.getHeaderParams(list), template.getQueryParams(list), criteria);
+                .execute(authentication, list, template);
 
         listResults.putAll(response);
 
@@ -148,11 +159,11 @@ public abstract class BaseObject extends RequestMap {
      */
     private static BaseObject createResponseBaseObject(final BaseObject bo) {
         return new BaseObject() {
-            @Override protected String getResourcePath(Action action) {
+            @Override protected String getResourcePath(Action action) throws IllegalArgumentException {
                 return bo.getResourcePath(action);
             }
 
-            @Override protected List<String> getHeaderParams(Action action) {
+            @Override protected List<String> getHeaderParams(Action action) throws IllegalArgumentException {
                 return bo.getHeaderParams(action);
             }
 
@@ -161,8 +172,14 @@ public abstract class BaseObject extends RequestMap {
                 return bo.getQueryParams(action);
             }
 
-            @Override protected String getApiVersion() {
+            @Override
+            protected String getApiVersion() {
                 return bo.getApiVersion();
+            }
+
+            @Override
+            protected String getHost() {
+                return bo.getHost();
             }
         };
     }
@@ -172,9 +189,8 @@ public abstract class BaseObject extends RequestMap {
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        Map<? extends String, ? extends Object> response = apiController
-                .execute(authentication, action, requestObject.getResourcePath(action), requestObject.getApiVersion(),
-                        requestObject.getHeaderParams(action), requestObject.getQueryParams(action), requestObject);
+        Map<? extends String, ? extends Object> response = apiController.execute(authentication, action,
+                requestObject);
 
         BaseObject responseObject = createResponseBaseObject(requestObject);
 

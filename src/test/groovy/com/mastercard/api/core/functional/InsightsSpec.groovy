@@ -62,6 +62,7 @@ public class InsightsSpec extends Specification {
 
         when:
         Insights response = Insights.query(map)
+        response.getApiVersion()
 
         then:
         response.get("SectorRecordList.SectorRecordArray.SectorRecord[0].SalesIndexValue").toString().equalsIgnoreCase("7146577.851")

@@ -3,6 +3,8 @@ package com.mastercard.api.core;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.security.CryptographyInterceptor;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +14,7 @@ import java.util.Map;
 public final class ApiConfig {
     private static boolean sandbox = true;
     private static boolean debug = false;
+    private static String host = null;
     private static Authentication authentication;
     private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
 
@@ -37,6 +40,20 @@ public final class ApiConfig {
 
     public static boolean isDebug() {
         return debug;
+    }
+
+    public static void setHostOverride(String host) throws MalformedURLException{
+        if (host != null) {
+            URL url = new URL(host);
+            ApiConfig.host = url.toString();
+        } else {
+            ApiConfig.host = null;
+        }
+
+    }
+
+    public static String getHostOverride() {
+        return ApiConfig.host;
     }
 
     /**

@@ -29,7 +29,7 @@ package com.mastercard.api.core.functional.model;
 
 import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.Action;
-import com.mastercard.api.core.model.BaseObject;
+import com.mastercard.api.core.BaseObject;
 import com.mastercard.api.core.security.Authentication;
 
 import java.util.Arrays;

@@ -27,6 +27,7 @@
 
 package com.mastercard.api.core.functional.model;
 
+import com.mastercard.api.core.BaseObject;
 import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.*;
@@ -36,7 +37,7 @@ import java.util.Map;
 
 
 
-public class Post extends BaseObject  {
+public class Post extends BaseObject {
 
     public Post() {
     }

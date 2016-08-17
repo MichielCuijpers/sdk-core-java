@@ -68,4 +68,32 @@ class ApiConfigSpec extends Specification {
         ApiConfig.getAuthentication() instanceof JwsAuthentication
     }
 
+
+    def 'test setHostOverride' () {
+        when:
+        ApiConfig.setHostOverride("https://api.mastercard.com");
+
+        then:
+        ApiConfig.getHostOverride() == "https://api.mastercard.com"
+
+        when:
+        ApiConfig.setHostOverride("http://api.mastercard.com");
+
+        then:
+        ApiConfig.getHostOverride() == "http://api.mastercard.com"
+
+        when:
+        ApiConfig.setHostOverride("blablalb");
+
+        then:
+        thrown(MalformedURLException)
+
+        when:
+        ApiConfig.setHostOverride(null)
+
+        then:
+        ApiConfig.getHostOverride() == null
+
+    }
+
 }
