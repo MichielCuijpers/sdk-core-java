@@ -27,7 +27,7 @@
 
 package com.mastercard.api.core.functional.model;
 
-import com.mastercard.api.core.BaseObject;
+import com.mastercard.api.core.model.BaseObject;
 import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.*;
@@ -51,83 +51,28 @@ public class Post extends BaseObject {
     }
 
 
-    @Override
-    protected String getResourcePath(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
+    @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
+        switch (operationUUID) {
+        case "list":
+            return new OperationConfig("/mock_crud_server/posts", Action.list, Arrays.asList(""), Arrays.asList(""));
+        case "create":
+            return new OperationConfig("/mock_crud_server/posts", Action.create, Arrays.asList(""), Arrays.asList(""));
+        case "read":
+            return new OperationConfig("/mock_crud_server/posts/{id}", Action.read, Arrays.asList(""), Arrays.asList(""));
+        case "update":
+            return new OperationConfig("/mock_crud_server/posts/{id}", Action.update, Arrays.asList(""), Arrays.asList(""));
+        case "delete":
+            return new OperationConfig("/mock_crud_server/posts/{id}", Action.delete, Arrays.asList(""), Arrays.asList(""));
+        default:
+            throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
         }
-        if (action == Action.list) {
-           return "/mock_crud_server/posts";
-        }
-        if (action == Action.create) {
-            return "/mock_crud_server/posts";
-        }
-        if (action == Action.read) {
-            return "/mock_crud_server/posts/{id}";
-        }
-        if (action == Action.update) {
-            return "/mock_crud_server/posts/{id}";
-        }
-        if (action == Action.delete) {
-            return "/mock_crud_server/posts/{id}";
-        }
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
+
     }
 
-
-    @Override
-    protected List<String> getHeaderParams(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
-        }
-        if (action == Action.list) {
-           return Arrays.asList();
-        }
-        if (action == Action.create) {
-            return Arrays.asList();
-        }
-        if (action == Action.read) {
-            return Arrays.asList();
-        }
-        if (action == Action.update) {
-            return Arrays.asList();
-        }
-        if (action == Action.delete) {
-            return Arrays.asList();
-        }
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
+    @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
+        return new OperationMetadata("0.0.1", null);
     }
 
-    @Override
-    protected List<String> getQueryParams(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
-        }
-        if (action == Action.list) {
-           return Arrays.asList();
-        }
-        if (action == Action.create) {
-            return Arrays.asList();
-        }
-        if (action == Action.read) {
-            return Arrays.asList();
-        }
-        if (action == Action.update) {
-            return Arrays.asList();
-        }
-        if (action == Action.delete) {
-            return Arrays.asList();
-        }
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
-    }
-
-    @Override protected String getApiVersion() {
-        return "0.0.1";
-    }
-
-    // max:(query:true, param:, header:, cookie:, body:)
-    
-    
     
     /**
      * Retrieve <code>Post</code> objects using the static properties <code>ApiController.PUBLIC_KEY</code> and
@@ -151,7 +96,7 @@ public class Post extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(null, new Post(), null);
+        return BaseObject.executeListOperation(null, "list", new Post(), null);
     }
 
     /**
@@ -176,7 +121,7 @@ public class Post extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(auth, new Post(), null);
+        return BaseObject.executeListOperation(auth, "list", new Post(), null);
     }
 
     /**
@@ -204,7 +149,7 @@ public class Post extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(null, new Post(), criteria);
+        return BaseObject.executeListOperation(null, "list", new Post(), criteria);
     }
 
     /**
@@ -231,7 +176,7 @@ public class Post extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(auth, new Post(), criteria);
+        return BaseObject.executeListOperation(auth, "list", new Post(), criteria);
     }
 
 
@@ -285,7 +230,7 @@ public class Post extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return new Post(BaseObject.createObject(auth, new Post(map)));
+        return new Post(BaseObject.executeOperation(auth, "create", new Post(map)));
     }
 
     
@@ -392,7 +337,7 @@ public class Post extends BaseObject {
         Post val = new Post();
         if (id != null) val.put("id", id);
         if (query != null)  val.putAll(query);
-        return new Post(BaseObject.readObject(auth, val));
+        return new Post(BaseObject.executeOperation(auth, "read", val));
     }
 
     // id:(query:, param:true, header:, cookie:, body:)// body:(query:, param:, header:, cookie:, body:true)
@@ -420,7 +365,7 @@ public class Post extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        BaseObject object = this.updateObject(this);
+        BaseObject object = this.executeOperation(null, "update", this);
         this.putAll(object);
         return this;
     }
@@ -449,7 +394,7 @@ public class Post extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        BaseObject object = this.updateObject(auth, this);
+        BaseObject object = this.executeOperation(auth, "update", this);
         this.putAll(object);
         return this;
     }
@@ -479,7 +424,7 @@ public class Post extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        BaseObject object = this.deleteObject(this);
+        BaseObject object = this.executeOperation(null, "delete", this);
         this.clear();
         this.putAll(object);
         return this;
@@ -502,7 +447,7 @@ public class Post extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        BaseObject object = this.deleteObject(auth, this);
+        BaseObject object = this.executeOperation(auth, "delete", this);
         this.clear();
         this.putAll(object);
         return this;

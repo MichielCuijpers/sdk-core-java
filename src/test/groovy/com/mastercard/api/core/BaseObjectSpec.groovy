@@ -1,6 +1,8 @@
 package com.mastercard.api.core
 import com.mastercard.api.core.mocks.MockAuthentication
 import com.mastercard.api.core.mocks.MockBaseObject
+import com.mastercard.api.core.model.Action
+import com.mastercard.api.core.model.BaseObject
 import com.mastercard.api.core.model.ResourceList
 import spock.lang.Specification
 /**
@@ -24,10 +26,10 @@ class BaseObjectSpec extends Specification {
     def 'test read object' () {
 
         when:
-        MockBaseObject response = MockBaseObject.readObject(new MockAuthentication(), new MockBaseObject());
+        MockBaseObject response = MockBaseObject.executeOperation(new MockAuthentication(), "uuid", new MockBaseObject(Action.read));
 
         then:
-        1 * apiController.execute(_,_,_)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_,_,_,_)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -36,10 +38,10 @@ class BaseObjectSpec extends Specification {
     def 'test query object' () {
 
         when:
-        MockBaseObject response = MockBaseObject.queryObject(new MockAuthentication(), new MockBaseObject());
+        MockBaseObject response = MockBaseObject.executeOperation(new MockAuthentication(), "uuid", new MockBaseObject(Action.query));
 
         then:
-        1 * apiController.execute(_,_,_)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_,_,_,_)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -49,10 +51,10 @@ class BaseObjectSpec extends Specification {
 
 
         when:
-        ResourceList<MockBaseObject> response = MockBaseObject.listObjects(new MockAuthentication(), new MockBaseObject(), null);
+        ResourceList<MockBaseObject> response = MockBaseObject.executeListOperation(new MockAuthentication(), "uuid", new MockBaseObject(Action.list), null);
 
         then:
-        1 * apiController.execute(_,_,_)  >> {
+        1 * apiController.execute(_,_,_,_)  >> {
             [
                 list: [
                     [a: 1, b: "2", c: true],
@@ -78,10 +80,10 @@ class BaseObjectSpec extends Specification {
 
 
         when:
-        ResourceList<MockBaseObject> response = MockBaseObject.listObjects(new MockAuthentication(), new MockBaseObject(), [max: 2])
+        ResourceList<MockBaseObject> response = MockBaseObject.executeListOperation(new MockAuthentication(), "uuid", new MockBaseObject(Action.list), [max: 2])
 
         then:
-        1 * apiController.execute(_,_,_)  >> {
+        1 * apiController.execute(_,_,_,_)  >> {
             [
                 list: [
                     [a: 1, b: "2", c: true],
@@ -102,10 +104,10 @@ class BaseObjectSpec extends Specification {
 
 
         when:
-        MockBaseObject response = MockBaseObject.createObject(new MockAuthentication(), new MockBaseObject())
+        MockBaseObject response = MockBaseObject.executeOperation(new MockAuthentication(), "uuid", new MockBaseObject(Action.create))
 
         then:
-        1 * apiController.execute(_,_,_)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_,_,_,_)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -115,10 +117,10 @@ class BaseObjectSpec extends Specification {
 
 
         when:
-        MockBaseObject response = MockBaseObject.createObject(new MockAuthentication(), new MockBaseObject())
+        MockBaseObject response = MockBaseObject.executeOperation(new MockAuthentication(), "uuid", new MockBaseObject(Action.create))
 
         then:
-        1 * apiController.execute(_,_,_)  >> null
+        1 * apiController.execute(_,_,_,_)  >> null
         response != null
         response.size() == 0
     }
@@ -127,10 +129,10 @@ class BaseObjectSpec extends Specification {
 
 
         when:
-        MockBaseObject response = new MockBaseObject().updateObject(new MockAuthentication(), new MockBaseObject())
+        MockBaseObject response = new MockBaseObject().executeOperation(new MockAuthentication(), "uuid",  new MockBaseObject(Action.update))
 
         then:
-        1 * apiController.execute(_,_,_)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_,_,_,_)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -140,10 +142,10 @@ class BaseObjectSpec extends Specification {
 
 
         when:
-        MockBaseObject response = new MockBaseObject().updateObject(new MockBaseObject())
+        MockBaseObject response = new MockBaseObject().executeOperation(null, "uuid", new MockBaseObject(Action.update))
 
         then:
-        1 * apiController.execute(_,_,_)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_,_,_,_)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -153,10 +155,10 @@ class BaseObjectSpec extends Specification {
 
 
         when:
-        MockBaseObject response = new MockBaseObject().deleteObject(new MockAuthentication(), new MockBaseObject())
+        MockBaseObject response = new MockBaseObject().executeOperation(new MockAuthentication(), "uuid", new MockBaseObject(Action.delete))
 
         then:
-        1 * apiController.execute(_,_,_)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_,_,_,_)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -166,10 +168,10 @@ class BaseObjectSpec extends Specification {
 
 
         when:
-        MockBaseObject response = new MockBaseObject().deleteObject(new MockBaseObject())
+        MockBaseObject response = new MockBaseObject().executeOperation(null, "uuid", new MockBaseObject(Action.delete))
 
         then:
-        1 * apiController.execute(_,_,_)  >> { [a: 1, b: "2", c: true] }
+        1 * apiController.execute(_,_,_,_)  >> { [a: 1, b: "2", c: true] }
         response.get("a") == 1
         response.get("b") == "2"
         response.get("c") == true
@@ -183,7 +185,6 @@ class BaseObjectSpec extends Specification {
         BaseObject response = MockBaseObject.createResponseBaseObject(value)
 
         then:
-        response.getResourcePath() == "/mock/MockObject"
         response.size() == 0
     }
 

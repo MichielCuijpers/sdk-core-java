@@ -27,12 +27,11 @@
 
 package com.mastercard.api.core.functional.model;
 
-import com.mastercard.api.core.BaseObject;
 import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.*;
-import com.mastercard.api.core.security.*;
+import com.mastercard.api.core.security.Authentication;
+
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 
@@ -51,46 +50,19 @@ public class UserPostPath extends BaseObject {
     }
 
 
-    @Override
-    protected String getResourcePath(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
+    @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
+        switch (operationUUID) {
+        case "uuid":
+            return new OperationConfig("/mock_crud_server/users/{user_id}/posts", Action.list, Arrays.asList(""), Arrays.asList(""));
+        default:
+            throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
         }
-        if (action == Action.list) {
-           return "/mock_crud_server/users/{user_id}/posts";
-        }
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
     }
 
 
-    @Override
-    protected List<String> getHeaderParams(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
-        }
-        if (action == Action.list) {
-           return Arrays.asList();
-        }
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
+    @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
+        return new OperationMetadata("0.0.1", null);
     }
-
-    @Override
-    protected List<String> getQueryParams(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
-        }
-        if (action == Action.list) {
-           return Arrays.asList();
-        }
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
-    }
-
-    @Override protected String getApiVersion() {
-        return "0.0.1";
-    }
-
-    // userId:(query:, param:true, header:, cookie:, body:)
-    
     
     
     /**
@@ -115,7 +87,7 @@ public class UserPostPath extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(null, new UserPostPath(), null);
+        return BaseObject.executeListOperation(null, "uuid", new UserPostPath(), null);
     }
 
     /**
@@ -140,7 +112,7 @@ public class UserPostPath extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(auth, new UserPostPath(), null);
+        return BaseObject.executeListOperation(auth, "uuid", new UserPostPath(), null);
     }
 
     /**
@@ -168,7 +140,7 @@ public class UserPostPath extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(null, new UserPostPath(), criteria);
+        return BaseObject.executeListOperation(null, "uuid", new UserPostPath(), criteria);
     }
 
     /**
@@ -195,7 +167,7 @@ public class UserPostPath extends BaseObject {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.listObjects(auth, new UserPostPath(), criteria);
+        return BaseObject.executeListOperation(auth, "uuid", new UserPostPath(), criteria);
     }
 
 

@@ -36,12 +36,14 @@ class ApiConfigSpec extends Specification {
 
         then:
         ApiConfig.isSandbox()
+        !ApiConfig.isProduction()
 
         when:
-        ApiConfig.setSandbox(false)
+        ApiConfig.setSandbox(false);
 
         then:
         !ApiConfig.isSandbox()
+        ApiConfig.isProduction()
     }
 
     def 'test setting oauth authentication' () {
@@ -66,34 +68,6 @@ class ApiConfigSpec extends Specification {
         then:
         ApiConfig.getAuthentication() != null
         ApiConfig.getAuthentication() instanceof JwsAuthentication
-    }
-
-
-    def 'test setHostOverride' () {
-        when:
-        ApiConfig.setHostOverride("https://api.mastercard.com");
-
-        then:
-        ApiConfig.getHostOverride() == "https://api.mastercard.com"
-
-        when:
-        ApiConfig.setHostOverride("http://api.mastercard.com");
-
-        then:
-        ApiConfig.getHostOverride() == "http://api.mastercard.com"
-
-        when:
-        ApiConfig.setHostOverride("blablalb");
-
-        then:
-        thrown(MalformedURLException)
-
-        when:
-        ApiConfig.setHostOverride(null)
-
-        then:
-        ApiConfig.getHostOverride() == null
-
     }
 
 }

@@ -28,8 +28,7 @@
 package com.mastercard.api.core;
 
 import com.mastercard.api.core.exception.*;
-import com.mastercard.api.core.model.Action;
-import com.mastercard.api.core.model.HttpMethod;
+import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.security.CryptographyInterceptor;
 import org.apache.commons.codec.DecoderException;
@@ -72,7 +71,7 @@ public class ApiController {
     private static String HEADER_SEPARATOR = ";";
     private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
 
-    private final String apiPath;
+    private final String host;
 
     /**
      */
@@ -84,7 +83,7 @@ public class ApiController {
             baseUrl = API_BASE_SANDBOX_URL;
         }
 
-        this.apiPath = baseUrl;
+        this.host = baseUrl;
     }
 
     private void checkState() throws RuntimeException {
@@ -104,9 +103,9 @@ public class ApiController {
     /**
      * Append parameter to URL
      *
-     * @param s
+     * @param s instance of StringBuilder
      * @param stringToAppend e.g. max=10
-     * @return
+     * @return StringBuilder
      */
     private StringBuilder appendToQueryString(StringBuilder s, String stringToAppend) {
         if (s.indexOf("?") == -1) {
@@ -162,42 +161,36 @@ public class ApiController {
         return tmpResult;
     }
 
-    private URI getURI(Action action, String resourcePath, Map<String, Object> objectMap, List<String> additionalQueryParametersList, String host)
+    private URI getURI(OperationConfig operationConfig, OperationMetadata operationMetadata, BaseObject requestObject)
             throws UnsupportedEncodingException, IllegalStateException {
         URI uri;
 
         //arizzini: need to replace all the path variables
-        String updatedType = getPathWithReplacedPath(resourcePath, objectMap);
+        String updatedType = getPathWithReplacedPath(operationConfig.getResourcePath(), requestObject);
 
         StringBuilder s = new StringBuilder("%s%s");
 
-        List<Object> objectList = new ArrayList<Object>();
+        List<Object> objectList = new ArrayList<>();
 
         //arizzini: host override, this takes precedence over all other scenarios.
-        if (ApiConfig.getHostOverride() != null) {
+        if (operationMetadata.getHost() == null) {
             //arizzini: removing last slash (/)
-            objectList.add(ApiConfig.getHostOverride().replaceAll("/$", ""));
+            objectList.add(host.replaceAll("/$", ""));
         } else {
-            if (host == null) {
-                //arizzini: removing last slash (/)
-                objectList.add(apiPath.replaceAll("/$", ""));
-            } else {
-                //arizzini: removing last slash (/)
-                objectList.add(host.replaceAll("/$", ""));
-            }
+            //arizzini: removing last slash (/)
+            objectList.add(operationMetadata.getHost().replaceAll("/$", ""));
         }
-
 
         //arizzini: removing last slash (/)
         objectList.add(updatedType.replaceAll("/$", ""));
 
         // Add Query Params
-        switch (action) {
+        switch (operationConfig.getAction()) {
             case read:
             case delete:
             case list:
             case query:
-                Iterator it = objectMap.entrySet().iterator();
+                Iterator it = requestObject.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry entry = (Map.Entry) it.next();
                     s = appendToQueryString(s, "%s=%s");
@@ -209,12 +202,12 @@ public class ApiController {
 
         // create and update may have Query and Body parameters as part of the request.
         // Check additionalQueryParametersList
-        if (additionalQueryParametersList.size() > 0) {
-            switch (action) {
+        if (operationConfig.getQueryParams().size() > 0) {
+            switch (operationConfig.getAction()) {
                 case create:
                 case update:
                     // Get the submap of query parameters which also removes the values from objectMap
-                    Map<String,Object> queryMap = subMap(objectMap, additionalQueryParametersList);
+                    Map<String,Object> queryMap = subMap(requestObject, operationConfig.getQueryParams());
                     Iterator it = queryMap.entrySet().iterator();
                     while (it.hasNext()) {
                         Map.Entry entry = (Map.Entry) it.next();
@@ -239,10 +232,18 @@ public class ApiController {
         return uri;
     }
 
-    private HttpRequestBase getRequest(Authentication authentication, URI uri, Action action,
-            String apiVersion, Map<String, Object> objectMap, Map<String, Object> headerMap,
-            CryptographyInterceptor interceptor)
+    private HttpRequestBase getRequest(Authentication authentication, OperationConfig operationConfig,
+            OperationMetadata operationMetadata, BaseObject requestObject)
             throws InvalidRequestException, MessageSignerException, NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
+
+
+        Map<String,Object> headerMap = subMap(requestObject, operationConfig.getHeaderParams());
+        URI uri = getURI(operationConfig, operationMetadata, requestObject);
+
+        //this is what is left from the parameters.
+        Map<String, Object> objectMap = new LinkedHashMap<>(requestObject);
+        CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.toString());
+
 
         HttpRequestBase message = null;
 
@@ -258,7 +259,7 @@ public class ApiController {
 
         String payload = null;
 
-        switch (action) {
+        switch (operationConfig.getAction()) {
         case create:
 
             if (interceptor != null) {
@@ -320,7 +321,7 @@ public class ApiController {
         }
 
         // Add user agent
-        String userAgent = "Java-SDK/" + apiVersion;
+        String userAgent = "Java-SDK/" + operationMetadata.getApiVersion();
         if (USER_AGENT != null) {
             userAgent = userAgent + " " + USER_AGENT;
         }
@@ -328,61 +329,38 @@ public class ApiController {
 
         // Sign the request
         authentication
-                .sign(uri, HttpMethod.fromAction(action), ContentType.APPLICATION_JSON, payload, message);
+                .sign(uri, HttpMethod.fromAction(operationConfig.getAction()), ContentType.APPLICATION_JSON, payload, message);
 
         return message;
     }
 
-    public Map<? extends String, ? extends Object> execute(Authentication auth, Action action, BaseObject requestObject)
+    public Map<? extends String, ? extends Object> execute(Authentication auth, OperationConfig operationConfig, OperationMetadata operationMetadata, BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, IllegalArgumentException, SystemException {
-
-        //arizzini: these are variables
-        String resourceHost = requestObject.getHost();
-        String resourcePath = requestObject.getResourcePath(action);
-        String apiVersion = requestObject.getApiVersion();
-        List<String> headerList = requestObject.getHeaderParams(action);
-        List<String> queryList = requestObject.getQueryParams(action);
-        Map<String, Object> objectMap = requestObject;
-
-
         checkState();
-        URI uri = null;
-        Map<String,Object> headerMap = null;
-        if (objectMap == null) {
-            objectMap = new LinkedHashMap<>();
-            headerMap = new LinkedHashMap<>();
-        } else {
-            headerMap = subMap(objectMap, headerList);
-        }
 
-        try {
-            uri = getURI(action, resourcePath, objectMap, queryList, resourceHost);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
-
-        int port = uri.getPort();
-        String scheme = uri.getScheme();
-
-        HttpHost host = new HttpHost(uri.getHost(), port, scheme);
         CloseableHttpClient httpClient = createHttpClient();
 
         try {
 
-            CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.toString());
-            HttpRequestBase message = getRequest(auth, uri, action, apiVersion, objectMap, headerMap, interceptor);
+            HttpRequestBase request = getRequest(auth, operationConfig, operationMetadata, requestObject);
+
+            CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(
+                    request.getURI().toString());
+            int port = request.getURI().getPort();
+            String scheme = request.getURI().getScheme();
+            HttpHost host = new HttpHost(request.getURI().getHost(), port, scheme);
 
             ResponseHandler<ApiControllerResponse> responseHandler = createResponseHandler();
 
-            ApiControllerResponse apiResponse = httpClient.execute(host, message, responseHandler);
+            ApiControllerResponse apiResponse = httpClient.execute(host, request, responseHandler);
 
             if (apiResponse.hasPayload()) {
 
                 Object response = JSONValue.parse(apiResponse.getPayload());
 
                 if (apiResponse.getStatus() < 300) {
-                    if (action == Action.list) {
+                    if (operationConfig.getAction() == Action.list) {
 
                         Map<String, Object> map = new HashMap<>();
                         List list = null;
@@ -402,7 +380,7 @@ public class ApiController {
                         if (interceptor == null) {
                             return (Map<? extends String, ? extends Object>) response;
                         } else {
-                            Map<String,Object> responseMap = (Map<String,Object>) response;
+                            Map<String, Object> responseMap = (Map<String, Object>) response;
                             return interceptor.decrypt(responseMap);
                         }
                     }
@@ -428,13 +406,13 @@ public class ApiController {
 
             return null;
 
+        } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException(e);
         } catch (HttpResponseException e) {
             throw new ApiCommunicationException(
                     "Failed to communicate with response code " + String.format("%d", e.getStatusCode()), e);
-
         } catch (ClientProtocolException e) {
             throw new ApiCommunicationException("HttpClient exception", e);
-
         } catch (IOException e) {
             throw new ApiCommunicationException("I/O error", e);
         } catch (NoSuchAlgorithmException | CertificateEncodingException | DecoderException | NoSuchProviderException | InvalidKeyException | BadPaddingException | InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException e) {

@@ -9,14 +9,13 @@ import com.mastercard.api.core.mocks.MockAuthentication
 import com.mastercard.api.core.mocks.MockBaseObject
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.model.ResourceList
-import spock.lang.IgnoreIf
 import spock.lang.Specification
 /**
  * Created by andrearizzini on 12/04/2016.
  */
 
 
-@IgnoreIf({ System.getProperty("RUN_NODEJS") == null })
+//@IgnoreIf({ System.getProperty("RUN_NODEJS") == null })
 class NodeJSMockServerSpec extends Specification {
 
 
