@@ -9,22 +9,21 @@ import com.mastercard.api.core.mocks.MockAuthentication
 import com.mastercard.api.core.mocks.MockBaseObject
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.model.ResourceList
-import spock.lang.IgnoreIf
 import spock.lang.Specification
 /**
  * Created by andrearizzini on 12/04/2016.
  */
 
 
-@IgnoreIf({ System.getProperty("RUN_NODEJS") == null })
+//@IgnoreIf({ System.getProperty("RUN_NODEJS") == null })
 class NodeJSMockServerSpec extends Specification {
 
 
     def setupSpec() {
         ApiConfig.setSandbox(true)
         ApiConfig.authentication = new MockAuthentication()
-        ApiController.API_BASE_SANDBOX_URL = "http://localhost:8080";
-        ApiController.API_BASE_LIVE_URL = "http://localhost:8080";
+        ApiController.API_BASE_SANDBOX_URL = "http://localhost:8081";
+        ApiController.API_BASE_LIVE_URL = "http://localhost:8081";
         MockBaseObject.setApiController(new ApiController())
 
 

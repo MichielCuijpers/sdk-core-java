@@ -30,10 +30,11 @@ package com.mastercard.api.core.functional.model;
 import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.Action;
 import com.mastercard.api.core.model.BaseObject;
+import com.mastercard.api.core.model.OperationConfig;
+import com.mastercard.api.core.model.OperationMetadata;
 import com.mastercard.api.core.security.Authentication;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 
@@ -52,45 +53,20 @@ public class AccountInquiry extends BaseObject  {
     }
 
 
-    @Override
-    protected String getResourcePath(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
+    @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
+        switch (operationUUID) {
+            case "uuid":
+                return new OperationConfig("/fraud/loststolen/v1/account-inquiry", Action.update, Arrays.asList(""), Arrays.asList(""));
+            default:
+                throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
         }
-        if (action == Action.update) {
-            return "/fraud/loststolen/v1/account-inquiry";
-        }
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
+
     }
 
-
-    @Override
-    protected List<String> getHeaderParams(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
-        }
-        if (action == Action.update) {
-            return Arrays.asList();
-        }
-        
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
+    @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
+        return new OperationMetadata("0.0.1", null);
     }
 
-    @Override
-    protected List<String> getQueryParams(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
-        }
-        if (action == Action.update) {
-            return Arrays.asList();
-        }
-
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
-    }
-
-    @Override protected String getApiVersion() {
-        return "0.0.1";
-    }
 
     /**
      * Updates an <code>AccountInquiry</code> object.
@@ -114,7 +90,7 @@ public class AccountInquiry extends BaseObject  {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        BaseObject object = this.updateObject(this);
+        BaseObject object = this.executeOperation(null, "uuid", this);
         this.putAll(object);
         return this;
     }
@@ -143,16 +119,12 @@ public class AccountInquiry extends BaseObject  {
         throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
         MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        BaseObject object = this.updateObject(auth, this);
+        BaseObject object = this.executeOperation(auth, "uuid", this);
         this.putAll(object);
         return this;
     }
 
-    
-    
-    
-    
-    
+
 }
 
 

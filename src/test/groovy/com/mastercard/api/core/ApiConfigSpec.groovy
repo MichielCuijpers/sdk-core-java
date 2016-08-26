@@ -36,12 +36,14 @@ class ApiConfigSpec extends Specification {
 
         then:
         ApiConfig.isSandbox()
+        !ApiConfig.isProduction()
 
         when:
-        ApiConfig.setSandbox(false)
+        ApiConfig.setSandbox(false);
 
         then:
         !ApiConfig.isSandbox()
+        ApiConfig.isProduction()
     }
 
     def 'test setting oauth authentication' () {

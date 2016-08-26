@@ -42,84 +42,35 @@ public abstract class BaseObject extends RequestMap {
 
     protected static ApiController apiController = new ApiController();
 
-    protected abstract String getResourcePath(Action action) throws IllegalArgumentException;
+    protected abstract OperationConfig getOperationConfig(String operationUUID);
 
-    protected abstract List<String> getHeaderParams(Action action) throws IllegalArgumentException;
+    protected abstract OperationMetadata getOperationMetadata();
 
-    protected abstract List<String> getQueryParams(Action action) throws IllegalArgumentException;
 
-    protected abstract String getApiVersion();
 
-    protected static BaseObject readObject(final Authentication authentication, final BaseObject value)
+
+    protected static BaseObject executeOperation(final Authentication authentication, String operationUUID, final BaseObject value)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
-        return execute(authentication, Action.read, value);
+        return execute(authentication, operationUUID, value);
     }
 
-    protected static BaseObject queryObject(final Authentication authentication, final BaseObject value)
-            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
-            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
-
-        return execute(authentication, Action.query, value);
-    }
-
-    protected static BaseObject createObject(final Authentication authentication,
-            final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
-            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
-
-        return execute(authentication, Action.create, requestObject);
-    }
-
-    protected BaseObject updateObject(final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
-            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
-
-        return updateObject(null, requestObject);
-    }
-
-    protected BaseObject updateObject(final Authentication authentication, final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
-            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
-
-        return execute(authentication, Action.update, requestObject);
-    }
-
-    protected BaseObject deleteObject(final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
-
-        return deleteObject(null, requestObject);
-    }
-
-    protected BaseObject deleteObject(final Authentication authentication, final BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
-
-        return execute(authentication, Action.delete, requestObject);
-    }
-
-    protected static <T extends BaseObject> ResourceList<T> listObjects(final Authentication authentication,
-            T template) throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
-            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
-
-        return listObjects(authentication, template, null);
-    }
-
-
-    protected static <T extends BaseObject> ResourceList<T> listObjects(final Authentication authentication,
-            T template, Map criteria)
+    protected static <T extends BaseObject> ResourceList<T> executeListOperation(
+            final Authentication authentication, String operationUUID, T template, Map criteria)
             throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
             InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
 
         ResourceList<T> listResults = new ResourceList<T>();
         Action list = Action.list;
 
+        if (criteria != null) {
+            template.putAll(criteria);
+        }
+
 
         Map<? extends String, ? extends Object> response = apiController
-                .execute(authentication, list, template.getResourcePath(list), template.getApiVersion(),
-                        template.getHeaderParams(list), template.getQueryParams(list), criteria);
+                .execute(authentication, template.getOperationConfig(operationUUID), template.getOperationMetadata(), template);
 
         listResults.putAll(response);
 
@@ -148,33 +99,22 @@ public abstract class BaseObject extends RequestMap {
      */
     private static BaseObject createResponseBaseObject(final BaseObject bo) {
         return new BaseObject() {
-            @Override protected String getResourcePath(Action action) {
-                return bo.getResourcePath(action);
+            @Override protected OperationConfig getOperationConfig(String uuid) throws IllegalArgumentException {
+                return bo.getOperationConfig(uuid);
             }
 
-            @Override protected List<String> getHeaderParams(Action action) {
-                return bo.getHeaderParams(action);
-            }
-
-            @Override
-            protected List<String> getQueryParams(Action action) throws IllegalArgumentException {
-                return bo.getQueryParams(action);
-            }
-
-            @Override protected String getApiVersion() {
-                return bo.getApiVersion();
+            @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
+                return bo.getOperationMetadata();
             }
         };
     }
 
 
-    private static BaseObject execute(Authentication authentication, Action action, BaseObject requestObject)
+    private static BaseObject execute(Authentication authentication, String operationUUID,  BaseObject requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
 
-        Map<? extends String, ? extends Object> response = apiController
-                .execute(authentication, action, requestObject.getResourcePath(action), requestObject.getApiVersion(),
-                        requestObject.getHeaderParams(action), requestObject.getQueryParams(action), requestObject);
+        Map<? extends String, ? extends Object> response = apiController.execute(authentication, requestObject.getOperationConfig(operationUUID), requestObject.getOperationMetadata(), requestObject);
 
         BaseObject responseObject = createResponseBaseObject(requestObject);
 
