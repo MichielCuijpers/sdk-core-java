@@ -18,16 +18,18 @@ class ApiConfigSpec extends Specification {
 
     def 'test settings debug' () {
         when:
+        ApiConfig.setDebug(false)
+
+        then:
+        !ApiConfig.isDebug()
+
+        when:
         ApiConfig.setDebug(true)
 
         then:
         ApiConfig.isDebug()
 
-        when:
-        ApiConfig.setDebug(false)
 
-        then:
-        !ApiConfig.isDebug()
     }
 
     def 'test settings sandbox' () {
