@@ -19,16 +19,18 @@ class ApiConfigSpec extends Specification {
 
     def 'test settings debug' () {
         when:
+        ApiConfig.setDebug(false)
+
+        then:
+        !ApiConfig.isDebug()
+
+        when:
         ApiConfig.setDebug(true)
 
         then:
         ApiConfig.isDebug()
 
-        when:
-        ApiConfig.setDebug(false)
 
-        then:
-        !ApiConfig.isDebug()
     }
 
     def 'test settings sandbox' () {
@@ -37,12 +39,14 @@ class ApiConfigSpec extends Specification {
 
         then:
         ApiConfig.isSandbox()
+        !ApiConfig.isProduction()
 
         when:
-        ApiConfig.setSandbox(false)
+        ApiConfig.setSandbox(false);
 
         then:
         !ApiConfig.isSandbox()
+        ApiConfig.isProduction()
     }
 
     def 'test setting oauth authentication' () {

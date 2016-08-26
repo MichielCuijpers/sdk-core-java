@@ -30,10 +30,11 @@ package com.mastercard.api.core.functional.model;
 import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.Action;
 import com.mastercard.api.core.model.BaseObject;
+import com.mastercard.api.core.model.OperationConfig;
+import com.mastercard.api.core.model.OperationMetadata;
 import com.mastercard.api.core.security.Authentication;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 
@@ -52,51 +53,20 @@ public class Parameters extends BaseObject  {
     }
 
 
-    @Override
-    protected String getResourcePath(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
+    @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
+        switch (operationUUID) {
+        case "uuid":
+            return new OperationConfig("/sectorinsights/v1/sectins.svc/parameters", Action.query, Arrays.asList(""), Arrays.asList(""));
+        default:
+            throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
         }
-        if (action == Action.query) {
-            return "/sectorinsights/v1/sectins.svc/parameters";
-        }
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
+
     }
 
-
-    @Override
-    protected List<String> getHeaderParams(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
-        }
-        if (action == Action.query) {
-            return Arrays.asList();
-        }
-        
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
+    @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
+        return new OperationMetadata("0.0.1", null);
     }
 
-    @Override
-    protected List<String> getQueryParams(Action action) throws IllegalArgumentException {
-        if (action == null) {
-            throw new IllegalArgumentException("Action cannot be null");
-        }
-        if (action == Action.query) {
-            return Arrays.asList();
-        }
-
-        throw new IllegalArgumentException("Invalid action supplied: " + action);
-    }
-
-
-    @Override protected String getApiVersion() {
-        return "0.0.1";
-    }
-    
-    
-    
-    
-    
         /**
      * Query / Retrieve a <code>Parameters</code> object.
      *
@@ -141,7 +111,7 @@ public class Parameters extends BaseObject  {
 
         Parameters val = new Parameters();
         if (query != null)  val.putAll(query);
-        return new Parameters(BaseObject.queryObject(auth, val));
+        return new Parameters(BaseObject.executeOperation(auth, "uuid", val));
     }
 
     
