@@ -34,14 +34,14 @@ class ApiConfigSpec extends Specification {
 
     def 'test settings sandbox' () {
         when:
-        ApiConfig.setSandbox()
+        ApiConfig.setSandbox(true)
 
         then:
         ApiConfig.isSandbox()
         !ApiConfig.isProduction()
 
         when:
-        ApiConfig.setProduction()
+        ApiConfig.setSandbox(false);
 
         then:
         !ApiConfig.isSandbox()
