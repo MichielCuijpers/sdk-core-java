@@ -19,19 +19,12 @@ public final class ApiConfig {
     /**
      * SDK will use sandbox APIs instead of production APIs
      */
-    public static void setSandbox() {
-        ApiConfig.sandbox = true;
+    public static void setSandbox(boolean sandbox) {
+        ApiConfig.sandbox = sandbox;
     }
 
     public static boolean isSandbox() {
         return sandbox;
-    }
-
-    /**
-     * SDK will use sandbox APIs instead of production APIs
-     */
-    public static void setProduction() {
-        ApiConfig.sandbox = false;
     }
 
     public static boolean isProduction() {

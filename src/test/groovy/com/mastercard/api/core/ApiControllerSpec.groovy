@@ -18,7 +18,7 @@ class ApiControllerSpec extends Specification {
     @Shared MockAuthentication mockAuthentication
 
     def setupSpec() {
-        ApiConfig.setSandbox()
+        ApiConfig.setSandbox(true)
     }
 
     def setup() {

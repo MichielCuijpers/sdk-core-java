@@ -41,7 +41,7 @@ public class TokenActivationSpec extends Specification {
 
     def setupSpec() {
         ApiConfig.setDebug(true);
-        ApiConfig.setSandbox();
+        ApiConfig.setSandbox(true);
 
         try {
             InputStream is = new FileInputStream("src/test/resources/mcapi_sandbox_key.p12");
