@@ -161,7 +161,7 @@ public class ApiController {
         return tmpResult;
     }
 
-    private URI getURI(OperationConfig operationConfig, OperationMetadata operationMetadata, BaseObject requestObject)
+    private URI getURI(OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)
             throws UnsupportedEncodingException, IllegalStateException {
         URI uri;
 
@@ -233,7 +233,7 @@ public class ApiController {
     }
 
     private HttpRequestBase getRequest(Authentication authentication, OperationConfig operationConfig,
-            OperationMetadata operationMetadata, BaseObject requestObject)
+            OperationMetadata operationMetadata, RequestMap requestObject)
             throws InvalidRequestException, MessageSignerException, NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
 
 
@@ -334,7 +334,7 @@ public class ApiController {
         return message;
     }
 
-    public Map<? extends String, ? extends Object> execute(Authentication auth, OperationConfig operationConfig, OperationMetadata operationMetadata, BaseObject requestObject)
+    public Map<? extends String, ? extends Object> execute(Authentication auth, OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, IllegalArgumentException, SystemException {
         checkState();
