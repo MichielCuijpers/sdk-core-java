@@ -54,6 +54,28 @@ public class AccountInquirySpec extends Specification {
     }
 
 
+//    @Unroll("test ASCII character number: #item")
+//    def 'test_example_stolen' () {
+//
+//
+//        expect:
+//        String tmpString = ""+(char)item+"TEXT";
+//        RequestMap request = new RequestMap();
+//        request.set("AccountInquiry.AccountNumber", "5343434343434343");
+//        println (tmpString);
+//        request.set("AccountInquiry.AsciiText", tmpString);
+//        AccountInquiry response = new AccountInquiry(request).update();
+//        response != null
+//
+//        where:
+//        item << (32..159)
+//        //request.set("AccountInquiry.AsciiText", "!#%&'()*+-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
+//
+//
+//
+//    }
+
+
     def 'test_example_stolen' () {
         when:
         RequestMap request = new RequestMap();
