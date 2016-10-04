@@ -69,7 +69,7 @@ public class ApiController {
     private static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
     private static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
-    private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
+    private static String[] SUPPORTED_TLS = new String[] { "TLSv1", "TLSv1.1", "TLSv1.2" };
 
     private final String host;
 
@@ -475,7 +475,7 @@ public class ApiController {
     }
 
     CloseableHttpClient createHttpClient() {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();;
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         httpClientBuilder.useSystemProperties();
 
         // TLSv1.1 and TLSv1.2 are disabled by default in Java 7, we want to enforce TLSv1.2
