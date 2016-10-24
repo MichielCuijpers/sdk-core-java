@@ -129,7 +129,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
             String thisKey = keys[i];
             Object tmpObject = _get(thisKey, map, false);
             if (tmpObject == null) {
-                tmpObject = _create(thisKey, null, map);
+                tmpObject = _create(thisKey, null, map, true);
                 if (tmpObject instanceof Map) {
                     map = (Map<String, Object>) tmpObject;
                 } else {
@@ -144,7 +144,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
             }
         }
 
-        return _create(keys[keys.length-1], value, map);
+        return _create(keys[keys.length-1], value, map, false);
     }
 
     /**
@@ -169,32 +169,35 @@ public class RequestMap extends LinkedHashMap<String, Object> {
      * @param key
      * @param value
      * @param map
+     * @param createSubObject - true if
      * @return
      */
-    private Object _create(String key, Object value, Map<String,Object> map) {
+    private Object _create(String key, Object value, Map<String,Object> map, boolean createSubObject) {
         Matcher m = arrayIndexPattern.matcher(key);
         boolean hasValue = (value == null) ? false : true;
 
         if (!m.matches()) {
             //this could return any object
             if (map == null) {
-                if (hasValue) {
-                    super.put(key, value);
-                    return value;
-                } else {
+                if (!hasValue && createSubObject) {
                     Map<String,Object> tmpMap = new LinkedHashMap();
                     super.put(key, tmpMap);
                     return  tmpMap;
                 }
+                else {
+                    super.put(key, value);
+                    return value;
+                }
 
             } else {
-                if (hasValue) {
-                    map.put(key, value);
-                    return value;
-                } else {
+                if (!hasValue && createSubObject) {
                     Map<String,Object> tmpMap = new LinkedHashMap();
                     map.put(key, tmpMap);
                     return tmpMap;
+                }
+                else {
+                    map.put(key, value);
+                    return value;
                 }
             }
         } else {
