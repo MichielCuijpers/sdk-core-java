@@ -599,6 +599,7 @@ class ApiControllerSpec extends Specification {
         mockHttpResponse | executeResult
         new MockHttpResponse(200, MockHttpResponse.defaultJsonResponse) | MockHttpResponse.defaultJsonResponse
         new MockHttpResponse(201, MockHttpResponse.defaultJsonResponse) | MockHttpResponse.defaultJsonResponse
+        new MockHttpResponse(200, null) | null
         new MockHttpResponse(204, null) | null
     }
 
@@ -645,7 +646,6 @@ class ApiControllerSpec extends Specification {
 
         where:
         mockHttpResponse                            | thrownEx
-        new MockHttpResponse(200, null)             | ApiCommunicationException
         new MockHttpResponse(400, [error: "error"]) | InvalidRequestException
         new MockHttpResponse(401, [error: "error"]) | AuthenticationException
         new MockHttpResponse(403, [error: "error"]) | NotAllowedException
