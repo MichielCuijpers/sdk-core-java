@@ -501,39 +501,42 @@ public class ApiController {
 
                 StatusLine statusLine = httpResponse.getStatusLine();
                 apiResponse.setStatus(statusLine.getStatusCode());
-
                 HttpEntity entity = httpResponse.getEntity();
-                Header header = httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE);
 
-                String payload = null;
+                //arizzini: entity == null when HTTP 200
                 if (entity != null) {
-                    payload = EntityUtils.toString(entity);
-                } else if (204 != statusLine.getStatusCode()) {
-                    throw new IOException(
-                            "Invalid response, there is no content in the response and the status code is "
-                                    + statusLine.getStatusCode() + ".  Status code should be 204.");
-                }
+                    String payload = EntityUtils.toString(entity);
 
-                String responseContentType;
+                    //arizzini: if we have content, we try to parse it
+                    if (!payload.isEmpty()) {
+                        String responseContentType;
+                        Header header = httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE);
+                        if (header == null) {
+                            throw new IllegalStateException("Unknown content type. Missing Content-Type header");
+                        } else {
+                            if (header.getValue().contains(HEADER_SEPARATOR)) {
+                                String parts[] = header.getValue().split(HEADER_SEPARATOR);
+                                responseContentType = parts[0];
+                            } else {
+                                responseContentType = header.getValue();
+                            }
+                        }
 
-                if (header == null) {
-                    throw new IllegalStateException("Unknown content type. Missing Content-Type header");
-                } else {
-                    if (header.getValue().contains(HEADER_SEPARATOR)) {
-                        String parts[] = header.getValue().split(HEADER_SEPARATOR);
-                        responseContentType = parts[0];
+                        if (responseContentType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
+                            apiResponse.setPayload(payload);
+                        } else {
+                            throw new IOException(
+                                    "Response was not " + ContentType.APPLICATION_JSON.getMimeType() + ", it was: "
+                                            + responseContentType + ". Unable to process payload. " +
+                                            "\nResponse: [ " + payload + " + ]");
+                        }
                     } else {
-                        responseContentType = header.getValue();
+                        //arizzini: 200 with no content like a delete.
+                        apiResponse.setPayload("");
                     }
-                }
-
-                if (responseContentType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
-                    apiResponse.setPayload(payload);
                 } else {
-                    throw new IOException(
-                            "Response was not " + ContentType.APPLICATION_JSON.getMimeType() + ", it was: "
-                                    + responseContentType + ". Unable to process payload. " +
-                                    "\nResponse: [ " + payload + " + ]");
+                    //arizzini: 204 with no content like a delete.
+                    apiResponse.setPayload("");
                 }
 
                 return apiResponse;
