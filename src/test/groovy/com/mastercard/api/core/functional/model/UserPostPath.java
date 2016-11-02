@@ -32,11 +32,22 @@ import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.Authentication;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 
 
 public class UserPostPath extends BaseObject {
+
+    private static Map<String, OperationConfig> operationConfigs;
+
+    static {
+        operationConfigs = new HashMap<>();
+
+        operationConfigs.put("79f2c461-cd66-42bf-a343-77ec624d9531", new OperationConfig("/mock_crud_server/users/{user_id}/posts", Action.list, Arrays.asList(""), Arrays.asList("")));
+
+
+    }
 
     public UserPostPath() {
     }
@@ -45,30 +56,30 @@ public class UserPostPath extends BaseObject {
         putAll(o);
     }
 
-    public UserPostPath(Map m) {
-        putAll(m);
+    public UserPostPath(RequestMap requestMap) {
+        putAll(requestMap);
     }
-
 
     @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
-        switch (operationUUID) {
-        case "uuid":
-            return new OperationConfig("/mock_crud_server/users/{user_id}/posts", Action.list, Arrays.asList(""), Arrays.asList(""));
-        default:
+        OperationConfig operationConfig = operationConfigs.get(operationUUID);
+
+        if(operationConfig == null) {
             throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
         }
-    }
 
+        return operationConfig;
+    }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata("0.0.1", null);
+        return new OperationMetadata(SDKConfig.getVersion(), SDKConfig.getHost());
     }
-    
-    
+
+
+
+
+
     /**
-     * Retrieve <code>UserPostPath</code> objects using the static properties <code>ApiController.PUBLIC_KEY</code> and
-     * <code>ApiController.PRIVATE_KEY</code> as the default public and private API keys respectively and the default
-     * criteria (max 20, offset 0, default sorting and no filtering).
+     * Retrieve a list of <code>UserPostPath</code> objects
      *
      * @return      a ResourceList<UserPostPath> object which holds the list of UserPostPath objects and the total
      *              number of UserPostPath objects available.
@@ -84,16 +95,16 @@ public class UserPostPath extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostPath> list()
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.executeListOperation(null, "uuid", new UserPostPath(), null);
+        return BaseObject.executeListOperation(null, "79f2c461-cd66-42bf-a343-77ec624d9531", new UserPostPath(), null);
     }
 
     /**
-     * Retrieve <code>UserPostPath</code> objects using the default criteria (max 20, offset 0, default sorting and no filtering).
+     * Retrieve a list of <code>UserPostPath</code> objects
      *
-     * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
+     * @param       auth Authentication object overriding <code>ApiConfig.setAuthentication(authentication)</code>
      *
      * @return      a ResourceList<UserPostPath> object which holds the list of UserPostPath objects and the total
      *              number of UserPostPath objects available.
@@ -109,22 +120,19 @@ public class UserPostPath extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostPath> list(Authentication auth)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.executeListOperation(auth, "uuid", new UserPostPath(), null);
+        return BaseObject.executeListOperation(auth, "79f2c461-cd66-42bf-a343-77ec624d9531", new UserPostPath(), null);
     }
 
     /**
-     * Retrieve <code>UserPostPath</code> objects using the specified criteria and using the static properties
-     * <code>ApiController.PUBLIC_KEY</code> and <code>ApiController.PRIVATE_KEY</code> as the default public and private
-     * API keys respectively.
+     * Retrieve a list of <code>UserPostPath</code> objects
      *
-     * @param       criteria a map of parameters; valid keys and types are:<dl style="padding-left:10px;"><#list method.visibleFlattenedInputs as input>
-     *              <dt><code>${input.type} ${input.fullName}</code></dt>    <dd>${input.message} <#if input.required == true><strong>required </strong></#if><#if input.fullName == 'sorting'>The value maps properties to the sort direction (either <code>asc</code> for ascending or <code>desc</code> for descending).  Sortable properties are: <#list sortableProperties as input><code>${input}</code> </#list>.</#if></dd></#list></dl>
+     * @param       criteria a map of additional criteria parameters
      *
-     * @return      a ResourceList<UserPostPath> object which holds the list of UserPostPath objects and the total
-     *              number of UserPostPath objects available.
+     * @return      a ResourceList<UserPostPath> object which holds the list of UserPostPath objects based on the
+     *              <code>criteria</code> provided  and the total number of UserPostPath objects available.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -136,22 +144,21 @@ public class UserPostPath extends BaseObject {
      *
      * @see ResourceList
      */
-    public static ResourceList<UserPostPath> list(Map criteria)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+    public static ResourceList<UserPostPath> list(RequestMap criteria)
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.executeListOperation(null, "uuid", new UserPostPath(), criteria);
+        return BaseObject.executeListOperation(null, "79f2c461-cd66-42bf-a343-77ec624d9531", new UserPostPath(), criteria);
     }
 
     /**
-     * Retrieve <code>UserPostPath</code> objects using the specified criteria.
+     * Retrieve a list of <code>UserPostPath</code> objects
      *
-     * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
-     * @param       criteria a map of parameters; valid keys and types are: <dl style="padding-left:10px;"><#list method.visibleFlattenedInputs as input>
-     *              <dt><code>${input.type} ${input.fullName}</code></dt> <dd>${input.message} <#if input.required == true><strong>required </strong></#if><#if input.fullName == 'sorting'>The value maps properties to the sort direction (either <code>asc</code> for ascending or <code>desc</code> for descending). Sortable properties are: <#list sortableProperties as input> <code>${input}</code> </#list>.</#if></dd></#list></dl>
+     * @param       auth Authentication object overriding <code>ApiConfig.setAuthentication(authentication)</code>
+     * @param       criteria a map of additional criteria parameters
      *
-     * @return      a ResourceList<UserPostPath> object which holds the list of UserPostPath objects and the total
-     *              number of UserPostPath objects available.
+     * @return      a ResourceList<UserPostPath> object which holds the list of UserPostPath objects based on the
+     *              <code>criteria</code> provided and the total number of UserPostPath objects available.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -163,17 +170,18 @@ public class UserPostPath extends BaseObject {
      *
      * @see ResourceList
      */
-    public static ResourceList<UserPostPath> list(Authentication auth, Map criteria)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+    public static ResourceList<UserPostPath> list(Authentication auth, RequestMap criteria)
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.executeListOperation(auth, "uuid", new UserPostPath(), criteria);
+        return BaseObject.executeListOperation(auth, "79f2c461-cd66-42bf-a343-77ec624d9531", new UserPostPath(), criteria);
     }
 
 
-    
-    
-    
+
+
+
+
 }
 
 

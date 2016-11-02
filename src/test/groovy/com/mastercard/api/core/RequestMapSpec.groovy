@@ -123,14 +123,18 @@ class RequestMapSpec extends Specification {
         requestMap.put("int", new Integer("1"))
         requestMap.put("double", new Double("2.5"))
         requestMap.put("boolean", true)
+        requestMap.put("null", null)
         requestMap.put("list", ["a", "b", "c"])
+        requestMap.put("d.null", null)
         requestMap.put("d.aa", 11)
 
         expect:
         requestMap.get("int") == 1
         requestMap.get("double") == 2.5
         requestMap.get("boolean") == true
+        requestMap.get("null") == null
         requestMap.get("list") == ["a", "b", "c"]
+        requestMap.get("d.null") == null
         requestMap.get("d.aa") == 11
     }
 
@@ -140,14 +144,18 @@ class RequestMapSpec extends Specification {
                 .set("int", new Integer("1"))
                 .set("double", new Double("2.5"))
                 .set("boolean", true)
+                .set("null", null)
                 .set("list", ["a", "b", "c"])
+                .set("d.null", null)
                 .set("d.aa", 11)
 
         expect:
         requestMap.get("int") == 1
         requestMap.get("double") == 2.5
         requestMap.get("boolean") == true
+        requestMap.get("null") == null
         requestMap.get("list") == ["a", "b", "c"]
+        requestMap.get("d.null") == null
         requestMap.get("d.aa") == 11
     }
 
@@ -157,7 +165,9 @@ class RequestMapSpec extends Specification {
         requestMap.set("int", new Integer("1"))
         requestMap.set("double", new Double("2.5"))
         requestMap.set("boolean", true)
+        requestMap.set("null", null)
         requestMap.set("list", ["a", "b", "c"])
+        requestMap.set("d.null", null)
         requestMap.set("d.aa", 1)
         requestMap.set("d.bb", 2)
         requestMap.set("d.cc", 3)
@@ -165,9 +175,11 @@ class RequestMapSpec extends Specification {
         when:
         requestMap.remove("int")
         requestMap.remove("d.aa")
+        requestMap.remove("d.null")
 
         then:
         requestMap.containsKey("int") == false
+        requestMap.containsKey("d.null") == false
         requestMap.containsKey("d.aa") == false
         requestMap.get("double") == 2.5
         requestMap.get("boolean") == true
@@ -230,6 +242,17 @@ class RequestMapSpec extends Specification {
         rm3.get("user.cards").size() == 2
         rm3.get("user.cards[0].pan") == "pan1"
         rm3.get("user.cards[1].pan") == "pan2"
+
+        when: "set a value using the index"
+        RequestMap rm4 = new RequestMap();
+        rm4.set("user.cards[0].pan", null)
+        rm4.set("user.cards[1].pan", "pan2")
+
+        then:
+        rm4.get("user.cards") instanceof List
+        rm4.get("user.cards").size() == 2
+        rm4.get("user.cards[0].pan") == null
+        rm4.get("user.cards[1].pan") == "pan2"
     }
 
     def 'test set multiple array' () {
@@ -237,12 +260,14 @@ class RequestMapSpec extends Specification {
         RequestMap requestMap = new RequestMap()
 
         when:
-        requestMap.set("user.cards[0].addresses[0].line1", "1")
+        requestMap.set("user.cards[0].addresses[0].line1", null)
+        requestMap.set("user.cards[1].addresses[0].line1", "1")
 
         then:
         requestMap.get("user.cards") instanceof List
         requestMap.get("user.cards[0].addresses") instanceof List
-        requestMap.get("user.cards[0].addresses[0].line1") == "1"
+        requestMap.get("user.cards[0].addresses[0].line1") == null
+        requestMap.get("user.cards[1].addresses[0].line1") == "1"
     }
 
 }

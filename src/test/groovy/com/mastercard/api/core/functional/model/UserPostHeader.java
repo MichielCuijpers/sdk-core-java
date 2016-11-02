@@ -32,11 +32,22 @@ import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.Authentication;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 
 
 public class UserPostHeader extends BaseObject {
+
+    private static Map<String, OperationConfig> operationConfigs;
+
+    static {
+        operationConfigs = new HashMap<>();
+
+        operationConfigs.put("378b52fa-47e7-4acc-b414-68fb2604ab39", new OperationConfig("/mock_crud_server/users/posts", Action.list, Arrays.asList(""), Arrays.asList("user_id")));
+
+
+    }
 
     public UserPostHeader() {
     }
@@ -45,31 +56,30 @@ public class UserPostHeader extends BaseObject {
         putAll(o);
     }
 
-    public UserPostHeader(Map m) {
-        putAll(m);
+    public UserPostHeader(RequestMap requestMap) {
+        putAll(requestMap);
     }
 
-
     @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
-        switch (operationUUID) {
-        case "uuid":
-            return new OperationConfig("/mock_crud_server/users/posts", Action.list, Arrays.asList(""), Arrays.asList("user_id"));
-        default:
+        OperationConfig operationConfig = operationConfigs.get(operationUUID);
+
+        if(operationConfig == null) {
             throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
         }
+
+        return operationConfig;
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata("0.0.1", null);
+        return new OperationMetadata(SDKConfig.getVersion(), SDKConfig.getHost());
     }
 
-    
-    
-    
+
+
+
+
     /**
-     * Retrieve <code>UserPostHeader</code> objects using the static properties <code>ApiController.PUBLIC_KEY</code> and
-     * <code>ApiController.PRIVATE_KEY</code> as the default public and private API keys respectively and the default
-     * criteria (max 20, offset 0, default sorting and no filtering).
+     * Retrieve a list of <code>UserPostHeader</code> objects
      *
      * @return      a ResourceList<UserPostHeader> object which holds the list of UserPostHeader objects and the total
      *              number of UserPostHeader objects available.
@@ -85,16 +95,16 @@ public class UserPostHeader extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostHeader> list()
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.executeListOperation(null, "uuid", new UserPostHeader(), null);
+        return BaseObject.executeListOperation(null, "378b52fa-47e7-4acc-b414-68fb2604ab39", new UserPostHeader(), null);
     }
 
     /**
-     * Retrieve <code>UserPostHeader</code> objects using the default criteria (max 20, offset 0, default sorting and no filtering).
+     * Retrieve a list of <code>UserPostHeader</code> objects
      *
-     * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
+     * @param       auth Authentication object overriding <code>ApiConfig.setAuthentication(authentication)</code>
      *
      * @return      a ResourceList<UserPostHeader> object which holds the list of UserPostHeader objects and the total
      *              number of UserPostHeader objects available.
@@ -110,22 +120,19 @@ public class UserPostHeader extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostHeader> list(Authentication auth)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.executeListOperation(auth, "uuid", new UserPostHeader(), null);
+        return BaseObject.executeListOperation(auth, "378b52fa-47e7-4acc-b414-68fb2604ab39", new UserPostHeader(), null);
     }
 
     /**
-     * Retrieve <code>UserPostHeader</code> objects using the specified criteria and using the static properties
-     * <code>ApiController.PUBLIC_KEY</code> and <code>ApiController.PRIVATE_KEY</code> as the default public and private
-     * API keys respectively.
+     * Retrieve a list of <code>UserPostHeader</code> objects
      *
-     * @param       criteria a map of parameters; valid keys and types are:<dl style="padding-left:10px;"><#list method.visibleFlattenedInputs as input>
-     *              <dt><code>${input.type} ${input.fullName}</code></dt>    <dd>${input.message} <#if input.required == true><strong>required </strong></#if><#if input.fullName == 'sorting'>The value maps properties to the sort direction (either <code>asc</code> for ascending or <code>desc</code> for descending).  Sortable properties are: <#list sortableProperties as input><code>${input}</code> </#list>.</#if></dd></#list></dl>
+     * @param       criteria a map of additional criteria parameters
      *
-     * @return      a ResourceList<UserPostHeader> object which holds the list of UserPostHeader objects and the total
-     *              number of UserPostHeader objects available.
+     * @return      a ResourceList<UserPostHeader> object which holds the list of UserPostHeader objects based on the
+     *              <code>criteria</code> provided  and the total number of UserPostHeader objects available.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -137,22 +144,21 @@ public class UserPostHeader extends BaseObject {
      *
      * @see ResourceList
      */
-    public static ResourceList<UserPostHeader> list(Map criteria)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+    public static ResourceList<UserPostHeader> list(RequestMap criteria)
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.executeListOperation(null, "uuid", new UserPostHeader(), criteria);
+        return BaseObject.executeListOperation(null, "378b52fa-47e7-4acc-b414-68fb2604ab39", new UserPostHeader(), criteria);
     }
 
     /**
-     * Retrieve <code>UserPostHeader</code> objects using the specified criteria.
+     * Retrieve a list of <code>UserPostHeader</code> objects
      *
-     * @param       auth Authentication object representing overrides for <code>ApiController.PRIVATE_KEY</code> and <code>ApiController.PUBLIC_KEY</code> and/or passing an access token in for operations using OAuth.
-     * @param       criteria a map of parameters; valid keys and types are: <dl style="padding-left:10px;"><#list method.visibleFlattenedInputs as input>
-     *              <dt><code>${input.type} ${input.fullName}</code></dt> <dd>${input.message} <#if input.required == true><strong>required </strong></#if><#if input.fullName == 'sorting'>The value maps properties to the sort direction (either <code>asc</code> for ascending or <code>desc</code> for descending). Sortable properties are: <#list sortableProperties as input> <code>${input}</code> </#list>.</#if></dd></#list></dl>
+     * @param       auth Authentication object overriding <code>ApiConfig.setAuthentication(authentication)</code>
+     * @param       criteria a map of additional criteria parameters
      *
-     * @return      a ResourceList<UserPostHeader> object which holds the list of UserPostHeader objects and the total
-     *              number of UserPostHeader objects available.
+     * @return      a ResourceList<UserPostHeader> object which holds the list of UserPostHeader objects based on the
+     *              <code>criteria</code> provided and the total number of UserPostHeader objects available.
      *
      * @throws      ApiCommunicationException
      * @throws      AuthenticationException
@@ -164,11 +170,11 @@ public class UserPostHeader extends BaseObject {
      *
      * @see ResourceList
      */
-    public static ResourceList<UserPostHeader> list(Authentication auth, Map criteria)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+    public static ResourceList<UserPostHeader> list(Authentication auth, RequestMap criteria)
+            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
+            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
 
-        return BaseObject.executeListOperation(auth, "uuid", new UserPostHeader(), criteria);
+        return BaseObject.executeListOperation(auth, "378b52fa-47e7-4acc-b414-68fb2604ab39", new UserPostHeader(), criteria);
     }
 
 
