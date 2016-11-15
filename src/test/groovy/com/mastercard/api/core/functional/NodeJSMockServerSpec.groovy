@@ -18,6 +18,7 @@ import spock.lang.Specification
  */
 
 
+@IgnoreIf({ System.getProperty("RUN_NODEJS") == null })
 class NodeJSMockServerSpec extends Specification {
 
 

@@ -373,15 +373,24 @@ public class ApiController {
                         else {
                             list = ((List<Map<? extends String, ? extends Object>>) response);
                         }
-
                         map.put("list", list);
                         return map;
                     } else {
-                        if (interceptor == null) {
-                            return (Map<? extends String, ? extends Object>) response;
+
+                        Map<String,Object> map = null;
+                        if (response instanceof JSONObject) {
+                            map = (Map<String, Object>) response;
+
+                            if (interceptor == null) {
+                                return map;
+                            } else {
+                                return interceptor.decrypt(map);
+                            }
+
                         } else {
-                            Map<String, Object> responseMap = (Map<String, Object>) response;
-                            return interceptor.decrypt(responseMap);
+                            map = new HashMap<>();
+                            map.put("list", ((List<Map<? extends String, ? extends Object>>) response));
+                            return map;
                         }
                     }
                 } else {
