@@ -25,8 +25,6 @@ class NodeJSMockServerSpec extends Specification {
     def setupSpec() {
         ApiConfig.setSandbox(true)
         ApiConfig.authentication = new MockAuthentication()
-        ApiController.API_BASE_SANDBOX_URL = "http://localhost:8081";
-        ApiController.API_BASE_LIVE_URL = "http://localhost:8081";
         MockBaseObject.setApiController(new ApiController())
 
 
@@ -34,8 +32,6 @@ class NodeJSMockServerSpec extends Specification {
 
     def cleanupSpec() {
         ApiConfig.authentication = null;
-        ApiController.API_BASE_SANDBOX_URL = "https://sandbox.api.mastercard.com";
-        ApiController.API_BASE_LIVE_URL = "https://api.mastercard.com";
         MockBaseObject.setApiController(new ApiController())
     }
 

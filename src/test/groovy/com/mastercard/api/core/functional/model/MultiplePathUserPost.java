@@ -46,7 +46,7 @@ public class MultiplePathUserPost extends BaseObject  {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata(SDKConfig.getVersion(), SDKConfig.getHost());
+        return new OperationMetadata(SDKConfig.getVersion(), "http://localhost:8081");
     }
 
 

@@ -11,25 +11,59 @@ import java.util.logging.Level;
  * SDK Configuration Overrides
  */
 public final class ApiConfig {
-    private static boolean sandbox = true;
     private static boolean debug = false;
     private static Authentication authentication;
     private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
+    private static String subDomain = "sandbox";
+    private static String environment = null;
+
 
     /**
      * SDK will use sandbox APIs instead of production APIs
      */
-    public static void setSandbox(boolean sandbox) {
-        ApiConfig.sandbox = sandbox;
-    }
 
     public static boolean isSandbox() {
-        return sandbox;
+        return subDomain != null && subDomain.compareTo("sandbox") == 0;
     }
 
     public static boolean isProduction() {
-        return !sandbox;
+        return subDomain == null;
     }
+
+    public static void setSandbox(boolean sandbox) {
+        if (sandbox) {
+            subDomain = "sandbox";
+        } else {
+            subDomain = null;
+        }
+    }
+
+    public static void setSubDomain(String subDomainName) {
+        if (subDomainName != null && !subDomainName.isEmpty()) {
+            subDomain = subDomainName;
+        } else {
+            subDomain = null;
+        }
+
+    }
+
+    public static String getSubDomain() {
+        return subDomain;
+    }
+
+    public static String getEnvironment() {
+        return environment;
+    }
+
+    public static void setEnvironment(String environmentName) {
+        if (environmentName != null && !environmentName.isEmpty()) {
+            environment = environmentName;
+        } else {
+            environment = null;
+        }
+    }
+
+
 
     /**
      * Turn on debug logging for the SDK

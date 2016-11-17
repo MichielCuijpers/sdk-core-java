@@ -65,8 +65,6 @@ import java.util.regex.Pattern;
 
 public class ApiController {
 
-    private static String API_BASE_LIVE_URL = Constants.API_BASE_LIVE_URL;
-    private static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
     private static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
     private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
@@ -77,26 +75,22 @@ public class ApiController {
      */
     public ApiController() {
 
-        String baseUrl = API_BASE_LIVE_URL;
-
-        if (ApiConfig.isSandbox()) {
-            baseUrl = API_BASE_SANDBOX_URL;
+        StringBuilder hostBuilder = new StringBuilder();
+        hostBuilder.append("https://");
+        if (ApiConfig.getSubDomain() != null) {
+            hostBuilder.append(ApiConfig.getSubDomain());
+            hostBuilder.append(".");
         }
+        hostBuilder.append("api.mastercard.com");
 
-        this.host = baseUrl;
+        this.host = hostBuilder.toString();
     }
 
     private void checkState() throws RuntimeException {
         try {
-            new URL(API_BASE_LIVE_URL);
+            new URL(this.host);
         } catch (MalformedURLException e) {
-            throw new IllegalStateException("Invalid URL supplied for API_BASE_LIVE_URL", e);
-        }
-
-        try {
-            new URL(API_BASE_SANDBOX_URL);
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("Invalid URL supplied for API_BASE_SANDBOX_URL", e);
+            throw new IllegalStateException("Invalid URL supplied for host="+this.host, e);
         }
     }
 
@@ -165,8 +159,20 @@ public class ApiController {
             throws UnsupportedEncodingException, IllegalStateException {
         URI uri;
 
+        String resourcePath = operationConfig.getResourcePath();
+        if (resourcePath.contains("{:env}")) {
+            String environment = "";
+            if (operationMetadata.getEnvironment() != null) {
+                environment = operationMetadata.getEnvironment();
+            } else if (ApiConfig.getEnvironment() != null) {
+                environment = ApiConfig.getEnvironment();
+            }
+            resourcePath = resourcePath.replace("{:env}", environment);
+            //don't worry of //, they will be removed in the getPathWithReplacedPath
+        }
+
         //arizzini: need to replace all the path variables
-        String updatedType = getPathWithReplacedPath(operationConfig.getResourcePath(), requestObject);
+        String updatedType = getPathWithReplacedPath(resourcePath, requestObject);
 
         StringBuilder s = new StringBuilder("%s%s");
 

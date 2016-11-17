@@ -70,7 +70,7 @@ public class Post extends BaseObject {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata("0.0.1", null);
+        return new OperationMetadata("0.0.1", "http://localhost:8081");
     }
 
     

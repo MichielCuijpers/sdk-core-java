@@ -48,6 +48,29 @@ class ApiConfigSpec extends Specification {
         ApiConfig.isProduction()
     }
 
+
+    def 'test setting sandbox && mft' () {
+        when:
+        ApiConfig.setSubDomain("sandbox")
+        ApiConfig.setEnvironment("mtf")
+
+        then:
+        ApiConfig.isSandbox()
+        !ApiConfig.isProduction()
+        ApiConfig.getSubDomain() == "sandbox"
+        ApiConfig.getEnvironment() == "mtf"
+
+        when:
+        ApiConfig.setSandbox(false)
+
+        then:
+        ApiConfig.getSubDomain() == null;
+        ApiConfig.getEnvironment() == "mtf"
+
+
+
+    }
+
     def 'test setting oauth authentication' () {
         given:
         OAuthAuthentication authentication = Mock(OAuthAuthentication)
