@@ -69,16 +69,13 @@ public class ApiController {
     private static String HEADER_SEPARATOR = ";";
     private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
 
-    private String host;
-
     /**
      */
     public ApiController() {
-        setHost();
 
     }
 
-    private void setHost() {
+    private String generateHost() {
         StringBuilder hostBuilder = new StringBuilder();
         hostBuilder.append("https://");
         if (ApiConfig.getSubDomain() != null) {
@@ -86,13 +83,15 @@ public class ApiController {
             hostBuilder.append(".");
         }
         hostBuilder.append("api.mastercard.com");
-        this.host = hostBuilder.toString();
+        String host = hostBuilder.toString();
 
         try {
-            new URL(this.host);
+            new URL(host);
         } catch (MalformedURLException e) {
-            throw new IllegalStateException("Invalid URL supplied for host="+this.host, e);
+            throw new IllegalStateException("Invalid URL supplied for host="+host, e);
         }
+
+        return host;
     }
 
 
@@ -161,7 +160,9 @@ public class ApiController {
             throws UnsupportedEncodingException, IllegalStateException {
         URI uri;
 
-        setHost();
+        //arizzini: if host config or environment config changes betweeen calls
+        // we need to update the host
+        String host = generateHost();
 
         String resourcePath = operationConfig.getResourcePath();
         if (resourcePath.contains("{:env}")) {
@@ -246,9 +247,7 @@ public class ApiController {
             OperationMetadata operationMetadata, RequestMap requestObject)
             throws InvalidRequestException, MessageSignerException, NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
 
-        //arizzini: if host config or environment config changes betweeen calls
-        // we need to update the host
-        setHost();
+
 
         Map<String,Object> headerMap = subMap(requestObject, operationConfig.getHeaderParams());
         URI uri = getURI(operationConfig, operationMetadata, requestObject);

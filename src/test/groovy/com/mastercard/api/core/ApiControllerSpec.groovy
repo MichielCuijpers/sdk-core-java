@@ -35,22 +35,19 @@ class ApiControllerSpec extends Specification {
     }
 
     def "test constructor: ApiController(String basePath)" () {
-        setup:
-        ApiController apiController = new ApiController()
 
         when:
-        apiController.setHost()
+        ApiController apiController = new ApiController()
 
         then:
-        apiController.host == "https://sandbox.api.mastercard.com"
+        apiController.generateHost() == "https://sandbox.api.mastercard.com"
 
 
         when:
         ApiConfig.setSandbox(false);
-        apiController.setHost()
 
         then:
-        apiController.host == "https://api.mastercard.com"
+        apiController.generateHost() == "https://api.mastercard.com"
         ApiConfig.setSandbox(true)
     }
 
