@@ -106,9 +106,9 @@ public class OAuthAuthenticationSpec extends Specification {
 
         then:
         header.name == OAuth.HTTP_AUTHORIZATION_HEADER
-        tokens."oauth_body_hash" == "u0JWorwmuzHq+83yrTJkjURYjUo="
+        tokens."oauth_body_hash" == "ICyYzhlixhDaaOr7QCdIMvlw/Rq/8KhiGfVtrWk5xyY="
         tokens."oauth_consumer_key" == consumerKey
-        tokens."oauth_signature_method" == "RSA-SHA1"
+        tokens."oauth_signature_method" == "RSA-SHA256"
         tokens."oauth_version" == "1.0"
 
         tokens.containsKey("oauth_nonce")

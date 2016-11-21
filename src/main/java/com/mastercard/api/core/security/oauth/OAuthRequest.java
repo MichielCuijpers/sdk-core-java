@@ -122,7 +122,7 @@ public class OAuthRequest implements HttpRequest {
         MessageDigest digest;
 
         try {
-            digest = MessageDigest.getInstance(OAuthConstants.SHA1);
+            digest = MessageDigest.getInstance(OAuthConstants.SHA256);
         }
         catch (NoSuchAlgorithmException e) {
             throw e;

@@ -28,7 +28,7 @@ public class OAuthSigner extends OAuthMessageSigner {
     @Override
     public String sign(HttpRequest request, HttpParameters requestParams) throws OAuthMessageSignerException {
         try {
-            Signature signer = Signature.getInstance("SHA1withRSA");
+            Signature signer = Signature.getInstance("SHA256withRSA");
             signer.initSign(signingPrivateKey);
 
             String sbs = new SignatureBaseString(request, requestParams).generate();
@@ -46,6 +46,6 @@ public class OAuthSigner extends OAuthMessageSigner {
 
     @Override
     public String getSignatureMethod() {
-        return "RSA-SHA1";
+        return "RSA-SHA256";
     }
 }
