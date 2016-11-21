@@ -69,12 +69,17 @@ public class ApiController {
     private static String HEADER_SEPARATOR = ";";
     private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
 
-    private final String host;
+    private String host;
 
     /**
      */
     public ApiController() {
+        setHost();
+        checkHost();
 
+    }
+
+    private void setHost() {
         StringBuilder hostBuilder = new StringBuilder();
         hostBuilder.append("https://");
         if (ApiConfig.getSubDomain() != null) {
@@ -82,11 +87,11 @@ public class ApiController {
             hostBuilder.append(".");
         }
         hostBuilder.append("api.mastercard.com");
-
         this.host = hostBuilder.toString();
     }
 
-    private void checkState() throws RuntimeException {
+    private void checkHost() throws RuntimeException {
+
         try {
             new URL(this.host);
         } catch (MalformedURLException e) {
@@ -158,6 +163,8 @@ public class ApiController {
     private URI getURI(OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)
             throws UnsupportedEncodingException, IllegalStateException {
         URI uri;
+
+        setHost();
 
         String resourcePath = operationConfig.getResourcePath();
         if (resourcePath.contains("{:env}")) {
@@ -343,7 +350,8 @@ public class ApiController {
     public Map<? extends String, ? extends Object> execute(Authentication auth, OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, IllegalArgumentException, SystemException {
-        checkState();
+
+        checkHost();
 
         CloseableHttpClient httpClient = createHttpClient();
 
