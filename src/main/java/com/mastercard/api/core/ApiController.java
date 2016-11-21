@@ -75,7 +75,6 @@ public class ApiController {
      */
     public ApiController() {
         setHost();
-        checkHost();
 
     }
 
@@ -88,9 +87,6 @@ public class ApiController {
         }
         hostBuilder.append("api.mastercard.com");
         this.host = hostBuilder.toString();
-    }
-
-    private void checkHost() throws RuntimeException {
 
         try {
             new URL(this.host);
@@ -98,6 +94,7 @@ public class ApiController {
             throw new IllegalStateException("Invalid URL supplied for host="+this.host, e);
         }
     }
+
 
     /**
      * Append parameter to URL
@@ -249,6 +246,9 @@ public class ApiController {
             OperationMetadata operationMetadata, RequestMap requestObject)
             throws InvalidRequestException, MessageSignerException, NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
 
+        //arizzini: if host config or environment config changes betweeen calls
+        // we need to update the host
+        setHost();
 
         Map<String,Object> headerMap = subMap(requestObject, operationConfig.getHeaderParams());
         URI uri = getURI(operationConfig, operationMetadata, requestObject);
@@ -351,7 +351,6 @@ public class ApiController {
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, IllegalArgumentException, SystemException {
 
-        checkHost();
 
         CloseableHttpClient httpClient = createHttpClient();
 
@@ -498,7 +497,7 @@ public class ApiController {
     }
 
     CloseableHttpClient createHttpClient() {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();;
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         httpClientBuilder.useSystemProperties();
 
         // TLSv1.1 and TLSv1.2 are disabled by default in Java 7, we want to enforce TLSv1.2
