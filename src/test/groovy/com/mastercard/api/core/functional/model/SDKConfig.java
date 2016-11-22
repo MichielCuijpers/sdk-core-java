@@ -27,6 +27,7 @@
 
 package com.mastercard.api.core.functional.model;
 
+import com.mastercard.api.core.ApiConfig;
 import com.mastercard.api.core.model.Environment;
 import com.mastercard.api.core.model.SDKConfigInterface;
 
@@ -35,18 +36,21 @@ import java.util.Map;
 
 public class SDKConfig implements SDKConfigInterface {
 
-    private String override = "http://localhost:8081";
-    private String host = null;
-    private String context = null;
+    private static String override = null;
+    private static String host = null;
+    private static String context = null;
+    private static final Map<Environment,String[]> environmentMap = new HashMap();
 
-    private static final Map<Environment,String[]> environmentMap = new HashMap() {{
-        this.put(Environment.PRODUCTION, new String[] { "https://api.mastercard.com", null});
-        this.put(Environment.SANDBOX, new String[] { "https://sandbox.api.mastercard.com", null});
-        this.put(Environment.STAGE, new String[] { "https://stage.api.mastercard.com", null});
-        this.put(Environment.DEV, new String[] { "https://dev.api.mastercard.com", null});
-        this.put(Environment.MTF, new String[] { "https://sandbox.api.mastercard.com", "mtf"});
-        this.put(Environment.ITF, new String[] { "https://sandbox.api.mastercard.com", "itf"});
-    }};
+    static {
+        environmentMap.put(Environment.PRODUCTION, new String[] { "https://api.mastercard.com", null});
+        environmentMap.put(Environment.SANDBOX, new String[] { "https://sandbox.api.mastercard.com", null});
+        environmentMap.put(Environment.STAGE, new String[] { "https://stage.api.mastercard.com", null});
+        environmentMap.put(Environment.DEV, new String[] { "https://dev.api.mastercard.com", null});
+        environmentMap.put(Environment.MTF, new String[] { "https://sandbox.api.mastercard.com", "mtf"});
+        environmentMap.put(Environment.ITF, new String[] { "https://sandbox.api.mastercard.com", "itf"});
+
+        //ApiConfig.addSdkConfig(this(SDKConfig));
+    }
 
 
     public String getContext() {
@@ -82,5 +86,9 @@ public class SDKConfig implements SDKConfigInterface {
     //this is only used for testing.
     public void clearOverride() {
         override = null;
+    }
+
+    public void setOverride() {
+        override = "http://localhost:8081";
     }
 }

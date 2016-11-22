@@ -42,6 +42,7 @@ public final class ApiConfig {
         } else {
             currentEnvironment = Environment.PRODUCTION;
         }
+        setEnvironment(currentEnvironment);
     }
 
 
