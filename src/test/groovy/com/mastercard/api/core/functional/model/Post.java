@@ -39,6 +39,7 @@ import java.util.Map;
 
 public class Post extends BaseObject {
 
+    private static SDKConfig config = new SDKConfig();
     public Post() {
     }
 
@@ -70,7 +71,7 @@ public class Post extends BaseObject {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata("0.0.1", "http://localhost:8081");
+        return new OperationMetadata(config.getVersion(), config.getHost(), config.getContext());
     }
 
     

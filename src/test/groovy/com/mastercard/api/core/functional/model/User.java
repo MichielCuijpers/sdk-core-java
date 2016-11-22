@@ -40,6 +40,7 @@ import java.util.Map;
 public class User extends BaseObject {
 
     private static Map<String, OperationConfig> operationConfigs;
+    private static SDKConfig config = new SDKConfig();
 
     static {
         operationConfigs = new HashMap<>();
@@ -77,7 +78,7 @@ public class User extends BaseObject {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata(SDKConfig.getVersion(), "http://localhost:8081");
+        return new OperationMetadata(config.getVersion(), config.getHost(), config.getContext());
     }
 
 

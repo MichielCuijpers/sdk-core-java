@@ -1,7 +1,9 @@
 package com.mastercard.api.core
 import com.mastercard.api.core.exception.*
+import com.mastercard.api.core.functional.model.SDKConfig
 import com.mastercard.api.core.mocks.*
 import com.mastercard.api.core.model.Action
+import com.mastercard.api.core.model.Environment
 import com.mastercard.api.core.model.OperationConfig
 import com.mastercard.api.core.model.OperationMetadata
 import com.mastercard.api.core.model.RequestMap
@@ -34,57 +36,40 @@ class ApiControllerSpec extends Specification {
         ApiConfig.authentication = null;
     }
 
-    def "test constructor: ApiController(String basePath)" () {
 
-        when:
-        ApiController apiController = new ApiController()
-
-        then:
-        apiController.generateHost() == "https://sandbox.api.mastercard.com"
-
-
-        when:
-        ApiConfig.setSandbox(false);
-
-        then:
-        apiController.generateHost() == "https://api.mastercard.com"
-        ApiConfig.setSandbox(true)
-    }
 
 
     @Unroll
-    def "test getUri: Using SubDomain: #subDomain and Environment: #envrironment "() {
+    def "test getUri: Using SubDomain: Environment: #envrironment "() {
         given:
         OperationConfig operationConfig = new OperationConfig("/mdes/digitization/{:env}/1/0/getToken", Action.create, [], [])
-        OperationMetadata operationMetadata = new OperationMetadata("0.0.1", null);
+        SDKConfig config = new SDKConfig();
+        config.clearOverride();
 
         when:
-        ApiConfig.setSubDomain(subDomain)
+        ApiConfig.addSdkConfig(config);
         ApiConfig.setEnvironment(envrironment)
         ApiController controller = new ApiController()
+        OperationMetadata operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext());
         URI uri = controller.getURI(operationConfig, operationMetadata, new RequestMap());
 
         then:
         uri.toURL().toString() == result
 
         cleanup:
-        ApiConfig.setSubDomain("sandbox")
-        ApiConfig.setEnvironment(null)
+        ApiConfig.setEnvironment(Environment.SANDBOX)
 
         where:
-        subDomain | envrironment | result
-        "sandbox" | "mtf"        | "https://sandbox.api.mastercard.com/mdes/digitization/mtf/1/0/getToken?Format=JSON"
-        null      | "ciao"       | "https://api.mastercard.com/mdes/digitization/ciao/1/0/getToken?Format=JSON"
-        null      | null         | "https://api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
-        "stage"   | "itf"        | "https://stage.api.mastercard.com/mdes/digitization/itf/1/0/getToken?Format=JSON"
-        "stage"   | null         | "https://stage.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
-        "stage"   |  "mtf"       | "https://stage.api.mastercard.com/mdes/digitization/mtf/1/0/getToken?Format=JSON"
-        "stage"   |  ""          | "https://stage.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
-        "stage"   | null         | "https://stage.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
-        "dev"     | null         | "https://dev.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
+        envrironment                 | result
+        Environment.PRODUCTION       | "https://api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
+        Environment.SANDBOX          | "https://sandbox.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
+        Environment.STAGE            | "https://stage.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
+        Environment.ITF              | "https://sandbox.api.mastercard.com/mdes/digitization/itf/1/0/getToken?Format=JSON"
+        Environment.MTF              | "https://sandbox.api.mastercard.com/mdes/digitization/mtf/1/0/getToken?Format=JSON"
 
 
     }
+
 
     def "test appendToQueryString" () {
         given:

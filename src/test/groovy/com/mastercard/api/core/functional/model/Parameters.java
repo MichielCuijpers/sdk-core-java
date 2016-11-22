@@ -64,7 +64,7 @@ public class Parameters extends BaseObject  {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata("0.0.1", null);
+        return new OperationMetadata("0.0.1", "https://sandbox.api.mastercard.com", null);
     }
 
         /**

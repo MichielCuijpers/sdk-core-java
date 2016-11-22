@@ -27,18 +27,60 @@
 
 package com.mastercard.api.core.functional.model;
 
-public class SDKConfig {
-    private static String host = "http://localhost:8081";
+import com.mastercard.api.core.model.Environment;
+import com.mastercard.api.core.model.SDKConfigInterface;
 
-    public static String getHost() {
-        return host;
+import java.util.HashMap;
+import java.util.Map;
+
+public class SDKConfig implements SDKConfigInterface {
+
+    private String override = "http://localhost:8081";
+    private String host = null;
+    private String context = null;
+
+    private static final Map<Environment,String[]> environmentMap = new HashMap() {{
+        this.put(Environment.PRODUCTION, new String[] { "https://api.mastercard.com", null});
+        this.put(Environment.SANDBOX, new String[] { "https://sandbox.api.mastercard.com", null});
+        this.put(Environment.STAGE, new String[] { "https://stage.api.mastercard.com", null});
+        this.put(Environment.DEV, new String[] { "https://dev.api.mastercard.com", null});
+        this.put(Environment.MTF, new String[] { "https://sandbox.api.mastercard.com", "mtf"});
+        this.put(Environment.ITF, new String[] { "https://sandbox.api.mastercard.com", "itf"});
+    }};
+
+
+    public String getContext() {
+        return context;
     }
 
-    public static void setHost(String host) {
-        SDKConfig.host = host;
+    public String getHost() {
+        return  (override!= null) ? override : host;
     }
 
-    public static String getVersion() {
+    public String getVersion() {
         return "0.0.1";
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        if (environmentMap.containsKey(environment)) {
+            String[] config = environmentMap.get(environment);
+            this.host = config[0];
+            this.context = config[1];
+        } else {
+            throw new RuntimeException("Environment: "+environment.name()+" not found for sdk:"+this.getClass().getName());
+        }
+    }
+
+    @Override
+    public void setEnvironment(String host, String context) {
+        this.context = context;
+        this.host = host;
+    }
+
+
+    //this is only used for testing.
+    public void clearOverride() {
+        override = null;
     }
 }

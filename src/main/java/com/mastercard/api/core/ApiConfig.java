@@ -1,9 +1,13 @@
 package com.mastercard.api.core;
 
+import com.mastercard.api.core.model.Environment;
+import com.mastercard.api.core.model.SDKConfigInterface;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.security.CryptographyInterceptor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -14,8 +18,10 @@ public final class ApiConfig {
     private static boolean debug = false;
     private static Authentication authentication;
     private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
-    private static String subDomain = "sandbox";
-    private static String environment = null;
+
+    private static Environment currentEnvironment = Environment.SANDBOX;
+    private static List<SDKConfigInterface> registeredInstances = new ArrayList<>();
+
 
 
     /**
@@ -23,44 +29,31 @@ public final class ApiConfig {
      */
 
     public static boolean isSandbox() {
-        return subDomain != null && subDomain.compareTo("sandbox") == 0;
+        return currentEnvironment == Environment.SANDBOX;
     }
 
     public static boolean isProduction() {
-        return subDomain == null;
+        return currentEnvironment == Environment.PRODUCTION;
     }
 
     public static void setSandbox(boolean sandbox) {
         if (sandbox) {
-            subDomain = "sandbox";
+            currentEnvironment = Environment.SANDBOX;
         } else {
-            subDomain = null;
+            currentEnvironment = Environment.PRODUCTION;
         }
     }
 
-    public static void setSubDomain(String subDomainName) {
-        if (subDomainName != null && !subDomainName.isEmpty()) {
-            subDomain = subDomainName;
-        } else {
-            subDomain = null;
+
+    public static Environment getEnvironment() {
+        return currentEnvironment;
+    }
+
+    public static void setEnvironment(Environment environment) {
+        for (SDKConfigInterface sdkConfig : registeredInstances) {
+            sdkConfig.setEnvironment(environment);
         }
-
-    }
-
-    public static String getSubDomain() {
-        return subDomain;
-    }
-
-    public static String getEnvironment() {
-        return environment;
-    }
-
-    public static void setEnvironment(String environmentName) {
-        if (environmentName != null && !environmentName.isEmpty()) {
-            environment = environmentName;
-        } else {
-            environment = null;
-        }
+        currentEnvironment = environment;
     }
 
 
@@ -138,6 +131,21 @@ public final class ApiConfig {
         if (!cryptographyMap.containsKey(cryptographyInterceptor.getTriggeringPath())){
             cryptographyMap.put(cryptographyInterceptor.getTriggeringPath(), cryptographyInterceptor);
         }
+    }
+
+    /**
+     *
+     * @param sdkConfigInterface
+     */
+    public static void addSdkConfig(SDKConfigInterface sdkConfigInterface) {
+        registeredInstances.add(sdkConfigInterface);
+    }
+
+    /**
+     *
+     */
+    public static void clearSdkConfig() {
+        registeredInstances.clear();
     }
 
     /**
