@@ -20,7 +20,7 @@ public final class ApiConfig {
     private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
 
     private static Environment currentEnvironment = Environment.SANDBOX;
-    private static List<SDKConfigInterface> registeredInstances = new ArrayList<>();
+    private static Map<String,SDKConfigInterface> registeredInstances = new HashMap<>();
 
 
 
@@ -51,7 +51,7 @@ public final class ApiConfig {
     }
 
     public static void setEnvironment(Environment environment) {
-        for (SDKConfigInterface sdkConfig : registeredInstances) {
+        for (SDKConfigInterface sdkConfig : registeredInstances.values()) {
             sdkConfig.setEnvironment(environment);
         }
         currentEnvironment = environment;
@@ -139,7 +139,11 @@ public final class ApiConfig {
      * @param sdkConfigInterface
      */
     public static void addSdkConfig(SDKConfigInterface sdkConfigInterface) {
-        registeredInstances.add(sdkConfigInterface);
+        String className = sdkConfigInterface.getClass().getName();
+        if (!registeredInstances.containsKey(className)) {
+            registeredInstances.put(className, sdkConfigInterface);
+        }
+
     }
 
     /**

@@ -48,6 +48,7 @@ public class SDKConfig implements SDKConfigInterface {
         environmentMap.put(Environment.DEV, new String[] { "https://dev.api.mastercard.com", null});
         environmentMap.put(Environment.MTF, new String[] { "https://sandbox.api.mastercard.com", "mtf"});
         environmentMap.put(Environment.ITF, new String[] { "https://sandbox.api.mastercard.com", "itf"});
+        environmentMap.put(Environment.LOCALHOST, new String[] { "http://localhost:8080", null});
 
         //ApiConfig.addSdkConfig(this(SDKConfig));
     }
