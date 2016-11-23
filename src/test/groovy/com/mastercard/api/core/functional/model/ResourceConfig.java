@@ -27,14 +27,13 @@
 
 package com.mastercard.api.core.functional.model;
 
-import com.mastercard.api.core.ApiConfig;
 import com.mastercard.api.core.model.Environment;
-import com.mastercard.api.core.model.SDKConfigInterface;
+import com.mastercard.api.core.model.ResourceConfigInterface;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SDKConfig implements SDKConfigInterface {
+public class ResourceConfig implements ResourceConfigInterface {
 
     private static String override = null;
     private static String host = null;
@@ -48,9 +47,9 @@ public class SDKConfig implements SDKConfigInterface {
         environmentMap.put(Environment.DEV, new String[] { "https://dev.api.mastercard.com", null});
         environmentMap.put(Environment.MTF, new String[] { "https://sandbox.api.mastercard.com", "mtf"});
         environmentMap.put(Environment.ITF, new String[] { "https://sandbox.api.mastercard.com", "itf"});
-        environmentMap.put(Environment.LOCALHOST, new String[] { "http://localhost:8080", null});
+        environmentMap.put(Environment.LOCALHOST, new String[] { "http://localhost:8081", null});
 
-        //ApiConfig.addSdkConfig(this(SDKConfig));
+        //ApiConfig.registerResourceConfig(this(ResourceConfig));
     }
 
 

@@ -1,6 +1,6 @@
 package com.mastercard.api.core
 import com.mastercard.api.core.exception.*
-import com.mastercard.api.core.functional.model.SDKConfig
+import com.mastercard.api.core.functional.model.ResourceConfig
 import com.mastercard.api.core.mocks.*
 import com.mastercard.api.core.model.Action
 import com.mastercard.api.core.model.Environment
@@ -42,13 +42,13 @@ class ApiControllerSpec extends Specification {
     @Unroll
     def "test getUri: Using SubDomain: Environment: #envrironment "() {
         given:
-        SDKConfig config = new SDKConfig();
+        ResourceConfig config = new ResourceConfig();
         config.clearOverride();
         OperationConfig operationConfig = new OperationConfig("/mdes/digitization/{:env}/1/0/getToken", Action.create, [], [])
 
 
         when:
-        ApiConfig.addSdkConfig(config);
+        ApiConfig.registerResourceConfig(config);
         ApiConfig.setEnvironment(envrironment)
         ApiController controller = new ApiController()
         OperationMetadata operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext());

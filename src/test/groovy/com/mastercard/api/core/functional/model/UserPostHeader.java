@@ -40,7 +40,7 @@ import java.util.Map;
 public class UserPostHeader extends BaseObject {
 
     private static Map<String, OperationConfig> operationConfigs;
-    private static SDKConfig config = new SDKConfig();
+    private static ResourceConfig config = new ResourceConfig();
 
     static {
         operationConfigs = new HashMap<>();

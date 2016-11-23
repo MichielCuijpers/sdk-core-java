@@ -1,6 +1,6 @@
 package com.mastercard.api.core
 
-import com.mastercard.api.core.functional.model.SDKConfig
+import com.mastercard.api.core.functional.model.ResourceConfig
 import com.mastercard.api.core.model.Environment
 import com.mastercard.api.core.security.jws.JwsAuthentication
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
@@ -76,9 +76,9 @@ class ApiConfigSpec extends Specification {
 
     def 'test throws runtime error when setting a SDK environment which does not exist'(){
         setup:
-        def config = new SDKConfig();
+        def config = new ResourceConfig();
         ApiConfig.clearSdkConfig();
-        ApiConfig.addSdkConfig(config);
+        ApiConfig.registerResourceConfig(config);
 
         when:
         ApiConfig.setEnvironment(Environment.OTHER1)

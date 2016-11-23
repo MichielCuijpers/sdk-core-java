@@ -32,14 +32,13 @@ import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.*;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 
 
 public class Post extends BaseObject {
 
-    private static SDKConfig config = new SDKConfig();
+    private static ResourceConfig config = new ResourceConfig();
     public Post() {
     }
 

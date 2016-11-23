@@ -1,13 +1,11 @@
 package com.mastercard.api.core;
 
 import com.mastercard.api.core.model.Environment;
-import com.mastercard.api.core.model.SDKConfigInterface;
+import com.mastercard.api.core.model.ResourceConfigInterface;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.security.CryptographyInterceptor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -20,7 +18,7 @@ public final class ApiConfig {
     private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
 
     private static Environment currentEnvironment = Environment.SANDBOX;
-    private static Map<String,SDKConfigInterface> registeredInstances = new HashMap<>();
+    private static Map<String,ResourceConfigInterface> registeredInstances = new HashMap<>();
 
 
 
@@ -51,7 +49,7 @@ public final class ApiConfig {
     }
 
     public static void setEnvironment(Environment environment) {
-        for (SDKConfigInterface sdkConfig : registeredInstances.values()) {
+        for (ResourceConfigInterface sdkConfig : registeredInstances.values()) {
             sdkConfig.setEnvironment(environment);
         }
         currentEnvironment = environment;
@@ -136,14 +134,13 @@ public final class ApiConfig {
 
     /**
      *
-     * @param sdkConfigInterface
+     * @param resource
      */
-    public static void addSdkConfig(SDKConfigInterface sdkConfigInterface) {
-        String className = sdkConfigInterface.getClass().getName();
+    public static void registerResourceConfig(ResourceConfigInterface resource) {
+        String className = resource.getClass().getName();
         if (!registeredInstances.containsKey(className)) {
-            registeredInstances.put(className, sdkConfigInterface);
+            registeredInstances.put(className, resource);
         }
-
     }
 
     /**

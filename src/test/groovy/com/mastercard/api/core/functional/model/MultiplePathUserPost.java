@@ -7,13 +7,12 @@ import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.*;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MultiplePathUserPost extends BaseObject  {
 
     private static Map<String, OperationConfig> operationConfigs;
-    private static SDKConfig config = new SDKConfig();
+    private static ResourceConfig config = new ResourceConfig();
 
     static {
         operationConfigs = new HashMap<>();
