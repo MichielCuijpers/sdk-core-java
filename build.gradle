@@ -2,16 +2,16 @@ apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
-apply plugin: 'net.saliman.cobertura'
+apply plugin: "net.saliman.cobertura"
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'signing'
-//apply plugin: 'cobertura'
 
 sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 buildscript {
     repositories {
-        jcenter()
+        maven { url "http://jcenter.bintray.com" }
     }
 
 
@@ -22,8 +22,12 @@ buildscript {
 }
 
 repositories {
+
     //arizzini: wait of time, bamboo outbound connections are blocked.
-    //mavenCentral()
+    maven {
+        url 'http://repo1.maven.org/maven2'
+    }
+
     maven {
         url "http://artifactory.mastercard.com:16364/artifactory/public"
     }
@@ -46,11 +50,21 @@ repositories {
 
     maven {
         url 'http://labs.mastercard.com/artifactory/repo'
+    }
+
+
+    maven {
+        url 'http://labs.mastercard.com/artifactory/repo'
 
     }
+
     maven {
         url 'http://labs.mastercard.com/artifactory/local-repos'
     }
+
+
+
+
 }
 
 ext {
@@ -64,15 +78,33 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.4'
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.4'
-
     testRuntime 'cglib:cglib-nodep:3.2.0'
     testRuntime 'org.objenesis:objenesis:2.2'
+    testRuntime 'org.hamcrest:hamcrest-core:1.3'
+    testRuntime "org.slf4j:slf4j-log4j12:1.7.21"
+    testRuntime "log4j:log4j:1.2.17"
 
     compile group: 'oauth.signpost', name: 'signpost-core', version: signpostVersion
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: httpClientVersion
     compile group: 'commons-codec', name: 'commons-codec', version: commonsCodecVersion
 }
+
+test {
+    filter {
+        includeTestsMatching "*Spec"
+    }
+}
+
+
+cobertura {
+    coverageFormats = ['html', 'xml']
+    coverageIgnoreTrivial = true
+    coverageIgnores = ['org.slf4j.Logger.*']
+    coverageReportDir = new File("$buildDir/reports/cobertura")
+}
+
+test.finalizedBy(project.tasks.cobertura)
 
 
 // Maven-Publishing+Artifactory.

@@ -32,7 +32,6 @@ import com.mastercard.api.core.exception.*;
 import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.*;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 
@@ -70,7 +69,7 @@ public class Post extends BaseObject {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata("0.0.1", null);
+        return new OperationMetadata(ResourceConfig.getInstance().getVersion(), ResourceConfig.getInstance().getHost(), ResourceConfig.getInstance().getContext());
     }
 
     

@@ -1,5 +1,7 @@
 package com.mastercard.api.core;
 
+import com.mastercard.api.core.model.Environment;
+import com.mastercard.api.core.model.ResourceConfigInterface;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.security.CryptographyInterceptor;
 
@@ -11,25 +13,49 @@ import java.util.logging.Level;
  * SDK Configuration Overrides
  */
 public final class ApiConfig {
-    private static boolean sandbox = true;
     private static boolean debug = false;
     private static Authentication authentication;
     private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
 
+    private static Environment currentEnvironment = Environment.SANDBOX;
+    private static Map<String,ResourceConfigInterface> registeredInstances = new HashMap<>();
+
+
+
     /**
      * SDK will use sandbox APIs instead of production APIs
      */
-    public static void setSandbox(boolean sandbox) {
-        ApiConfig.sandbox = sandbox;
-    }
 
     public static boolean isSandbox() {
-        return sandbox;
+        return currentEnvironment == Environment.SANDBOX;
     }
 
     public static boolean isProduction() {
-        return !sandbox;
+        return currentEnvironment == Environment.PRODUCTION;
     }
+
+    public static void setSandbox(boolean sandbox) {
+        if (sandbox) {
+            currentEnvironment = Environment.SANDBOX;
+        } else {
+            currentEnvironment = Environment.PRODUCTION;
+        }
+        setEnvironment(currentEnvironment);
+    }
+
+
+    public static Environment getEnvironment() {
+        return currentEnvironment;
+    }
+
+    public static void setEnvironment(Environment environment) {
+        for (ResourceConfigInterface sdkConfig : registeredInstances.values()) {
+            sdkConfig.setEnvironment(environment);
+        }
+        currentEnvironment = environment;
+    }
+
+
 
     /**
      * Turn on debug logging for the SDK
@@ -104,6 +130,24 @@ public final class ApiConfig {
         if (!cryptographyMap.containsKey(cryptographyInterceptor.getTriggeringPath())){
             cryptographyMap.put(cryptographyInterceptor.getTriggeringPath(), cryptographyInterceptor);
         }
+    }
+
+    /**
+     *
+     * @param resource
+     */
+    public static void registerResourceConfig(ResourceConfigInterface resource) {
+        String className = resource.getClass().getName();
+        if (!registeredInstances.containsKey(className)) {
+            registeredInstances.put(className, resource);
+        }
+    }
+
+    /**
+     *
+     */
+    public static void clearResourceConfig() {
+        registeredInstances.clear();
     }
 
     /**

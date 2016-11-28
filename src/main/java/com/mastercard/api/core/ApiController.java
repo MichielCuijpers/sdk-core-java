@@ -65,40 +65,17 @@ import java.util.regex.Pattern;
 
 public class ApiController {
 
-    private static String API_BASE_LIVE_URL = Constants.API_BASE_LIVE_URL;
-    private static String API_BASE_SANDBOX_URL = Constants.API_BASE_SANDBOX_URL;
     private static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
     private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
-
-    private final String host;
 
     /**
      */
     public ApiController() {
 
-        String baseUrl = API_BASE_LIVE_URL;
-
-        if (ApiConfig.isSandbox()) {
-            baseUrl = API_BASE_SANDBOX_URL;
-        }
-
-        this.host = baseUrl;
     }
 
-    private void checkState() throws RuntimeException {
-        try {
-            new URL(API_BASE_LIVE_URL);
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("Invalid URL supplied for API_BASE_LIVE_URL", e);
-        }
 
-        try {
-            new URL(API_BASE_SANDBOX_URL);
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("Invalid URL supplied for API_BASE_SANDBOX_URL", e);
-        }
-    }
 
     /**
      * Append parameter to URL
@@ -165,8 +142,27 @@ public class ApiController {
             throws UnsupportedEncodingException, IllegalStateException {
         URI uri;
 
+        //arizzini: if host config or environment config changes betweeen calls
+        // we need to update the host
+        String host = operationMetadata.getHost();
+        try {
+            new URL(host);
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("Invalid URL supplied for host="+host, e);
+        }
+
+        String resourcePath = operationConfig.getResourcePath();
+        if (resourcePath.contains("{:env}")) {
+            String context = "";
+            if (operationMetadata.getContext() != null) {
+                context = operationMetadata.getContext();
+            }
+            resourcePath = resourcePath.replace("{:env}", context);
+            //don't worry of //, they will be removed in the getPathWithReplacedPath
+        }
+
         //arizzini: need to replace all the path variables
-        String updatedType = getPathWithReplacedPath(operationConfig.getResourcePath(), requestObject);
+        String updatedType = getPathWithReplacedPath(resourcePath, requestObject);
 
         StringBuilder s = new StringBuilder("%s%s");
 
@@ -235,6 +231,7 @@ public class ApiController {
     private HttpRequestBase getRequest(Authentication authentication, OperationConfig operationConfig,
             OperationMetadata operationMetadata, RequestMap requestObject)
             throws InvalidRequestException, MessageSignerException, NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
+
 
 
         Map<String,Object> headerMap = subMap(requestObject, operationConfig.getHeaderParams());
@@ -337,7 +334,7 @@ public class ApiController {
     public Map<? extends String, ? extends Object> execute(Authentication auth, OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)
             throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
             MessageSignerException, NotAllowedException, ObjectNotFoundException, IllegalArgumentException, SystemException {
-        checkState();
+
 
         CloseableHttpClient httpClient = createHttpClient();
 
@@ -484,7 +481,7 @@ public class ApiController {
     }
 
     CloseableHttpClient createHttpClient() {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();;
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         httpClientBuilder.useSystemProperties();
 
         // TLSv1.1 and TLSv1.2 are disabled by default in Java 7, we want to enforce TLSv1.2

@@ -1,7 +1,12 @@
 package com.mastercard.api.core
 import com.mastercard.api.core.exception.*
+import com.mastercard.api.core.functional.model.ResourceConfig
 import com.mastercard.api.core.mocks.*
 import com.mastercard.api.core.model.Action
+import com.mastercard.api.core.model.Environment
+import com.mastercard.api.core.model.OperationConfig
+import com.mastercard.api.core.model.OperationMetadata
+import com.mastercard.api.core.model.RequestMap
 import org.apache.http.client.ClientProtocolException
 import org.apache.http.client.HttpResponseException
 import org.apache.http.client.methods.*
@@ -31,42 +36,41 @@ class ApiControllerSpec extends Specification {
         ApiConfig.authentication = null;
     }
 
-    def "test constructor: ApiController(String basePath)" () {
-        when:
-        ApiController apiController = new ApiController()
-
-        then:
-        apiController.host == "$ApiController.API_BASE_SANDBOX_URL"
-    }
 
 
-    def "test checkState" () {
+
+    @Unroll
+    def "test getUri: Using SubDomain: Environment: #envrironment "() {
         given:
-        String originalLive = ApiController.API_BASE_LIVE_URL
-        String originalSandbox = ApiController.API_BASE_SANDBOX_URL
-        ApiController apiController = new ApiController()
+        ResourceConfig config = ResourceConfig.getInstance();
+        config.clearOverride();
+        OperationConfig operationConfig = new OperationConfig("/mdes/digitization/{:env}/1/0/getToken", Action.create, [], [])
+
 
         when:
-        ApiController.API_BASE_LIVE_URL = "API_BASE_LIVE_URL"
-        apiController.checkState()
+        ApiConfig.registerResourceConfig(config);
+        ApiConfig.setEnvironment(envrironment)
+        ApiController controller = new ApiController()
+        OperationMetadata operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext());
+        URI uri = controller.getURI(operationConfig, operationMetadata, new RequestMap());
 
         then:
-        def ex = thrown(IllegalStateException)
-        ex.message == "Invalid URL supplied for API_BASE_LIVE_URL"
-
-        when:
-        ApiController.API_BASE_LIVE_URL = originalLive
-        ApiController.API_BASE_SANDBOX_URL = "API_BASE_SANDBOX_URL"
-        apiController.checkState()
-
-        then:
-        ex = thrown(IllegalStateException)
-        ex.message == "Invalid URL supplied for API_BASE_SANDBOX_URL"
+        uri.toURL().toString() == result
 
         cleanup:
-        ApiController.API_BASE_LIVE_URL = originalLive
-        ApiController.API_BASE_SANDBOX_URL = originalSandbox
+        ApiConfig.setEnvironment(Environment.SANDBOX)
+
+        where:
+        envrironment                 | result
+        Environment.PRODUCTION       | "https://api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
+        Environment.SANDBOX          | "https://sandbox.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
+        Environment.STAGE            | "https://stage.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
+        Environment.ITF              | "https://sandbox.api.mastercard.com/mdes/digitization/itf/1/0/getToken?Format=JSON"
+        Environment.MTF              | "https://sandbox.api.mastercard.com/mdes/digitization/mtf/1/0/getToken?Format=JSON"
+
+
     }
+
 
     def "test appendToQueryString" () {
         given:

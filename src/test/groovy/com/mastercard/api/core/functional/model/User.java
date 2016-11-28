@@ -77,7 +77,7 @@ public class User extends BaseObject {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata(SDKConfig.getVersion(), SDKConfig.getHost());
+        return new OperationMetadata(ResourceConfig.getInstance().getVersion(), ResourceConfig.getInstance().getHost(), ResourceConfig.getInstance().getContext());
     }
 
 

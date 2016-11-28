@@ -28,7 +28,7 @@ public class OAuthRequestSpec extends Specification {
         oAuthRequest.getContentType() == "application/json"
         oAuthRequest.getFormParams() == formParams
         oAuthRequest.getMethod() == "POST"
-        oAuthRequest.getOauthBodyHash() == "Agg/RXngimEkJcDBoX7ket14O5Q="
+        oAuthRequest.getOauthBodyHash() == "Iw2DWNyOiJC0xY3utikS7i8gNXrpKlzIYbmOaP4xrLU="
         oAuthRequest.getRequestUrl() == "https://sandbox.api.mastercard.com/mock"
         oAuthRequest.unwrap() == oAuthRequest
 

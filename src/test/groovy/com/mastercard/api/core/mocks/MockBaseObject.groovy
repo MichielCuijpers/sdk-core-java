@@ -22,7 +22,7 @@ class MockBaseObject extends BaseObject {
         resourcePath = "/mock/MockObject"
         headerParams = Arrays.asList("x-sdk-mock-header")
         queryParams = Arrays.asList("query-param")
-        host = null
+        host = "https://sandbox.api.mastercard.com"
     }
 
     MockBaseObject(Action action) {

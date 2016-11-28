@@ -49,7 +49,7 @@ public class OAuthSignerSpec extends Specification {
         String signature = oAuthSigner.sign(request, httpParameters)
 
         then:
-        signature == "D3wVtEdQ2j196i5Pbzv4RSzgmfDw/Jl+aHpRlIyWL6BZiL1ElrD6b54Dw8Ogb0zYOfRPqVoofFTy2+LUNFE3bP4AZ50gwE63frpQatK7jE0BG7jSfMzm1VnZz4qpml052UtfI7MzK208n3ScYUIMlwyisz/WWnpLgLGkJYt4L9LCObXPku0wcM9NYui1v2OHnCPPQJLLKHaJI/FgHbtvAgqRH9zofUseCpO4lEmxX8LoDYnGbiUm0K+dao7ncm6Gv6cRSRJdjYvtY/JwgkDmvKMl73RE6Ka9gXeNsfzRvcvkBxrUGJjEuLoSDokgonRmOpxhauu9QTzokMxrGaEsHw=="
+        signature == "CEpnxXM3TVpANo3pVUy4MnZL8sYFS9yKlRfEKF3mcHOZC4KzkvRX579ImMDW5YvmAL5n2sDk6GdHCRhPbOqtJywwth7uNOId5kkBoM4e8VUm+UgKzJ1rMpMpUe9mv2uZqftnpJBO01F5w4fbeNodzyOCXahU1qSY5eu5cglomghlRNh9+8CMGoLksiCPJrz92ZW/z+XRl5IrghLJ/BsFvaw1sGcULZ0u7zuElLRA6zNERXk82xPWDogw+JQ+oC+fqPR5/AhC2o7BlVP7JlPLO7piNeBEPNUACDw3K4utPbE6zqVnbcr7uuEmCkQeTtENx8YV+i7WIvapXdpMXY2EEg=="
     }
 
     def 'test sign with null key throws InvalidKeyException' () {

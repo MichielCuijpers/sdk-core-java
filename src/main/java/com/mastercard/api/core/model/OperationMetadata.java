@@ -6,10 +6,17 @@ package com.mastercard.api.core.model;
 public class OperationMetadata {
     String apiVersion;
     String host;
+    String context;
 
     public OperationMetadata(String apiVersion, String host) {
         this.apiVersion = apiVersion;
         this.host = host;
+    }
+
+    public OperationMetadata(String apiVersion, String host, String context) {
+        this.apiVersion = apiVersion;
+        this.host = host;
+        this.context = context;
     }
 
     public String getApiVersion() {
@@ -18,5 +25,9 @@ public class OperationMetadata {
 
     public String getHost() {
         return host;
+    }
+
+    public String getContext() {
+        return context;
     }
 }

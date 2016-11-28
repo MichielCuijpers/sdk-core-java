@@ -1,5 +1,7 @@
 package com.mastercard.api.core
 
+import com.mastercard.api.core.functional.model.ResourceConfig
+import com.mastercard.api.core.model.Environment
 import com.mastercard.api.core.security.jws.JwsAuthentication
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
 import spock.lang.Specification
@@ -47,6 +49,43 @@ class ApiConfigSpec extends Specification {
         then:
         !ApiConfig.isSandbox()
         ApiConfig.isProduction()
+    }
+
+
+    def 'test setting sandbox && mft' () {
+        when:
+        ApiConfig.setEnvironment(Environment.MTF)
+
+        then:
+        !ApiConfig.isSandbox()
+        !ApiConfig.isProduction()
+        ApiConfig.getEnvironment() == Environment.MTF
+
+        when:
+        ApiConfig.setSandbox(false)
+
+        then:
+        ApiConfig.getEnvironment() == Environment.PRODUCTION
+
+        when:
+        ApiConfig.setSandbox(true)
+
+        then:
+        ApiConfig.getEnvironment() == Environment.SANDBOX
+
+    }
+
+    def 'test throws runtime error when setting a SDK environment which does not exist'(){
+        setup:
+        def config = ResourceConfig.getInstance();
+        ApiConfig.clearResourceConfig();
+        ApiConfig.registerResourceConfig(config);
+
+        when:
+        ApiConfig.setEnvironment(Environment.OTHER1)
+
+        then: "IllegalStateException is thrown"
+        thrown(RuntimeException)
     }
 
     def 'test setting oauth authentication' () {
