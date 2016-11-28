@@ -4,6 +4,7 @@ import com.mastercard.api.core.ApiController
 import com.mastercard.api.core.exception.ApiCommunicationException
 import com.mastercard.api.core.functional.model.MultiplePathUserPost
 import com.mastercard.api.core.functional.model.Post
+import com.mastercard.api.core.functional.model.ResourceConfig
 import com.mastercard.api.core.functional.model.User
 import com.mastercard.api.core.functional.model.UserPostHeader
 import com.mastercard.api.core.functional.model.UserPostPath
@@ -11,18 +12,19 @@ import com.mastercard.api.core.mocks.MockAuthentication
 import com.mastercard.api.core.mocks.MockBaseObject
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.model.ResourceList
-import spock.lang.IgnoreIf
 import spock.lang.Specification
 /**
  * Created by andrearizzini on 12/04/2016.
  */
 
 
-@IgnoreIf({ System.getProperty("RUN_NODEJS") == null })
+//@IgnoreIf({ System.getProperty("RUN_NODEJS") == null })
 class NodeJSMockServerSpec extends Specification {
 
 
     def setupSpec() {
+        def config = ResourceConfig.getInstance();
+        config.setOverride();
         ApiConfig.setSandbox(true)
         ApiConfig.authentication = new MockAuthentication()
         MockBaseObject.setApiController(new ApiController())
@@ -31,8 +33,11 @@ class NodeJSMockServerSpec extends Specification {
     }
 
     def cleanupSpec() {
+        def config = ResourceConfig.getInstance();
+        config.clearOverride();
         ApiConfig.authentication = null;
         MockBaseObject.setApiController(new ApiController())
+
     }
 
 

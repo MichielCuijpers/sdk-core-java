@@ -7,12 +7,12 @@ import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.*;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MultiplePathUserPost extends BaseObject  {
 
     private static Map<String, OperationConfig> operationConfigs;
+
 
     static {
         operationConfigs = new HashMap<>();
@@ -46,7 +46,7 @@ public class MultiplePathUserPost extends BaseObject  {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata(SDKConfig.getVersion(), "http://localhost:8081");
+        return new OperationMetadata(ResourceConfig.getInstance().getVersion(), ResourceConfig.getInstance().getHost(), ResourceConfig.getInstance().getContext());
     }
 
 

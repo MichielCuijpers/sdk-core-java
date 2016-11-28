@@ -75,24 +75,6 @@ public class ApiController {
 
     }
 
-    private String generateHost() {
-        StringBuilder hostBuilder = new StringBuilder();
-        hostBuilder.append("https://");
-        if (ApiConfig.getSubDomain() != null) {
-            hostBuilder.append(ApiConfig.getSubDomain());
-            hostBuilder.append(".");
-        }
-        hostBuilder.append("api.mastercard.com");
-        String host = hostBuilder.toString();
-
-        try {
-            new URL(host);
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("Invalid URL supplied for host="+host, e);
-        }
-
-        return host;
-    }
 
 
     /**
@@ -162,17 +144,20 @@ public class ApiController {
 
         //arizzini: if host config or environment config changes betweeen calls
         // we need to update the host
-        String host = generateHost();
+        String host = operationMetadata.getHost();
+        try {
+            new URL(host);
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("Invalid URL supplied for host="+host, e);
+        }
 
         String resourcePath = operationConfig.getResourcePath();
         if (resourcePath.contains("{:env}")) {
-            String environment = "";
-            if (operationMetadata.getEnvironment() != null) {
-                environment = operationMetadata.getEnvironment();
-            } else if (ApiConfig.getEnvironment() != null) {
-                environment = ApiConfig.getEnvironment();
+            String context = "";
+            if (operationMetadata.getContext() != null) {
+                context = operationMetadata.getContext();
             }
-            resourcePath = resourcePath.replace("{:env}", environment);
+            resourcePath = resourcePath.replace("{:env}", context);
             //don't worry of //, they will be removed in the getPathWithReplacedPath
         }
 

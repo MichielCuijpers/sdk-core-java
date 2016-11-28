@@ -40,6 +40,7 @@ import java.util.Map;
 public class UserPostPath extends BaseObject {
 
     private static Map<String, OperationConfig> operationConfigs;
+//    private static ResourceConfig config = new ResourceConfig();
 
     static {
         operationConfigs = new HashMap<>();
@@ -71,7 +72,7 @@ public class UserPostPath extends BaseObject {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata(SDKConfig.getVersion(), "http://localhost:8081");
+        return new OperationMetadata(ResourceConfig.getInstance().getVersion(), ResourceConfig.getInstance().getHost(), ResourceConfig.getInstance().getContext());
     }
 
 
