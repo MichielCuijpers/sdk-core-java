@@ -42,7 +42,7 @@ class ApiControllerSpec extends Specification {
     @Unroll
     def "test getUri: Using SubDomain: Environment: #envrironment "() {
         given:
-        ResourceConfig config = new ResourceConfig();
+        ResourceConfig config = ResourceConfig.getInstance();
         config.clearOverride();
         OperationConfig operationConfig = new OperationConfig("/mdes/digitization/{:env}/1/0/getToken", Action.create, [], [])
 

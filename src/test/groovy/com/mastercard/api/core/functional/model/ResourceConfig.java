@@ -35,40 +35,41 @@ import java.util.Map;
 
 public class ResourceConfig implements ResourceConfigInterface {
 
-    private static String override = null;
-    private static String host = null;
-    private static String context = null;
-    private static final Map<Environment,String[]> environmentMap = new HashMap();
+    private String override = null;
+    private String host = null;
+    private String context = null;
+    private static ResourceConfig instance = null;
 
-    static {
-        environmentMap.put(Environment.PRODUCTION, new String[] { "https://api.mastercard.com", null});
-        environmentMap.put(Environment.SANDBOX, new String[] { "https://sandbox.api.mastercard.com", null});
-        environmentMap.put(Environment.STAGE, new String[] { "https://stage.api.mastercard.com", null});
-        environmentMap.put(Environment.DEV, new String[] { "https://dev.api.mastercard.com", null});
-        environmentMap.put(Environment.MTF, new String[] { "https://sandbox.api.mastercard.com", "mtf"});
-        environmentMap.put(Environment.ITF, new String[] { "https://sandbox.api.mastercard.com", "itf"});
-        environmentMap.put(Environment.LOCALHOST, new String[] { "http://localhost:8081", null});
-
-        //ApiConfig.registerResourceConfig(this(ResourceConfig));
+    private ResourceConfig() {
     }
 
+    /**
+     * This is the singleton method to return the
+     * instance of the class
+     * @return
+     */
+    public static ResourceConfig getInstance() {
+        if (instance == null) {
+            instance = new ResourceConfig();
+        }
+        return instance;
+
+    }
 
     public String getContext() {
         return context;
     }
-
     public String getHost() {
         return  (override!= null) ? override : host;
     }
-
     public String getVersion() {
         return "0.0.1";
     }
 
     @Override
     public void setEnvironment(Environment environment) {
-        if (environmentMap.containsKey(environment)) {
-            String[] config = environmentMap.get(environment);
+        if (Environment.MAPPINGS.containsKey(environment)) {
+            String[] config = Environment.MAPPINGS.get(environment);
             this.host = config[0];
             this.context = config[1];
         } else {
@@ -81,7 +82,6 @@ public class ResourceConfig implements ResourceConfigInterface {
         this.context = context;
         this.host = host;
     }
-
 
     //this is only used for testing.
     public void clearOverride() {

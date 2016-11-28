@@ -76,8 +76,8 @@ class ApiConfigSpec extends Specification {
 
     def 'test throws runtime error when setting a SDK environment which does not exist'(){
         setup:
-        def config = new ResourceConfig();
-        ApiConfig.clearSdkConfig();
+        def config = ResourceConfig.getInstance();
+        ApiConfig.clearResourceConfig();
         ApiConfig.registerResourceConfig(config);
 
         when:

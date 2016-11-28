@@ -38,7 +38,6 @@ import java.util.Map;
 
 public class Post extends BaseObject {
 
-    private static ResourceConfig config = new ResourceConfig();
     public Post() {
     }
 
@@ -70,7 +69,7 @@ public class Post extends BaseObject {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata(config.getVersion(), config.getHost(), config.getContext());
+        return new OperationMetadata(ResourceConfig.getInstance().getVersion(), ResourceConfig.getInstance().getHost(), ResourceConfig.getInstance().getContext());
     }
 
     

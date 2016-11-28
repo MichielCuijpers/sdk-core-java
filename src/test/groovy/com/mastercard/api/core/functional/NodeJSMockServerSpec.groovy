@@ -23,7 +23,7 @@ class NodeJSMockServerSpec extends Specification {
 
 
     def setupSpec() {
-        def config = new ResourceConfig()
+        def config = ResourceConfig.getInstance();
         config.setOverride();
         ApiConfig.setSandbox(true)
         ApiConfig.authentication = new MockAuthentication()
@@ -33,7 +33,7 @@ class NodeJSMockServerSpec extends Specification {
     }
 
     def cleanupSpec() {
-        def config = new ResourceConfig()
+        def config = ResourceConfig.getInstance();
         config.clearOverride();
         ApiConfig.authentication = null;
         MockBaseObject.setApiController(new ApiController())

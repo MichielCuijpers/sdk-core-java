@@ -146,7 +146,7 @@ public final class ApiConfig {
     /**
      *
      */
-    public static void clearSdkConfig() {
+    public static void clearResourceConfig() {
         registeredInstances.clear();
     }
 
