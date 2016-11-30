@@ -72,6 +72,35 @@ class ApiControllerSpec extends Specification {
     }
 
 
+    @Unroll
+    def "test getUri: Using custom host: #host context: #context "() {
+        given:
+        ResourceConfig config = ResourceConfig.getInstance();
+        config.clearOverride();
+        OperationConfig operationConfig = new OperationConfig("/mdes/digitization/{:env}/1/0/getToken", Action.create, [], [])
+
+
+        when:
+        ResourceConfig.getInstance().setEnvironment(host, context);
+        ApiController controller = new ApiController()
+        OperationMetadata operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext());
+        URI uri = controller.getURI(operationConfig, operationMetadata, new RequestMap());
+
+        then:
+        uri.toURL().toString() == result
+
+        cleanup:
+        ApiConfig.setEnvironment(Environment.SANDBOX)
+
+        where:
+        host   |     context     | result
+        "https://localhost:8080" | null | "https://localhost:8080/mdes/digitization/1/0/getToken?Format=JSON"
+        "https://localhost:8080" | "mtf" | "https://localhost:8080/mdes/digitization/mtf/1/0/getToken?Format=JSON"
+
+
+    }
+
+
     def "test appendToQueryString" () {
         given:
         ApiController apiController = new ApiController()
