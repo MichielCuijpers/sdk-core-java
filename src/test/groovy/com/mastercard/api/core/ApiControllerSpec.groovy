@@ -45,11 +45,11 @@ class ApiControllerSpec extends Specification {
         ResourceConfig config = ResourceConfig.getInstance();
         config.clearOverride();
         OperationConfig operationConfig = new OperationConfig("/mdes/digitization/{:env}/1/0/getToken", Action.create, [], [])
-
+        ApiConfig.registerResourceConfig(config);
 
         when:
-        ApiConfig.registerResourceConfig(config);
         ApiConfig.setEnvironment(envrironment)
+
         ApiController controller = new ApiController()
         OperationMetadata operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext());
         URI uri = controller.getURI(operationConfig, operationMetadata, new RequestMap());

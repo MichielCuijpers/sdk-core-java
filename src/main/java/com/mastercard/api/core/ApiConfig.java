@@ -49,8 +49,8 @@ public final class ApiConfig {
     }
 
     public static void setEnvironment(Environment environment) {
-        for (ResourceConfigInterface sdkConfig : registeredInstances.values()) {
-            sdkConfig.setEnvironment(environment);
+        for (ResourceConfigInterface resourceConfig : registeredInstances.values()) {
+            resourceConfig.setEnvironment(environment);
         }
         currentEnvironment = environment;
     }
