@@ -239,7 +239,7 @@ public class ApiController {
 
         //this is what is left from the parameters.
         Map<String, Object> objectMap = new LinkedHashMap<>(requestObject);
-        CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.toString());
+        CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.getPath());
 
 
         HttpRequestBase message = null;
@@ -294,7 +294,7 @@ public class ApiController {
             try {
                 updateEntity = new StringEntity(payload);
             } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException("Unsupported encoding for create action.", e);
+                throw new IllegalStateException("Unsupported encoding for update action.", e);
             }
             ((HttpPut) message).setEntity(updateEntity);
 
@@ -343,7 +343,7 @@ public class ApiController {
             HttpRequestBase request = getRequest(auth, operationConfig, operationMetadata, requestObject);
 
             CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(
-                    request.getURI().toString());
+                    request.getURI().getPath());
             int port = request.getURI().getPort();
             String scheme = request.getURI().getScheme();
             HttpHost host = new HttpHost(request.getURI().getHost(), port, scheme);

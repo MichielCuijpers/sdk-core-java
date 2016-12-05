@@ -1,5 +1,6 @@
 package com.mastercard.api.core.security.mdes;
 
+import com.mastercard.api.core.model.RequestMap;
 import com.mastercard.api.core.security.CryptographyInterceptor;
 import com.mastercard.api.core.security.util.CryptUtil;
 import org.apache.commons.codec.DecoderException;
@@ -21,11 +22,11 @@ import java.util.*;
  */
 public class MDESCryptography implements CryptographyInterceptor {
 
-    private Certificate issuerCertificate;
-    private PrivateKey privateKey;
-    private List<String> fieldsToHide = Arrays.asList("publicKeyFingerprint","oaepHashingAlgorithm","iv","encryptedData","encryptedKey");
-    public  final String triggeringPath = "/tokenize";
-
+    private final Certificate issuerCertificate;
+    private final PrivateKey privateKey;
+    private final List<String> triggeringEndPath;
+    private final List<String> objectsToEncrypt;
+    private final List<String> objectsToDecrypt;
 
 
     public MDESCryptography(InputStream issuerKeyInputStream, InputStream privateKeyInputStream)
@@ -33,100 +34,121 @@ public class MDESCryptography implements CryptographyInterceptor {
             KeyStoreException, IOException, NoSuchProviderException, InvalidKeySpecException {
         this.issuerCertificate = CryptUtil.loadCertificate("X.509", issuerKeyInputStream);
         this.privateKey = CryptUtil.loadPrivateKey("RSA", privateKeyInputStream);
+        this.triggeringEndPath = Arrays.asList("/tokenize", "/searchTokens", "/getToken", "/transact", "/notifyTokenUpdated");
+        this.objectsToEncrypt = Arrays.asList("cardInfo.encryptedData", "encryptedPayload.encryptedData");
+        this.objectsToDecrypt = Arrays.asList("encryptedPayload.encryptedData", "tokenDetail.encryptedData");
     }
 
-    @Override
-    public String getTriggeringPath() {
-        return triggeringPath;
+
+    public MDESCryptography(InputStream issuerKeyInputStream, InputStream privateKeyInputStream, List<String> triggeringEndPath, List<String> objectsToEncrypt, List<String> objectsToDecrypt)
+            throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException,
+            KeyStoreException, IOException, NoSuchProviderException, InvalidKeySpecException {
+        this.issuerCertificate = CryptUtil.loadCertificate("X.509", issuerKeyInputStream);
+        this.privateKey = CryptUtil.loadPrivateKey("RSA", privateKeyInputStream);
+        this.triggeringEndPath = triggeringEndPath;
+        this.objectsToEncrypt = objectsToEncrypt;
+        this.objectsToDecrypt = objectsToDecrypt;
+    }
+
+
+    public List<String> getTriggeringEndPath() {
+        return triggeringEndPath;
     }
 
     @Override public Map<String,Object> encrypt(Map<String,Object> map) throws NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
 
-        if(map.containsKey("cardInfo")) {
-            // 1) extract the encryptedData from map
-            Map<String,Object> encryptedDataMap =  (Map<String,Object>)  map.remove("cardInfo");
+        //requestMap is a SmartMap it offers a easy way to do nested lookups.
+        RequestMap smartMap = new RequestMap(map);
+        for (String objectToEncryt : objectsToEncrypt) {
+            if(smartMap.containsKey(objectToEncryt)) {
+                // 1) extract the encryptedData from map
+                Map<String,Object> encryptedDataMap =  (Map<String,Object>)  smartMap.remove(objectToEncryt);
 
-            // 2) create json string
-            String payload = JSONValue.toJSONString(encryptedDataMap);
-            // 3) escaping the string
-            payload = CryptUtil.sanitizeJson(payload);
+                // 2) create json string
+                String payload = JSONValue.toJSONString(encryptedDataMap);
+                // 3) escaping the string
+                payload = CryptUtil.sanitizeJson(payload);
 
-            // 4) generate random iv
-            IvParameterSpec iv = CryptUtil.generateIv();
-            String hexIv = CryptUtil.byteArrayToHexString(iv.getIV());
+                // 4) generate random iv
+                IvParameterSpec iv = CryptUtil.generateIv();
+                String hexIv = CryptUtil.byteArrayToHexString(iv.getIV());
 
-            // 5) generate AES SecretKey
-            SecretKey secretKey = CryptUtil.generateSecretKey("AES",  128);
+                // 5) generate AES SecretKey
+                SecretKey secretKey = CryptUtil.generateSecretKey("AES",  128);
 
-            // 6) encrypt payload
-            byte[] encryptedData = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "AES/CBC/PKCS5Padding", "SunJCE",  secretKey, iv, payload.getBytes("UTF8"));
-            String hexEncryptedData = CryptUtil.byteArrayToHexString(encryptedData);
+                // 6) encrypt payload
+                byte[] encryptedData = CryptUtil.crypt(Cipher.ENCRYPT_MODE, "AES/CBC/PKCS5Padding", "SunJCE",  secretKey, iv, payload.getBytes("UTF8"));
+                String hexEncryptedData = CryptUtil.byteArrayToHexString(encryptedData);
 
-            // 7) encrypt secretKey with issuer key
-            byte[] encryptedSecretKey = CryptUtil.wrap("RSA/ECB/PKCS1Padding", "SunJCE", this.issuerCertificate.getPublicKey(), secretKey);
-            String hexEncryptedKey = CryptUtil.byteArrayToHexString(encryptedSecretKey);
+                // 7) encrypt secretKey with issuer key
+                byte[] encryptedSecretKey = CryptUtil.wrap("RSA/ECB/PKCS1Padding", "SunJCE", this.issuerCertificate.getPublicKey(), secretKey);
+                String hexEncryptedKey = CryptUtil.byteArrayToHexString(encryptedSecretKey);
 
-            byte[] certificateFingerprint = CryptUtil.generateFingerprint("SHA-1", this.issuerCertificate);
-            String fingerprintHexString = CryptUtil.byteArrayToHexString(certificateFingerprint);
+                byte[] certificateFingerprint = CryptUtil.generateFingerprint("SHA-1", this.issuerCertificate);
+                String fingerprintHexString = CryptUtil.byteArrayToHexString(certificateFingerprint);
 
-            HashMap encryptedMap = new HashMap();
-            encryptedMap.put("publicKeyFingerprint", fingerprintHexString);
-            encryptedMap.put("encryptedKey", hexEncryptedKey);
-//            encryptedMap.put("oaepHashingAlgorithm", "PKCS1");
-            encryptedMap.put("iv", hexIv);
-            encryptedMap.put("encryptedData", hexEncryptedData);
-            map.put("cardInfo", encryptedMap);
-
+                HashMap encryptedMap = new HashMap();
+                encryptedMap.put("publicKeyFingerprint", fingerprintHexString);
+                encryptedMap.put("encryptedKey", hexEncryptedKey);
+                encryptedMap.put("iv", hexIv);
+                encryptedMap.put("encryptedData", hexEncryptedData);
+                String keyMap = objectToEncryt.substring(0, objectToEncryt.indexOf("."));
+                smartMap.put(keyMap, encryptedMap);
+                break;
+            }
         }
 
-        return map;
+        return smartMap;
 
     }
 
     @Override
     public Map<String,Object> decrypt(Map<String,Object> map) throws DecoderException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException {
 
+        //requestMap is a SmartMap it offers a easy way to do nested lookups.
+        RequestMap smartMap = new RequestMap(map);
+        for (String objectToDescript : objectsToDecrypt) {
+            if (smartMap.containsKey(objectToDescript)) {
+                String keyMap = objectToDescript.substring(0, objectToDescript.lastIndexOf("."));
+                String encryptedKeyMap = objectToDescript.substring(objectToDescript.lastIndexOf(".")+1);
+                Map<String, Object> enclosingBlock = (Map<String, Object>) smartMap.get(keyMap);
+                if (enclosingBlock.containsKey(encryptedKeyMap) && enclosingBlock.containsKey("encryptedKey")) {
 
-        if (map.containsKey("token")) {
-            Map<String,Object> tokenMap = (Map<String,Object>) map.get("token");
+                    //need to read the key
+                    String encryptedKey = (String) enclosingBlock.remove("encryptedKey");
+                    byte[] encryptedKeyByteArray = CryptUtil.hexStringToByteArray(encryptedKey);
 
-            if (tokenMap.containsKey("encryptedData") && tokenMap.containsKey("encryptedKey")) {
+                    //need to decryt with RSA
+                    //need to decrypt the key
+                    SecretKey secretKey = (SecretKey) CryptUtil.unwrap("RSA/ECB/PKCS1Padding", "SunJCE", this.privateKey, encryptedKeyByteArray, "AES", Cipher.SECRET_KEY);
 
-                //need to read the key
-                String encryptedKey = (String) tokenMap.remove("encryptedKey");
-                byte[] encryptedKeyByteArray = CryptUtil.hexStringToByteArray(encryptedKey);
-
-                //need to decryt with RSA
-                //need to decrypt the key
-                SecretKey secretKey = (SecretKey) CryptUtil.unwrap("RSA/ECB/PKCS1Padding", "SunJCE", this.privateKey, encryptedKeyByteArray, "AES", Cipher.SECRET_KEY);
-
-                //need to read the iv
-                String ivString = (String) tokenMap.remove("iv");
-                byte[] ivByteArray = CryptUtil.hexStringToByteArray(ivString);
-                IvParameterSpec iv = new IvParameterSpec(ivByteArray);
+                    //need to read the iv
+                    String ivString = (String) enclosingBlock.remove("iv");
+                    byte[] ivByteArray = CryptUtil.hexStringToByteArray(ivString);
+                    IvParameterSpec iv = new IvParameterSpec(ivByteArray);
 
 
-                //need to decrypt the data
-                String encryptedData = (String) tokenMap.remove("encryptedData");
-                byte[] encryptedDataByteArray = CryptUtil.hexStringToByteArray(encryptedData);
+                    //need to decrypt the data
+                    String encryptedData = (String) enclosingBlock.remove(encryptedKeyMap);
+                    byte[] encryptedDataByteArray = CryptUtil.hexStringToByteArray(encryptedData);
 
-                byte[] decryptedDataArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "AES/CBC/PKCS5Padding", "SunJCE",  secretKey, iv, encryptedDataByteArray);
-                String decryptedDataString = new String(decryptedDataArray);
+                    byte[] decryptedDataArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "AES/CBC/PKCS5Padding", "SunJCE", secretKey, iv, encryptedDataByteArray);
+                    String decryptedDataString = new String(decryptedDataArray);
 
-                // remove the field that are not required in the map
-                for(String toHide : fieldsToHide) {
-                    tokenMap.remove(toHide);
+
+                    HashMap encryptedMap = new HashMap();
+                    // add the decrypted data map to the token.
+                    Map<String, Object> decryptedDataMap = (Map<String, Object>) JSONValue.parse(decryptedDataString);
+                    for (Map.Entry<String, Object> entry : decryptedDataMap.entrySet()) {
+                        encryptedMap.put(entry.getKey(), entry.getValue());
+                    }
+                    enclosingBlock.put(encryptedKeyMap, encryptedMap);
                 }
-
-                // add the decrypted data map to the token.
-                Map<String,Object> decryptedDataMap = (Map<String,Object>) JSONValue.parse(decryptedDataString);
-                for(Map.Entry<String,Object> entry : decryptedDataMap.entrySet()) {
-                    tokenMap.put(entry.getKey(), entry.getValue());
-                }
+                break;
             }
         }
 
-        return map;
+        return smartMap;
 
     }
 

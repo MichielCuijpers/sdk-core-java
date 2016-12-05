@@ -127,8 +127,9 @@ public final class ApiConfig {
      * @param cryptographyInterceptor
      */
     public static void addCryptographyInterceptor(CryptographyInterceptor cryptographyInterceptor) {
-        if (!cryptographyMap.containsKey(cryptographyInterceptor.getTriggeringPath())){
-            cryptographyMap.put(cryptographyInterceptor.getTriggeringPath(), cryptographyInterceptor);
+
+        if (!cryptographyMap.containsKey(cryptographyInterceptor.getClass().getName())){
+            cryptographyMap.put(cryptographyInterceptor.getClass().getName(), cryptographyInterceptor);
         }
     }
 
@@ -156,9 +157,10 @@ public final class ApiConfig {
      * @return
      */
     public static CryptographyInterceptor getCryptographyInterceptor(String basePath) {
-        for (Map.Entry<String,CryptographyInterceptor> entry : cryptographyMap.entrySet()) {
-            if (entry.getKey().contains(basePath) || basePath.contains(entry.getKey())) {
-                return entry.getValue();
+        for (CryptographyInterceptor interceptor : cryptographyMap.values()) {
+            for (String triggeringPath : interceptor.getTriggeringEndPath())
+            if (triggeringPath.compareTo(basePath) == 0 || basePath.endsWith(triggeringPath)) {
+                return interceptor;
             }
         }
         return null;
