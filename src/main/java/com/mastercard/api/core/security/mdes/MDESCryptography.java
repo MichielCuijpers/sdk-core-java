@@ -24,7 +24,7 @@ public class MDESCryptography implements CryptographyInterceptor {
 
     private final Certificate issuerCertificate;
     private final PrivateKey privateKey;
-    private final List<String> triggeringPath;
+    private final List<String> triggeringEndPath;
     private final List<String> objectsToEncrypt;
     private final List<String> objectsToDecrypt;
 
@@ -34,26 +34,25 @@ public class MDESCryptography implements CryptographyInterceptor {
             KeyStoreException, IOException, NoSuchProviderException, InvalidKeySpecException {
         this.issuerCertificate = CryptUtil.loadCertificate("X.509", issuerKeyInputStream);
         this.privateKey = CryptUtil.loadPrivateKey("RSA", privateKeyInputStream);
-        triggeringPath = Arrays.asList("/tokenize", "/searchTokens", "/getToken", "/transact", "/notifyTokenUpdated");
-        objectsToEncrypt = Arrays.asList("cardInfo.encryptedData", "encryptedPayload.encryptedData");
-        objectsToDecrypt = Arrays.asList("encryptedPayload.encryptedData", "tokenDetail.encryptedData");
+        this.triggeringEndPath = Arrays.asList("/tokenize", "/searchTokens", "/getToken", "/transact", "/notifyTokenUpdated");
+        this.objectsToEncrypt = Arrays.asList("cardInfo.encryptedData", "encryptedPayload.encryptedData");
+        this.objectsToDecrypt = Arrays.asList("encryptedPayload.encryptedData", "tokenDetail.encryptedData");
     }
 
 
-    public MDESCryptography(InputStream issuerKeyInputStream, InputStream privateKeyInputStream, List<String> triggeringPath, List<String> objectsToEncrypt, List<String> objectsToDecrypt)
+    public MDESCryptography(InputStream issuerKeyInputStream, InputStream privateKeyInputStream, List<String> triggeringEndPath, List<String> objectsToEncrypt, List<String> objectsToDecrypt)
             throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException,
             KeyStoreException, IOException, NoSuchProviderException, InvalidKeySpecException {
         this.issuerCertificate = CryptUtil.loadCertificate("X.509", issuerKeyInputStream);
         this.privateKey = CryptUtil.loadPrivateKey("RSA", privateKeyInputStream);
-        this.triggeringPath = triggeringPath;
+        this.triggeringEndPath = triggeringEndPath;
         this.objectsToEncrypt = objectsToEncrypt;
         this.objectsToDecrypt = objectsToDecrypt;
     }
 
 
-    @Override
-    public List<String> getTriggeringPath() {
-        return triggeringPath;
+    public List<String> getTriggeringEndPath() {
+        return triggeringEndPath;
     }
 
     @Override public Map<String,Object> encrypt(Map<String,Object> map) throws NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {

@@ -49,8 +49,8 @@ public final class ApiConfig {
     }
 
     public static void setEnvironment(Environment environment) {
-        for (ResourceConfigInterface sdkConfig : registeredInstances.values()) {
-            sdkConfig.setEnvironment(environment);
+        for (ResourceConfigInterface resourceConfig : registeredInstances.values()) {
+            resourceConfig.setEnvironment(environment);
         }
         currentEnvironment = environment;
     }
@@ -158,7 +158,7 @@ public final class ApiConfig {
      */
     public static CryptographyInterceptor getCryptographyInterceptor(String basePath) {
         for (CryptographyInterceptor interceptor : cryptographyMap.values()) {
-            for (String triggeringPath : interceptor.getTriggeringPath())
+            for (String triggeringPath : interceptor.getTriggeringEndPath())
             if (triggeringPath.compareTo(basePath) == 0 || basePath.endsWith(triggeringPath)) {
                 return interceptor;
             }
