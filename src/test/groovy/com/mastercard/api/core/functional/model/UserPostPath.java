@@ -43,7 +43,7 @@ public class UserPostPath extends BaseObject {
 //    private static ResourceConfig config = new ResourceConfig();
 
     static {
-        operationConfigs = new HashMap<>();
+        operationConfigs = new HashMap<String, OperationConfig>();
 
         operationConfigs.put("79f2c461-cd66-42bf-a343-77ec624d9531", new OperationConfig("/mock_crud_server/users/{user_id}/posts", Action.list, Arrays.asList(""), Arrays.asList("")));
 

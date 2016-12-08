@@ -317,17 +317,15 @@ public class CryptUtil {
 
     public static byte[] getBytesFromInputStream(InputStream is) throws IOException
     {
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream();)
-        {
-            byte[] buffer = new byte[1024];
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
 
-            for (int len; (len = is.read(buffer)) != -1;) {
-                os.write(buffer, 0, len);
-            }
-            os.flush();
-
-            return os.toByteArray();
+        for (int len; (len = is.read(buffer)) != -1;) {
+            os.write(buffer, 0, len);
         }
+        os.flush();
+
+        return os.toByteArray();
     }
 
     public static Key loadKey(KeyType type, String instance, InputStream p12, String alias, String password)

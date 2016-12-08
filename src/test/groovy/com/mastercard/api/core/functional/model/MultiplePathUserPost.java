@@ -15,7 +15,7 @@ public class MultiplePathUserPost extends BaseObject  {
 
 
     static {
-        operationConfigs = new HashMap<>();
+        operationConfigs = new HashMap<String, OperationConfig>();
 
         operationConfigs.put("38074ade-a5e8-4e62-9e6a-4a71726470a6", new OperationConfig("/mock_crud_server/users/{user_id}/post/{post_id}", Action.list, Arrays.asList(""), Arrays.asList("")));
         operationConfigs.put("ff2f8c50-03d4-48cd-aed2-6eb2d2023e42", new OperationConfig("/mock_crud_server/users/{user_id}/post/{post_id}", Action.update, Arrays.asList("testQuery"), Arrays.asList("")));

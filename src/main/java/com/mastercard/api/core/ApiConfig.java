@@ -15,10 +15,10 @@ import java.util.logging.Level;
 public final class ApiConfig {
     private static boolean debug = false;
     private static Authentication authentication;
-    private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<>();
+    private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<String,CryptographyInterceptor>();
 
     private static Environment currentEnvironment = Environment.SANDBOX;
-    private static Map<String,ResourceConfigInterface> registeredInstances = new HashMap<>();
+    private static Map<String,ResourceConfigInterface> registeredInstances = new HashMap<String,ResourceConfigInterface>();
 
 
 

@@ -166,7 +166,7 @@ public class ApiController {
 
         StringBuilder s = new StringBuilder("%s%s");
 
-        List<Object> objectList = new ArrayList<>();
+        List<Object> objectList = new ArrayList<Object>();
 
         //arizzini: host override, this takes precedence over all other scenarios.
         if (operationMetadata.getHost() == null) {
@@ -238,8 +238,9 @@ public class ApiController {
         URI uri = getURI(operationConfig, operationMetadata, requestObject);
 
         //this is what is left from the parameters.
-        Map<String, Object> objectMap = new LinkedHashMap<>(requestObject);
+        Map<String, Object> objectMap = new LinkedHashMap<String, Object>(requestObject);
         CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.getPath());
+
 
 
         HttpRequestBase message = null;
@@ -359,7 +360,7 @@ public class ApiController {
                 if (apiResponse.getStatus() < 300) {
                     if (operationConfig.getAction() == Action.list) {
 
-                        Map<String, Object> map = new HashMap<>();
+                        Map<String, Object> map = new HashMap<String,Object>();
                         List list = null;
 
                         //arizzini:  if the response is an object we need to convert this into a map
@@ -385,7 +386,7 @@ public class ApiController {
                             }
 
                         } else {
-                            map = new HashMap<>();
+                            map = new HashMap<String, Object>();
                             map.put("list", ((List<Map<? extends String, ? extends Object>>) response));
                             return map;
                         }
@@ -421,7 +422,23 @@ public class ApiController {
             throw new ApiCommunicationException("HttpClient exception", e);
         } catch (IOException e) {
             throw new ApiCommunicationException("I/O error", e);
-        } catch (NoSuchAlgorithmException | CertificateEncodingException | DecoderException | NoSuchProviderException | InvalidKeyException | BadPaddingException | InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException e) {
+        } catch (NoSuchAlgorithmException e) {
+            throw new SystemException("Cryptography Error", e);
+        } catch (CertificateEncodingException e) {
+            throw new SystemException("Cryptography Error", e);
+        } catch (DecoderException e) {
+            throw new SystemException("Cryptography Error", e);
+        } catch (NoSuchProviderException e) {
+            throw new SystemException("Cryptography Error", e);
+        } catch (InvalidKeyException e) {
+            throw new SystemException("Cryptography Error", e);
+        } catch (BadPaddingException e) {
+            throw new SystemException("Cryptography Error", e);
+        } catch (InvalidAlgorithmParameterException e) {
+            throw new SystemException("Cryptography Error", e);
+        } catch (NoSuchPaddingException e) {
+            throw new SystemException("Cryptography Error", e);
+        } catch (IllegalBlockSizeException e) {
             throw new SystemException("Cryptography Error", e);
         } finally {
             try {
@@ -435,7 +452,7 @@ public class ApiController {
 
     protected static Map subMap(Map<String,Object> inputMap, List<String> keyList)
     {
-        LinkedHashMap<String, Object> resultMap = new LinkedHashMap<>();
+        LinkedHashMap<String, Object> resultMap = new LinkedHashMap<String, Object>();
         for (Map.Entry entry : inputMap.entrySet())
         {
             if (keyList.contains(entry.getKey())) {
@@ -466,7 +483,7 @@ public class ApiController {
 
             if (level1 != null && level1.keySet().iterator().hasNext()) {
                 key = level1.keySet().iterator().next();
-                list = level1.get(key) instanceof List ? (List) level1.get(key) : new ArrayList<>();
+                list = level1.get(key) instanceof List ? (List) level1.get(key) : new ArrayList<Object>();
             }
         }
 

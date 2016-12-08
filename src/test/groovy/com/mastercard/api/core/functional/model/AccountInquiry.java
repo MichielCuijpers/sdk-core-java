@@ -54,12 +54,7 @@ public class AccountInquiry extends BaseObject  {
 
 
     @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
-        switch (operationUUID) {
-            case "uuid":
-                return new OperationConfig("/fraud/loststolen/v1/account-inquiry", Action.update, Arrays.asList(""), Arrays.asList(""));
-            default:
-                throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
-        }
+        return new OperationConfig("/fraud/loststolen/v1/account-inquiry", Action.update, Arrays.asList(""), Arrays.asList(""));
 
     }
 

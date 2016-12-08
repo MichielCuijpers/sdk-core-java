@@ -51,13 +51,7 @@ public class Tokenize extends BaseObject {
 
 
     @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
-        switch (operationUUID) {
-        case "uuid":
             return new OperationConfig("/mdes/static/digitization/1/0/tokenize", Action.create, Arrays.asList(""), Arrays.asList(""));
-        default:
-            throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
-        }
-
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {

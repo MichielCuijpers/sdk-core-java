@@ -210,14 +210,14 @@ public class RequestMap extends LinkedHashMap<String, Object> {
             if (map == null) {
                 tmpObject = super.get(keyName);  // get the list from the map
                 if (tmpObject == null) {
-                    tmpObject = new ArrayList<>();
+                    tmpObject = new ArrayList<Object>();
                     super.put(keyName, tmpObject);
 
                 }
             } else {
                 tmpObject = map.get(keyName);
                 if (tmpObject == null) {
-                    tmpObject = new ArrayList<>();
+                    tmpObject = new ArrayList<Object>();
                     map.put(keyName, tmpObject);
                 }
             }
@@ -240,7 +240,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
                 tmpList.add(index, value);
                 return value;
             } else {
-                Map<String,Object> tmpMap = new LinkedHashMap<>();
+                Map<String,Object> tmpMap = new LinkedHashMap<String, Object>();
                 tmpList.add(index, tmpMap);
                 return tmpMap;
             }
