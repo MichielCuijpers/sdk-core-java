@@ -42,7 +42,7 @@ public abstract class ApiException extends Exception {
     private String message;
     private int status;
 
-    private List<Map<? extends String, ? extends Object>> errors = new ArrayList<>();
+    private List<Map<? extends String, ? extends Object>> errors = new ArrayList<Map<? extends String, ? extends Object>>();
 
     /**
      * Constructs an <code>ApiException</code> with no detail message.

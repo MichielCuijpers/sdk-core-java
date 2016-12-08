@@ -45,11 +45,11 @@ class ApiControllerSpec extends Specification {
         ResourceConfig config = ResourceConfig.getInstance();
         config.clearOverride();
         OperationConfig operationConfig = new OperationConfig("/mdes/digitization/{:env}/1/0/getToken", Action.create, [], [])
-
+        ApiConfig.registerResourceConfig(config);
 
         when:
-        ApiConfig.registerResourceConfig(config);
         ApiConfig.setEnvironment(envrironment)
+
         ApiController controller = new ApiController()
         OperationMetadata operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext());
         URI uri = controller.getURI(operationConfig, operationMetadata, new RequestMap());
@@ -65,8 +65,37 @@ class ApiControllerSpec extends Specification {
         Environment.PRODUCTION       | "https://api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
         Environment.SANDBOX          | "https://sandbox.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
         Environment.STAGE            | "https://stage.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
-        Environment.ITF              | "https://sandbox.api.mastercard.com/mdes/digitization/itf/1/0/getToken?Format=JSON"
-        Environment.MTF              | "https://sandbox.api.mastercard.com/mdes/digitization/mtf/1/0/getToken?Format=JSON"
+        Environment.ITF              | "https://api.mastercard.com/mdes/digitization/itf/1/0/getToken?Format=JSON"
+        Environment.MTF              | "https://api.mastercard.com/mdes/digitization/mtf/1/0/getToken?Format=JSON"
+
+
+    }
+
+
+    @Unroll
+    def "test getUri: Using custom host: #host context: #context "() {
+        given:
+        ResourceConfig config = ResourceConfig.getInstance();
+        config.clearOverride();
+        OperationConfig operationConfig = new OperationConfig("/mdes/digitization/{:env}/1/0/getToken", Action.create, [], [])
+
+
+        when:
+        ResourceConfig.getInstance().setEnvironment(host, context);
+        ApiController controller = new ApiController()
+        OperationMetadata operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext());
+        URI uri = controller.getURI(operationConfig, operationMetadata, new RequestMap());
+
+        then:
+        uri.toURL().toString() == result
+
+        cleanup:
+        ApiConfig.setEnvironment(Environment.SANDBOX)
+
+        where:
+        host   |     context     | result
+        "https://localhost:8080" | null | "https://localhost:8080/mdes/digitization/1/0/getToken?Format=JSON"
+        "https://localhost:8080" | "mtf" | "https://localhost:8080/mdes/digitization/mtf/1/0/getToken?Format=JSON"
 
 
     }

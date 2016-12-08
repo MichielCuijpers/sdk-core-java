@@ -43,7 +43,7 @@ public class UserPostHeader extends BaseObject {
 //    private static ResourceConfig config = new ResourceConfig();
 
     static {
-        operationConfigs = new HashMap<>();
+        operationConfigs = new HashMap<String, OperationConfig>();
 
         operationConfigs.put("378b52fa-47e7-4acc-b414-68fb2604ab39", new OperationConfig("/mock_crud_server/users/posts", Action.list, Arrays.asList(""), Arrays.asList("user_id")));
 

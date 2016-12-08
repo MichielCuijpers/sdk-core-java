@@ -54,12 +54,7 @@ public class Insights extends BaseObject {
 
 
     @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
-        switch (operationUUID) {
-        case "uuid":
-            return new OperationConfig("/sectorinsights/v1/sectins.svc/insights", Action.query, Arrays.asList(""), Arrays.asList(""));
-        default:
-            throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
-        }
+        return new OperationConfig("/sectorinsights/v1/sectins.svc/insights", Action.query, Arrays.asList(""), Arrays.asList(""));
 
     }
 

@@ -42,7 +42,7 @@ public class User extends BaseObject {
     private static Map<String, OperationConfig> operationConfigs;
 
     static {
-        operationConfigs = new HashMap<>();
+        operationConfigs = new HashMap<String, OperationConfig>();
 
         operationConfigs.put("4f7d3051-9774-4df1-b826-2a275e42e169", new OperationConfig("/mock_crud_server/users", Action.list, Arrays.asList(""), Arrays.asList("")));
         operationConfigs.put("c749141f-fa78-4bcd-b63c-5a499c40ddac", new OperationConfig("/mock_crud_server/users", Action.create, Arrays.asList(""), Arrays.asList("")));

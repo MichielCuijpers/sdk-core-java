@@ -51,21 +51,18 @@ public class Post extends BaseObject {
 
 
     @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
-        switch (operationUUID) {
-        case "list":
+        if (operationUUID.compareTo("list") == 0) {
             return new OperationConfig("/mock_crud_server/posts", Action.list, Arrays.asList(""), Arrays.asList(""));
-        case "create":
+        } else if (operationUUID.compareTo("create") == 0) {
             return new OperationConfig("/mock_crud_server/posts", Action.create, Arrays.asList(""), Arrays.asList(""));
-        case "read":
+        } else if (operationUUID.compareTo("read") == 0) {
             return new OperationConfig("/mock_crud_server/posts/{id}", Action.read, Arrays.asList(""), Arrays.asList(""));
-        case "update":
+        } else if (operationUUID.compareTo("update") == 0) {
             return new OperationConfig("/mock_crud_server/posts/{id}", Action.update, Arrays.asList(""), Arrays.asList(""));
-        case "delete":
+        } else if (operationUUID.compareTo("delete") == 0) {
             return new OperationConfig("/mock_crud_server/posts/{id}", Action.delete, Arrays.asList(""), Arrays.asList(""));
-        default:
-            throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
         }
-
+        throw new IllegalArgumentException("Invalid operationUUID supplied: " + operationUUID);
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {

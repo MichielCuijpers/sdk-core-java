@@ -69,17 +69,17 @@ public class TokenActivationSpec extends Specification {
         requestMap.set("tokenType", "CLOUD");
         requestMap.set("taskId", "123456");
 
-        requestMap.set("cardInfo.source", "CARD_ON_FILE");
-        requestMap.set("cardInfo.accountNumber", "5123456789012345");
-        requestMap.set("cardInfo.expiryMonth", "12");
-        requestMap.set("cardInfo.expiryYear", "16");
-        requestMap.set("cardInfo.securityCode", "123");
-        requestMap.set("cardInfo.billingAddress.line", "100 1st Street");
-        requestMap.set("cardInfo.billingAddress.line2", "Apt. 4B");
-        requestMap.set("cardInfo.billingAddress.city", "St. Louis");
-        requestMap.set("cardInfo.billingAddress.countrySubdivision", "MO");
-        requestMap.set("cardInfo.billingAddress.postalCode", "61000");
-        requestMap.set("cardInfo.billingAddress.country", "USA");
+        requestMap.set("cardInfo.encryptedData.source", "CARD_ON_FILE");
+        requestMap.set("cardInfo.encryptedData.accountNumber", "5123456789012345");
+        requestMap.set("cardInfo.encryptedData.expiryMonth", "12");
+        requestMap.set("cardInfo.encryptedData.expiryYear", "16");
+        requestMap.set("cardInfo.encryptedData.securityCode", "123");
+        requestMap.set("cardInfo.encryptedData.billingAddress.line", "100 1st Street");
+        requestMap.set("cardInfo.encryptedData.billingAddress.line2", "Apt. 4B");
+        requestMap.set("cardInfo.encryptedData.billingAddress.city", "St. Louis");
+        requestMap.set("cardInfo.encryptedData.billingAddress.countrySubdivision", "MO");
+        requestMap.set("cardInfo.encryptedData.billingAddress.postalCode", "61000");
+        requestMap.set("cardInfo.encryptedData.billingAddress.country", "USA");
 
         Tokenize response = new Tokenize(requestMap).create(requestMap);
 

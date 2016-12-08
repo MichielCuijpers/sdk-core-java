@@ -25,7 +25,7 @@ public class OAuthRequest implements HttpRequest {
 
     public OAuthRequest() {
         super();
-        headers = new LinkedHashMap<>();
+        headers = new LinkedHashMap<String, String>();
         formParams = new LinkedHashMap<String, String>();
     }
 

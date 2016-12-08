@@ -15,8 +15,8 @@ public enum Environment {
         MAPPINGS.put(Environment.SANDBOX, new String[] { "https://sandbox.api.mastercard.com", null});
         MAPPINGS.put(Environment.STAGE, new String[] { "https://stage.api.mastercard.com", null});
         MAPPINGS.put(Environment.DEV, new String[] { "https://dev.api.mastercard.com", null});
-        MAPPINGS.put(Environment.MTF, new String[] { "https://sandbox.api.mastercard.com", "mtf"});
-        MAPPINGS.put(Environment.ITF, new String[] { "https://sandbox.api.mastercard.com", "itf"});
+        MAPPINGS.put(Environment.MTF, new String[] { "https://api.mastercard.com", "mtf"});
+        MAPPINGS.put(Environment.ITF, new String[] { "https://api.mastercard.com", "itf"});
         MAPPINGS.put(Environment.LOCALHOST, new String[] { "http://localhost:8081", null});
     }
 }
