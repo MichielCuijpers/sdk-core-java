@@ -68,6 +68,7 @@ public class ApiController {
     private static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
     private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
+    public  static final String ENVIRONMENT_IDENTIFIER = "#env";
 
     /**
      */
@@ -152,12 +153,12 @@ public class ApiController {
         }
 
         String resourcePath = operationConfig.getResourcePath();
-        if (resourcePath.contains("{:env}")) {
+        if (resourcePath.contains(ENVIRONMENT_IDENTIFIER)) {
             String context = "";
             if (operationMetadata.getContext() != null) {
                 context = operationMetadata.getContext();
             }
-            resourcePath = resourcePath.replace("{:env}", context);
+            resourcePath = resourcePath.replace(ENVIRONMENT_IDENTIFIER, context);
             //don't worry of //, they will be removed in the getPathWithReplacedPath
         }
 

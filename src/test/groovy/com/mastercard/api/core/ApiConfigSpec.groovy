@@ -53,12 +53,12 @@ class ApiConfigSpec extends Specification {
 
     def 'test setting sandbox && mft' () {
         when:
-        ApiConfig.setEnvironment(Environment.MTF)
+        ApiConfig.setEnvironment(Environment.PRODUCTION_MTF)
 
         then:
         !ApiConfig.isSandbox()
         !ApiConfig.isProduction()
-        ApiConfig.getEnvironment() == Environment.MTF
+        ApiConfig.getEnvironment() == Environment.PRODUCTION_MTF
 
         when:
         ApiConfig.setSandbox(false)
@@ -81,7 +81,7 @@ class ApiConfigSpec extends Specification {
         ApiConfig.registerResourceConfig(config);
 
         when:
-        ApiConfig.setEnvironment(Environment.OTHER1)
+        ApiConfig.setEnvironment(Environment.OTHER)
 
         then: "IllegalStateException is thrown"
         thrown(RuntimeException)
