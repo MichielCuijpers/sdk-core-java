@@ -44,7 +44,7 @@ class ApiControllerSpec extends Specification {
         given:
         ResourceConfig config = ResourceConfig.getInstance();
         config.clearOverride();
-        OperationConfig operationConfig = new OperationConfig("/mdes/digitization/{:env}/1/0/getToken", Action.create, [], [])
+        OperationConfig operationConfig = new OperationConfig("/mdes/digitization/#env/1/0/getToken", Action.create, [], [])
         ApiConfig.registerResourceConfig(config);
 
         when:
@@ -65,8 +65,8 @@ class ApiControllerSpec extends Specification {
         Environment.PRODUCTION       | "https://api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
         Environment.SANDBOX          | "https://sandbox.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
         Environment.STAGE            | "https://stage.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
-        Environment.ITF              | "https://api.mastercard.com/mdes/digitization/itf/1/0/getToken?Format=JSON"
-        Environment.MTF              | "https://api.mastercard.com/mdes/digitization/mtf/1/0/getToken?Format=JSON"
+        Environment.PRODUCTION_ITF   | "https://api.mastercard.com/mdes/digitization/itf/1/0/getToken?Format=JSON"
+        Environment.PRODUCTION_MTF   | "https://api.mastercard.com/mdes/digitization/mtf/1/0/getToken?Format=JSON"
 
 
     }
@@ -77,7 +77,7 @@ class ApiControllerSpec extends Specification {
         given:
         ResourceConfig config = ResourceConfig.getInstance();
         config.clearOverride();
-        OperationConfig operationConfig = new OperationConfig("/mdes/digitization/{:env}/1/0/getToken", Action.create, [], [])
+        OperationConfig operationConfig = new OperationConfig("/mdes/digitization/#env/1/0/getToken", Action.create, [], [])
 
 
         when:

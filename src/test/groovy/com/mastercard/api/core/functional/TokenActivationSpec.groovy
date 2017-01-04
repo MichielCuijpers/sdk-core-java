@@ -32,8 +32,11 @@ import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.Authentication
 import com.mastercard.api.core.security.mdes.MDESCryptography
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
+import spock.lang.Ignore
 import spock.lang.Specification
 
+
+@Ignore
 public class TokenActivationSpec extends Specification {
 
 
