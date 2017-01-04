@@ -50,15 +50,16 @@ import org.json.simple.JSONValue;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.*;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,6 +69,7 @@ public class ApiController {
     private static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
     private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
+    public  static final String ENVIRONMENT_IDENTIFIER = "#env";
 
     /**
      */
@@ -152,12 +154,12 @@ public class ApiController {
         }
 
         String resourcePath = operationConfig.getResourcePath();
-        if (resourcePath.contains("{:env}")) {
+        if (resourcePath.contains(ENVIRONMENT_IDENTIFIER)) {
             String context = "";
             if (operationMetadata.getContext() != null) {
                 context = operationMetadata.getContext();
             }
-            resourcePath = resourcePath.replace("{:env}", context);
+            resourcePath = resourcePath.replace(ENVIRONMENT_IDENTIFIER, context);
             //don't worry of //, they will be removed in the getPathWithReplacedPath
         }
 
@@ -505,12 +507,44 @@ public class ApiController {
         final String[] supportedProtocols = SUPPORTED_TLS;
         final String[] supportedCipherSuites = split(System.getProperty("https.cipherSuites"));
 
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                (SSLSocketFactory) SSLSocketFactory.getDefault(),
-                supportedProtocols,
-                supportedCipherSuites,
-                SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+        if (ApiConfig.ignoreSSLErrors()) {
+            try {
+                SSLContext sslContext = SSLContext.getInstance("SSL");
+                // set up a TrustManager that trusts everything
+                sslContext.init(null, new TrustManager[]{new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
 
+                    public void checkClientTrusted(X509Certificate[] certs,
+                                                   String authType) {
+                    }
+
+                    public void checkServerTrusted(X509Certificate[] certs,
+                                                   String authType) {
+                    }
+                }}, new SecureRandom());
+
+                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                        sslContext,
+                        supportedProtocols,
+                        supportedCipherSuites,
+                        SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+                httpClientBuilder.setSSLSocketFactory(sslsf);
+
+                return httpClientBuilder.build();
+
+            } catch (Exception e) {
+                //don't worry we simply fall back on the original implementation if this doesn't work..
+            }
+        }
+
+        //arizzini: fallback
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+        (SSLSocketFactory) SSLSocketFactory.getDefault(),
+        supportedProtocols,
+        supportedCipherSuites,
+        SSLConnectionSocketFactory.getDefaultHostnameVerifier());
         httpClientBuilder.setSSLSocketFactory(sslsf);
 
         return httpClientBuilder.build();

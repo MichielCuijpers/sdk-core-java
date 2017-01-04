@@ -14,12 +14,11 @@ import java.util.logging.Level;
  */
 public final class ApiConfig {
     private static boolean debug = false;
+    private static boolean ignoreSSLErrors = false;
     private static Authentication authentication;
     private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<String,CryptographyInterceptor>();
-
     private static Environment currentEnvironment = Environment.SANDBOX;
     private static Map<String,ResourceConfigInterface> registeredInstances = new HashMap<String,ResourceConfigInterface>();
-
 
 
     /**
@@ -55,6 +54,13 @@ public final class ApiConfig {
         currentEnvironment = environment;
     }
 
+    public static boolean ignoreSSLErrors() {
+        return ignoreSSLErrors;
+    }
+
+    public static void ignoreSSLErrors(boolean value) {
+        ignoreSSLErrors = value;
+    }
 
 
     /**
