@@ -1,10 +1,15 @@
 package com.mastercard.api.core
 
 import com.mastercard.api.core.functional.model.ResourceConfig
+import com.mastercard.api.core.model.Action
 import com.mastercard.api.core.model.Environment
+import com.mastercard.api.core.model.OperationConfig
+import com.mastercard.api.core.model.OperationMetadata
+import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.jws.JwsAuthentication
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * Created by eamondoyle on 16/02/2016.
@@ -71,6 +76,27 @@ class ApiConfigSpec extends Specification {
 
         then:
         ApiConfig.getEnvironment() == Environment.SANDBOX
+
+    }
+
+    @Unroll
+    def "test Environment.parse(#envrironment) "() {
+        given:
+        Environment parsed = null;
+
+        when:
+        parsed = Environment.parse(envrironment)
+
+        then:
+        parsed == result
+
+        where:
+        envrironment       | result
+        "production"       | Environment.PRODUCTION
+        "SANDBOX"          | Environment.SANDBOX
+        "sTaGe"            | Environment.STAGE
+
+
 
     }
 

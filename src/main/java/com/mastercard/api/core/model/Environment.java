@@ -9,6 +9,18 @@ import java.util.Map;
 public enum Environment {
     PRODUCTION,SANDBOX,SANDBOX_STATIC,STAGE,DEV,PRODUCTION_MTF,PRODUCTION_ITF,STAGE_MTF,STAGE_ITF,LOCALHOST,OTHER;
 
+
+    public static Environment parse(String value) {
+        if (value != null) {
+            for (Environment environment : Environment.values()) {
+                if (value.equalsIgnoreCase(environment.name())) {
+                    return environment;
+                }
+            }
+        }
+        return null;
+    }
+
     public static final Map<Environment,String[]> MAPPINGS = new HashMap();
     static {
         MAPPINGS.put(Environment.PRODUCTION, new String[] { "https://api.mastercard.com", null});

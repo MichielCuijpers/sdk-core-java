@@ -502,6 +502,8 @@ public class ApiController {
     CloseableHttpClient createHttpClient() {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         httpClientBuilder.useSystemProperties();
+        //arizzini: disabling cookie manager... we don't use cookies. REST are stateless.
+        httpClientBuilder.disableCookieManagement();
 
         // TLSv1.1 and TLSv1.2 are disabled by default in Java 7, we want to enforce TLSv1.2
         final String[] supportedProtocols = SUPPORTED_TLS;
