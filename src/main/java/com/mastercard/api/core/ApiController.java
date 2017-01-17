@@ -317,7 +317,10 @@ public class ApiController {
 
         // Set other headers
         for (Map.Entry<String, Object> entry : headerMap.entrySet()) {
-            message.setHeader(entry.getKey(), entry.getValue().toString());
+            //arizzini: checking for NPE, if value is null, then we simply skipp it.
+            if (entry.getValue() != null) {
+                message.setHeader(entry.getKey(), entry.getValue().toString());
+            }
         }
 
         // Add user agent
