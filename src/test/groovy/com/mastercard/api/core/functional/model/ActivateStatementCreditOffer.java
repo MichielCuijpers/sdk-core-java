@@ -92,8 +92,7 @@ public class ActivateStatementCreditOffer extends BaseObject {
      * @throws SystemException
      */
     public static ActivateStatementCreditOffer activateCredit(RequestMap map)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return activateCredit(null, map);
     }
@@ -115,8 +114,7 @@ public class ActivateStatementCreditOffer extends BaseObject {
      * @throws SystemException
      */
     public static ActivateStatementCreditOffer activateCredit(Authentication auth, RequestMap map)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return new ActivateStatementCreditOffer(BaseObject.executeOperation(auth, "c2f9d3fa-0733-48eb-8ba2-615cd87a11b5", new ActivateStatementCreditOffer(map)));
     }

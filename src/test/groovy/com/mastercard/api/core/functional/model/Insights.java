@@ -82,8 +82,7 @@ public class Insights extends BaseObject {
      * @throws      SystemException
      */
     public static Insights query(Map query)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return query(null, query);
     }
@@ -105,8 +104,7 @@ public class Insights extends BaseObject {
      * @throws      SystemException
      */
     public static Insights query(Authentication auth, Map query)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         Insights val = new Insights();
         if (query != null)  val.putAll(query);

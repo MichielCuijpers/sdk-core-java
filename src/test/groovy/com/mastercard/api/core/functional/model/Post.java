@@ -89,8 +89,7 @@ public class Post extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<Post> list()
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return BaseObject.executeListOperation(null, "list", new Post(), null);
     }
@@ -114,8 +113,7 @@ public class Post extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<Post> list(Authentication auth)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return BaseObject.executeListOperation(auth, "list", new Post(), null);
     }
@@ -142,8 +140,7 @@ public class Post extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<Post> list(Map criteria)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return BaseObject.executeListOperation(null, "list", new Post(), criteria);
     }
@@ -169,8 +166,7 @@ public class Post extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<Post> list(Authentication auth, Map criteria)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return BaseObject.executeListOperation(auth, "list", new Post(), criteria);
     }
@@ -198,8 +194,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public static Post create(RequestMap map)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return create(null, map);
     }
@@ -223,8 +218,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public static Post create(Authentication auth, RequestMap map)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return new Post(BaseObject.executeOperation(auth, "create", new Post(map)));
     }
@@ -256,8 +250,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public static Post read(String id)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return read(null, id, null);
     }
@@ -280,8 +273,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public static Post read(String id, Map query)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return read(null, id, query);
     }
@@ -303,8 +295,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public static Post read(Authentication auth, String id)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return read(auth, id, null);
     }
@@ -327,8 +318,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public static Post read(Authentication auth, String id, Map query)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         Post val = new Post();
         if (id != null) val.put("id", id);
@@ -358,8 +348,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public Post update()
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         BaseObject object = this.executeOperation(null, "update", this);
         this.putAll(object);
@@ -387,8 +376,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public Post update(Authentication auth)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         BaseObject object = this.executeOperation(auth, "update", this);
         this.putAll(object);
@@ -417,8 +405,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public Post delete()
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         BaseObject object = this.executeOperation(null, "delete", this);
         this.clear();
@@ -440,8 +427,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public Post delete(Authentication auth)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         BaseObject object = this.executeOperation(auth, "delete", this);
         this.clear();
@@ -466,8 +452,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public static Post delete(String id)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return delete(null, id);
     }
@@ -488,8 +473,7 @@ public class Post extends BaseObject {
      * @throws      SystemException
      */
     public static Post delete(Authentication auth, String id)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         Post object = new Post(new RequestMap("id", id));
         return object.delete(auth);

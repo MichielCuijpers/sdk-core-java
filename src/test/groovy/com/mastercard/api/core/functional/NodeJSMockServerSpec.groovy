@@ -1,7 +1,7 @@
 package com.mastercard.api.core.functional
 import com.mastercard.api.core.ApiConfig
 import com.mastercard.api.core.ApiController
-import com.mastercard.api.core.exception.ApiCommunicationException
+
 import com.mastercard.api.core.functional.model.MultiplePathUserPost
 import com.mastercard.api.core.functional.model.Post
 import com.mastercard.api.core.functional.model.ResourceConfig

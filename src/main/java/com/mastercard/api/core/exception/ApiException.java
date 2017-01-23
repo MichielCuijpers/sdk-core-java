@@ -27,6 +27,7 @@
 
 package com.mastercard.api.core.exception;
 
+import com.mastercard.api.core.model.CaseInsensitiveMap;
 import com.mastercard.api.core.model.RequestMap;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import java.util.Map;
 /**
  * Base class for all API exceptions.
  */
-public abstract class ApiException extends Exception {
+public class ApiException extends Exception {
 
     private String errorCode;
     private String message;
@@ -97,12 +98,15 @@ public abstract class ApiException extends Exception {
         this.status = status;
 
         // Use RequestMap for easy traversing
-        RequestMap requestMap = new RequestMap((Map<String, Object>) errorData);
 
-        if (!requestMap.containsKey("Errors.Error"))
+        Map errorDataMap = new CaseInsensitiveMap((Map<String,Object>) errorData);
+
+        RequestMap requestMap = new RequestMap(errorDataMap);
+
+        if (!requestMap.containsKey("errors.error"))
             return;
 
-        Object o = requestMap.get("Errors.Error");
+        Object o = requestMap.get("errors.error");
 
         if (o instanceof Map) {
             errors.add((Map<? extends String, ? extends Object>) o);
@@ -114,8 +118,8 @@ public abstract class ApiException extends Exception {
         // Use the first error
         if (errors.size() > 0) {
             Map<? extends String, ? extends Object> error = errors.get(0);
-            errorCode = (String) error.get("ReasonCode");
-            message = (String) error.get("Description");
+            errorCode = (String) error.get("reasoncode");
+            message = (String) error.get("description");
         }
     }
 
@@ -133,7 +137,9 @@ public abstract class ApiException extends Exception {
      *
      * @return an integer representing the HTTP status code for this API error (or 0 if there is no status)
      */
-    public abstract int getStatus();
+    public int getStatus() {
+        return status;
+    }
 
     public List<Map<? extends String, ? extends Object>> getErrors() {
         return errors;

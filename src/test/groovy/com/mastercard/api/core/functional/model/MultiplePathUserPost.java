@@ -70,8 +70,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @see ResourceList
      */
     public static ResourceList<MultiplePathUserPost> list()
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(null, "38074ade-a5e8-4e62-9e6a-4a71726470a6", new MultiplePathUserPost(), null);
     }
@@ -95,8 +94,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @see ResourceList
      */
     public static ResourceList<MultiplePathUserPost> list(Authentication auth)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(auth, "38074ade-a5e8-4e62-9e6a-4a71726470a6", new MultiplePathUserPost(), null);
     }
@@ -120,8 +118,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @see ResourceList
      */
     public static ResourceList<MultiplePathUserPost> list(RequestMap criteria)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(null, "38074ade-a5e8-4e62-9e6a-4a71726470a6", new MultiplePathUserPost(), criteria);
     }
@@ -146,8 +143,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @see ResourceList
      */
     public static ResourceList<MultiplePathUserPost> list(Authentication auth, RequestMap criteria)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(auth, "38074ade-a5e8-4e62-9e6a-4a71726470a6", new MultiplePathUserPost(), criteria);
     }
@@ -173,8 +169,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @throws      SystemException
      */
     public MultiplePathUserPost update()
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(null, "ff2f8c50-03d4-48cd-aed2-6eb2d2023e42", this);
         this.putAll(object);
@@ -197,8 +192,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @throws      SystemException
      */
     public MultiplePathUserPost update(Authentication auth)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(auth, "ff2f8c50-03d4-48cd-aed2-6eb2d2023e42", this);
         this.putAll(object);
@@ -228,8 +222,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @throws      SystemException
      */
     public MultiplePathUserPost delete()
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(null, "69c50952-b9a1-4d1d-a6eb-84e2dc3a09a5", this);
         this.clear();
@@ -253,8 +246,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @throws      SystemException
      */
     public MultiplePathUserPost delete(Authentication auth)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(auth, "69c50952-b9a1-4d1d-a6eb-84e2dc3a09a5", this);
         this.clear();
@@ -278,8 +270,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @throws      SystemException
      */
     public static MultiplePathUserPost delete(String id)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return delete(null, id);
     }
@@ -301,8 +292,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @throws      SystemException
      */
     public static MultiplePathUserPost delete(Authentication auth, String id)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         MultiplePathUserPost object = new MultiplePathUserPost(new RequestMap("id", id));
         return object.delete(auth);
@@ -325,8 +315,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @throws      SystemException
      */
     public static MultiplePathUserPost delete(String id, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return delete(null, id, map);
     }
@@ -349,8 +338,7 @@ public class MultiplePathUserPost extends BaseObject  {
      * @throws      SystemException
      */
     public static MultiplePathUserPost delete(Authentication auth, String id, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         MultiplePathUserPost object = new MultiplePathUserPost(new RequestMap("id", id));
         if (map != null)  object.putAll(map);

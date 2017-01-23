@@ -455,7 +455,7 @@ class ApiControllerSpec extends Specification {
         apiController.getRequest(null, mockBaseObject.getOperationConfig(), mockBaseObject.getOperationMetadata(), mockBaseObject)
 
         then:
-        thrown(MessageSignerException)
+        thrown(SdkException)
 
     }
 
@@ -679,15 +679,15 @@ class ApiControllerSpec extends Specification {
 
         where:
         mockHttpResponse                            | thrownEx
-        new MockHttpResponse(400, [error: "error"]) | InvalidRequestException
-        new MockHttpResponse(401, [error: "error"]) | AuthenticationException
-        new MockHttpResponse(403, [error: "error"]) | NotAllowedException
-        new MockHttpResponse(404, [error: "error"]) | ObjectNotFoundException
-        new MockHttpResponse(500, [error: "error"]) | SystemException
-        new MockHttpResponse(503, [error: "error"]) | ApiCommunicationException
-        new MockHttpResponse(503, [error: "error"], { throw new HttpResponseException(503, "mock") }) | ApiCommunicationException
-        new MockHttpResponse(503, [error: "error"], { throw new ClientProtocolException() }) | ApiCommunicationException
-        new MockHttpResponse(503, [error: "error"], { throw new IOException() }) | ApiCommunicationException
+        new MockHttpResponse(400, [error: "error"]) | ApiException
+        new MockHttpResponse(401, [error: "error"]) | ApiException
+        new MockHttpResponse(403, [error: "error"]) | ApiException
+        new MockHttpResponse(404, [error: "error"]) | ApiException
+        new MockHttpResponse(500, [error: "error"]) | ApiException
+        new MockHttpResponse(503, [error: "error"]) | ApiException
+        new MockHttpResponse(503, [error: "error"], { throw new HttpResponseException(503, "mock") }) | ApiException
+        new MockHttpResponse(503, [error: "error"], { throw new ClientProtocolException() }) | ApiException
+        new MockHttpResponse(503, [error: "error"], { throw new IOException() }) | ApiException
     }
 
     @Unroll
@@ -720,7 +720,7 @@ class ApiControllerSpec extends Specification {
         apiController.execute(null, mockBaseObject.getOperationConfig(), mockBaseObject.getOperationMetadata(), mockBaseObject)
 
         then:
-        thrown(ApiCommunicationException)
+        thrown(ApiException)
 
         when:
         mockHttpResponse.contentType = null

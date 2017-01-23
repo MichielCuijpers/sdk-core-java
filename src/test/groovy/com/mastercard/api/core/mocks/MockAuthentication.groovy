@@ -1,7 +1,8 @@
 package com.mastercard.api.core.mocks
 
+import com.mastercard.api.core.exception.SdkException
 import com.mastercard.api.core.model.HttpMethod
-import com.mastercard.api.core.exception.MessageSignerException
+
 import com.mastercard.api.core.security.Authentication
 import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.entity.ContentType
@@ -13,7 +14,7 @@ class MockAuthentication implements Authentication {
     boolean called = false
 
     @Override
-    HttpRequestBase sign(URI uri, HttpMethod httpMethod, ContentType contentType, Object body, HttpRequestBase message) throws MessageSignerException {
+    HttpRequestBase sign(URI uri, HttpMethod httpMethod, ContentType contentType, Object body, HttpRequestBase message) throws SdkException {
         called = true
 
         message.setHeader("MockAuthentication", "MockValue")

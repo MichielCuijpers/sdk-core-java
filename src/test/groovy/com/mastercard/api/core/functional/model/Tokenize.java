@@ -81,8 +81,7 @@ public class Tokenize extends BaseObject {
 
 
     public static Tokenize create(RequestMap map)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return create(null, map);
     }
@@ -106,8 +105,7 @@ public class Tokenize extends BaseObject {
      * @throws      SystemException
      */
     public static Tokenize create(Authentication auth, RequestMap map)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return new Tokenize(BaseObject.executeOperation(auth, "uuid", new Tokenize(map)));
     }
