@@ -113,6 +113,31 @@ public class ApiExceptionSpec extends Specification {
 
         when:
         errorData =
+                [
+                        "errors":
+                                [
+                                        "error":
+                                                [
+                                                        "source":"System",
+                                                        "reasonCode":"SYSTEM_ERROR",
+                                                        "description":"Unknown Error",
+                                                        "recoverable":"false"
+                                                ]
+                                ]
+                ]
+
+        ApiException = new ApiException(500,errorData)
+
+        then:
+        ApiException.getErrorCode() == "SYSTEM_ERROR"
+        ApiException.getErrors().size() == 1
+        ApiException.getErrors() == [errorData.errors.error]
+        ApiException.getMessage() == "Unknown Error"
+        ApiException.getStatus() == 500
+        ApiException.getCause() == null
+
+        when:
+        errorData =
         [
             "Errors":
             [
@@ -173,7 +198,7 @@ public class ApiExceptionSpec extends Specification {
         then:
         ApiException.getErrorCode() == "SYSTEM_ERROR1"
         ApiException.getErrors().size() == 2
-        ApiException.getErrors() == errorData.Errors.Error
+        ApiException.getErrors() == errorData.errors.error
         ApiException.getMessage() == "Unknown Error1"
         ApiException.getStatus() == 500
         ApiException.getCause() == null

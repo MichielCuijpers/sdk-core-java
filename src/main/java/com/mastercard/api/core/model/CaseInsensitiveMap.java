@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Created by andrearizzini on 23/01/2017.
  */
-public class CaseInsensitiveMap extends LinkedHashMap<String,Object> {
+public class CaseInsensitiveMap extends TreeMap<String,Object> {
 
     /**
      * Constructs an empty map with the default capacity and load factor.
@@ -20,24 +20,24 @@ public class CaseInsensitiveMap extends LinkedHashMap<String,Object> {
      * @param map the map whose mappings are to be placed in this map
      */
     public CaseInsensitiveMap(Map<String, Object> map) {
-        super();
+        super(String.CASE_INSENSITIVE_ORDER);
         putAll(parseMap(map));
     }
 
 
 
     private Map<String,Object> parseMap(Map<String, Object> map) {
-        Map<String,Object> result = new LinkedHashMap();
+        Map<String,Object> result = new TreeMap(String.CASE_INSENSITIVE_ORDER);
         for (Map.Entry<String,Object> entry : map.entrySet()) {
             if (entry.getValue() instanceof Map) {
                 //recursive add map
-                result.put(entry.getKey().toLowerCase(), parseMap((Map<String,Object>) entry.getValue()));
+                result.put(entry.getKey(), parseMap((Map<String,Object>) entry.getValue()));
             } else if (entry.getValue() instanceof List) {
                 //recursive add list
-                result.put(entry.getKey().toLowerCase(), parseList((List<Object>) entry.getValue()));
+                result.put(entry.getKey(), parseList((List<Object>) entry.getValue()));
             } else {
                 // add normal value
-                result.put(entry.getKey().toLowerCase(), entry.getValue());
+                result.put(entry.getKey(), entry.getValue());
             }
 
         }

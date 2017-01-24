@@ -29,6 +29,7 @@ package com.mastercard.api.core.exception;
 
 import com.mastercard.api.core.model.CaseInsensitiveMap;
 import com.mastercard.api.core.model.RequestMap;
+import com.mastercard.api.core.model.SmartMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,25 +102,25 @@ public class ApiException extends Exception {
 
         Map errorDataMap = new CaseInsensitiveMap((Map<String,Object>) errorData);
 
-        RequestMap requestMap = new RequestMap(errorDataMap);
 
-        if (!requestMap.containsKey("errors.error"))
+        if (! (errorDataMap.containsKey("Errors") && ((Map) errorDataMap.get("Errors")).containsKey("Error")))
             return;
 
-        Object o = requestMap.get("errors.error");
+        Map container = (Map) errorDataMap.get("Errors");
+        Object o = container.get("Error");
 
         if (o instanceof Map) {
-            errors.add((Map<? extends String, ? extends Object>) o);
+            errors.add((Map<String,Object>) o);
         }
         else if (o instanceof List) {
-            errors = (List<Map<? extends String, ? extends Object>>) o;
+            errors= (List<Map<? extends String, ? extends Object>>) o;
         }
 
         // Use the first error
         if (errors.size() > 0) {
             Map<? extends String, ? extends Object> error = errors.get(0);
-            errorCode = (String) error.get("reasoncode");
-            message = (String) error.get("description");
+            errorCode = (String) error.get("ReasonCode");
+            message = (String) error.get("Description");
         }
     }
 
