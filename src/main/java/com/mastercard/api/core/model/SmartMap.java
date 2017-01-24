@@ -29,7 +29,10 @@ package com.mastercard.api.core.model;
 
 import org.json.simple.JSONValue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,13 +77,13 @@ import java.util.regex.Pattern;
  * Both of these examples construct a RequestMap containing the keys 'currency', 'amount' and 'card'.  The
  * value for the 'card' key is a map containing the key 'number', 'cvc', 'expMonth' and 'expYear'.
  */
-public class RequestMap extends LinkedHashMap<String, Object> {
+public class SmartMap extends LinkedHashMap<String, Object> {
     private static final Pattern arrayIndexPattern = Pattern.compile("(.*)\\[(.*)\\]");
 
     /**
      * Constructs an empty map with the default capacity and load factor.
      */
-    public RequestMap() {
+    public SmartMap() {
         super();
     }
 
@@ -89,7 +92,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
      *
      * @param map the map whose mappings are to be placed in this map
      */
-    public RequestMap(Map<String, Object> map) {
+    public SmartMap(Map<String, Object> map) {
         super(map);
     }
 
@@ -98,7 +101,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
      *
      * @param jsonMapString the JSON string used to construct the map
      */
-    public RequestMap(String jsonMapString) {
+    public SmartMap(String jsonMapString) {
         super();
         putAll((Map<? extends String, ? extends Object>) JSONValue.parse(jsonMapString));
     }
@@ -108,7 +111,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
      * @param keyPath key path with which the specified value is to be associated.
      * @param value value to be associated with the specified key path.
      */
-    public RequestMap(String keyPath, Object value) {
+    public SmartMap(String keyPath, Object value) {
         put(keyPath, value);
     }
 
@@ -157,7 +160,7 @@ public class RequestMap extends LinkedHashMap<String, Object> {
      * @throws IllegalArgumentException  if part of the key path does not match the expected type.
      * @throws IndexOutOfBoundsException if using an array index in the key path is out of bounds.
      */
-    public RequestMap set(String keyPath, Object value) {
+    public SmartMap set(String keyPath, Object value) {
         put(keyPath, value);
         return this;
     }
