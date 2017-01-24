@@ -42,7 +42,7 @@ public class ApiExceptionSpec extends Specification {
         ApiException.getErrorCode() == null
         ApiException.getErrors() == []
         ApiException.getMessage() == null
-        ApiException.getStatus() == 0
+        ApiException.getHttpStatus() == 0
         ApiException.getCause() == null
     }
 
@@ -54,7 +54,7 @@ public class ApiExceptionSpec extends Specification {
         ApiException.getErrorCode() == null
         ApiException.getErrors() == []
         ApiException.getMessage() == "mock"
-        ApiException.getStatus() == 0
+        ApiException.getHttpStatus() == 0
         ApiException.getCause() == null
     }
 
@@ -67,7 +67,7 @@ public class ApiExceptionSpec extends Specification {
         ApiException.getErrorCode() == null
         ApiException.getErrors() == []
         ApiException.getMessage() == "mock2"
-        ApiException.getStatus() == 0
+        ApiException.getHttpStatus() == 0
         ApiException.getCause() == e
     }
 
@@ -80,7 +80,7 @@ public class ApiExceptionSpec extends Specification {
         ApiException.getErrorCode() == null
         ApiException.getErrors() == []
         ApiException.getMessage() == "java.lang.Exception: mock"
-        ApiException.getStatus() == 0
+        ApiException.getHttpStatus() == 0
         ApiException.getCause() == e
     }
 
@@ -108,7 +108,7 @@ public class ApiExceptionSpec extends Specification {
         ApiException.getErrors().size() == 1
         ApiException.getErrors() == [errorData.Errors.Error]
         ApiException.getMessage() == "Unknown Error"
-        ApiException.getStatus() == 500
+        ApiException.getHttpStatus() == 500
         ApiException.getCause() == null
 
         when:
@@ -133,7 +133,7 @@ public class ApiExceptionSpec extends Specification {
         ApiException.getErrors().size() == 1
         ApiException.getErrors() == [errorData.errors.error]
         ApiException.getMessage() == "Unknown Error"
-        ApiException.getStatus() == 500
+        ApiException.getHttpStatus() == 500
         ApiException.getCause() == null
 
         when:
@@ -166,7 +166,7 @@ public class ApiExceptionSpec extends Specification {
         ApiException.getErrors().size() == 2
         ApiException.getErrors() == errorData.Errors.Error
         ApiException.getMessage() == "Unknown Error1"
-        ApiException.getStatus() == 500
+        ApiException.getHttpStatus() == 500
         ApiException.getCause() == null
 
 
@@ -200,7 +200,7 @@ public class ApiExceptionSpec extends Specification {
         ApiException.getErrors().size() == 2
         ApiException.getErrors() == errorData.errors.error
         ApiException.getMessage() == "Unknown Error1"
-        ApiException.getStatus() == 500
+        ApiException.getHttpStatus() == 500
         ApiException.getCause() == null
 
         when:
@@ -213,7 +213,7 @@ public class ApiExceptionSpec extends Specification {
         ApiException.getErrors().size() == 0
         ApiException.getErrors() == []
         ApiException.getMessage() == null
-        ApiException.getStatus() == 500
+        ApiException.getHttpStatus() == 500
         ApiException.getCause() == null
     }
 
@@ -238,7 +238,7 @@ public class ApiExceptionSpec extends Specification {
         String describe = ApiException.describe()
 
         then:
-        describe == "ApiException: \"Unknown Error\" (status: 500, error code: SYSTEM_ERROR)"
+        describe == "ApiException: \"Unknown Error\" (httpStatus: 500, error code: SYSTEM_ERROR)"
     }
 
 }

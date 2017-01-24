@@ -41,7 +41,7 @@ public class ApiException extends Exception {
 
     private String errorCode;
     private String message;
-    private int status;
+    private int httpStatus;
     private SmartMap rawErrorData;
 
     private List<Map<? extends String, ? extends Object>> errors = new ArrayList<Map<? extends String, ? extends Object>>();
@@ -85,20 +85,20 @@ public class ApiException extends Exception {
 
 
     /**
-     * Constructs an <code>ApiException</code> with the specified details status
+     * Constructs an <code>ApiException</code> with the specified details httpStatus
      * and error data.
      *
-     * @param status    the HTTP status code
+     * @param httpStatus    the HTTP httpStatus code
      * @param errorData a map representing the error details returned by the API.  The map is
      *                  expected to contain <code>String</code> value for the key  <code>"reference"</code> and
      *                  a map containing the detailed error data for the key <code>"key"</code>.  This map in turn
      *                  is expected to contain <code>String</code> values for the keys
      *                  <code>"code"</code> and <code>"message"</code>.
      */
-    public ApiException(int status, Map<? extends String, ? extends Object> errorData) {
+    public ApiException(int httpStatus, Map<? extends String, ? extends Object> errorData) {
         super();
 
-        this.status = status;
+        this.httpStatus = httpStatus;
 
 
         Map tmpMap = (Map<String,Object>) errorData;
@@ -140,12 +140,12 @@ public class ApiException extends Exception {
     }
 
     /**
-     * Returns the HTTP status code for this exception.
+     * Returns the HTTP httpStatus code for this exception.
      *
-     * @return an integer representing the HTTP status code for this API error (or 0 if there is no status)
+     * @return an integer representing the HTTP httpStatus code for this API error (or 0 if there is no httpStatus)
      */
-    public int getStatus() {
-        return status;
+    public int getHttpStatus() {
+        return httpStatus;
     }
 
     public List<Map<? extends String, ? extends Object>> getErrors() {
@@ -181,8 +181,8 @@ public class ApiException extends Exception {
         return sb.append(getClass().getSimpleName())
                 .append(": \"")
                 .append(getMessage())
-                .append("\" (status: ")
-                .append(getStatus())
+                .append("\" (httpStatus: ")
+                .append(getHttpStatus())
                 .append(", error code: ")
                 .append(getErrorCode())
                 .append(")").toString();
