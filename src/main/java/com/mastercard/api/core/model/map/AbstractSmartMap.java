@@ -1,119 +1,19 @@
-/*
- * Copyright 2015 MasterCard International.
- *
- * Redistribution and use in source and binary forms, with or without modification, are 
- * permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list of 
- * conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of 
- * conditions and the following disclaimer in the documentation and/or other materials 
- * provided with the distribution.
- * Neither the name of the MasterCard International Incorporated nor the names of its 
- * contributors may be used to endorse or promote products derived from this software 
- * without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
- * SUCH DAMAGE.
- *
- */
+package com.mastercard.api.core.model.map;
 
-package com.mastercard.api.core.model;
-
-import org.json.simple.JSONValue;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
- * Map object that extends the LinkedHashMap map with support for insertion and retrieval of keys using special
- * key path values.  The key path support nested maps and array values.
- * <p>
- * A key path consists of a sequence of key values separated by '.' characters.  Each part of the key path
- * consists of a separate map.  For example a key path of 'k1.k2.k3' is a map containing a key 'k1' whose
- * value is a map containing a key 'k2' whose values is a map containing a key 'k3'.   A key path can also
- * contain an array notation ['number'] in which case the value of 'a' in the map is a list containing
- * a map.  For example 'a[1].k2' refers to the key value 'k2' in the 2nd element of the list referred to by
- * the value of key 'a' in the map.  If no index value is given (i.e., '[]') then a put() method appends
- * to the list while a get() method returns the last value in the list.
- * <p>
- * When using the array index notation the value inserted must be a map; inserting values is not permitted.
- * For example using <code>put("a[3].k1", 1)</code> is permitted while <code>put("a[3]", 1)</code> results
- * in an <code>IllegalArgumentException</code>.
- * <p>
- * <p>
- * Examples:
- * <pre>
- * RequestMap map  = new RequestMap();
- * map.put("card.number", "5555555555554444");
- * map.put("card.cvc", "123");
- * map.put("card.expMonth", 5);
- * map.put("card.expYear", 15);
- * map.put("currency", "USD");
- * map.put("amount", 1234);
- * </pre>
- * There is also an set() method which is similar to put() but returns the map providing a fluent map builder.
- * <pre>
- * RequestMap map = new RequestMap()
- *      .set("card.number", "5555555555554444")
- *      .set("card.cvc", "123")
- *      .set("card.expMonth", 5)
- *      .set("card.expYear", 15)
- *      .set("currency", "USD")
- *      .set("amount", 1234);
- * </pre>
- * Both of these examples construct a RequestMap containing the keys 'currency', 'amount' and 'card'.  The
- * value for the 'card' key is a map containing the key 'number', 'cvc', 'expMonth' and 'expYear'.
+ * Created by andrearizzini on 25/01/2017.
  */
-public class SmartMap extends LinkedHashMap<String, Object> {
+abstract class AbstractSmartMap implements Map<String,Object>,Cloneable,Serializable {
+
     private static final Pattern arrayIndexPattern = Pattern.compile("(.*)\\[(.*)\\]");
-
-    /**
-     * Constructs an empty map with the default capacity and load factor.
-     */
-    public SmartMap() {
-        super();
-    }
-
-    /**
-     * Constructs a map with the same mappings as in the specifed map.
-     *
-     * @param map the map whose mappings are to be placed in this map
-     */
-    public SmartMap(Map<String, Object> map) {
-        super(map);
-    }
-
-    /**
-     * Consturcts a map based of the speficied JSON string.
-     *
-     * @param jsonMapString the JSON string used to construct the map
-     */
-    public SmartMap(String jsonMapString) {
-        super();
-        putAll((Map<? extends String, ? extends Object>) JSONValue.parse(jsonMapString));
-    }
-
-    /**
-     * Constructs a map with an initial mapping of keyPath to value.
-     * @param keyPath key path with which the specified value is to be associated.
-     * @param value value to be associated with the specified key path.
-     */
-    public SmartMap(String keyPath, Object value) {
-        put(keyPath, value);
-    }
+    protected Map<String,Object> store = null;
+    protected abstract Map<String,Object> createMap();
+    protected abstract Map<String, Object> createMap(Map<String,Object> map);
 
     /**
      * Associates the specified value to the specified key path.
@@ -151,21 +51,6 @@ public class SmartMap extends LinkedHashMap<String, Object> {
     }
 
     /**
-     * Associates the specified value to the specified key path and returns a reference to
-     * this map.
-     *
-     * @param keyPath key path to which the specified value is to be associated.
-     * @param value   the value which is to be associated with the specified key path.
-     * @return this map
-     * @throws IllegalArgumentException  if part of the key path does not match the expected type.
-     * @throws IndexOutOfBoundsException if using an array index in the key path is out of bounds.
-     */
-    public SmartMap set(String keyPath, Object value) {
-        put(keyPath, value);
-        return this;
-    }
-
-    /**
      * This is the private method which is used internally to create the map / lit structure if
      * it doesn't exists. For example the User.Address[0].Name will invoke 3 times this method, one
      * for User, one for Address[0] and one for Name
@@ -183,18 +68,18 @@ public class SmartMap extends LinkedHashMap<String, Object> {
             //this could return any object
             if (map == null) {
                 if (!hasValue && createSubObject) {
-                    Map<String,Object> tmpMap = new LinkedHashMap();
-                    super.put(key, tmpMap);
+                    Map<String,Object> tmpMap = createMap();
+                    store.put(key, tmpMap);
                     return  tmpMap;
                 }
                 else {
-                    super.put(key, value);
+                    store.put(key, value);
                     return value;
                 }
 
             } else {
                 if (!hasValue && createSubObject) {
-                    Map<String,Object> tmpMap = new LinkedHashMap();
+                    Map<String,Object> tmpMap = createMap();
                     map.put(key, tmpMap);
                     return tmpMap;
                 }
@@ -211,10 +96,10 @@ public class SmartMap extends LinkedHashMap<String, Object> {
             Object tmpObject = null;
 
             if (map == null) {
-                tmpObject = super.get(keyName);  // get the list from the map
+                tmpObject = store.get(keyName);  // get the list from the map
                 if (tmpObject == null) {
                     tmpObject = new ArrayList<Object>();
-                    super.put(keyName, tmpObject);
+                    store.put(keyName, tmpObject);
 
                 }
             } else {
@@ -243,7 +128,7 @@ public class SmartMap extends LinkedHashMap<String, Object> {
                 tmpList.add(index, value);
                 return value;
             } else {
-                Map<String,Object> tmpMap = new LinkedHashMap<String, Object>();
+                Map<String,Object> tmpMap = createMap();
                 tmpList.add(index, tmpMap);
                 return tmpMap;
             }
@@ -258,7 +143,7 @@ public class SmartMap extends LinkedHashMap<String, Object> {
      * @return
      * @throws IllegalArgumentException
      */
-    private Object _get(String key, Map<String, Object> map) throws IllegalArgumentException {
+    private Object _get(String key, Map<String,Object> map) throws IllegalArgumentException {
         return _get(key, map, true);
     }
 
@@ -270,12 +155,12 @@ public class SmartMap extends LinkedHashMap<String, Object> {
      * @return
      * @throws IllegalArgumentException
      */
-    private Object _get(String key, Map<String, Object> map, boolean retrievalMode) throws IllegalArgumentException {
+    private Object _get(String key, Map<String,Object> map, boolean retrievalMode) throws IllegalArgumentException {
         Matcher m = arrayIndexPattern.matcher(key);
         if (!m.matches()) {
             //this could return any object
             if (map == null) {
-                return super.get(key);
+                return store.get(key);
             } else {
                 return map.get(key);
             }
@@ -287,7 +172,7 @@ public class SmartMap extends LinkedHashMap<String, Object> {
 
             Object tmpObject = null;
             if (map == null) {
-                tmpObject = super.get(keyName);  // get the list from the map
+                tmpObject = store.get(keyName);  // get the list from the map
             } else {
                 tmpObject = map.get(keyName);
             }
@@ -333,7 +218,7 @@ public class SmartMap extends LinkedHashMap<String, Object> {
         if (!m.matches()) {
             //this could return any object
             if (map == null) {
-                return super.remove(key);
+                return store.remove(key);
             } else {
                 return map.remove(key);
             }
@@ -344,7 +229,7 @@ public class SmartMap extends LinkedHashMap<String, Object> {
             // gets the key to retrieve from the matcher
             Object tmpObject = null;
             if (map == null) {
-                tmpObject = super.get(keyName);
+                tmpObject = store.get(keyName);
             }  else {
                 tmpObject = map.get(keyName);  // get the list from the map
             }
@@ -445,6 +330,12 @@ public class SmartMap extends LinkedHashMap<String, Object> {
         return _remove(keys[keys.length - 1], map);
     }
 
+    /**
+     *
+     * @param keyPath
+     * @return
+     * @throws IllegalArgumentException
+     */
     private Map<String, Object> findLastMapInKeyPath(String keyPath) throws  IllegalArgumentException {
         String[] keys = ((String) keyPath).split("\\.");
 
@@ -465,4 +356,80 @@ public class SmartMap extends LinkedHashMap<String, Object> {
         return map;
     }
 
+
+    protected Map<String,Object> parseMap(Map<String, Object> map) {
+        Map<String,Object> result = createMap();
+        for (Map.Entry<String,Object> entry : map.entrySet()) {
+            if (entry.getValue() instanceof Map) {
+                //recursive add map
+                result.put(entry.getKey(), parseMap((Map<String,Object>) entry.getValue()));
+            } else if (entry.getValue() instanceof List) {
+                //recursive add list
+                result.put(entry.getKey(), parseList((List<Object>) entry.getValue()));
+            } else {
+                // add normal value
+                result.put(entry.getKey(), entry.getValue());
+            }
+
+        }
+        return result;
+
+    }
+
+    private List<Object> parseList(List<Object> list) {
+        List<Object> result = new ArrayList();
+        for (Object o : list) {
+            if (o instanceof Map) {
+                result.add(parseMap((Map) o));
+            } else if (o instanceof List) {
+                result.add(parseList( (List) o));
+            } else {
+                result.add(o);
+            }
+        }
+        return result;
+    }
+
+
+
+
+    @Override
+    public int size() {
+        return store.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return store.isEmpty();
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        return containsValue(value);
+    }
+
+    @Override
+    public void putAll(Map<? extends String, ?> m) {
+        store.putAll(m);
+    }
+
+    @Override
+    public void clear() {
+        store.clear();
+    }
+
+    @Override
+    public Set<String> keySet() {
+        return store.keySet();
+    }
+
+    @Override
+    public Collection<Object> values() {
+        return store.values();
+    }
+
+    @Override
+    public Set<Entry<String, Object>> entrySet() {
+        return store.entrySet();
+    }
 }

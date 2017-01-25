@@ -46,9 +46,6 @@ public abstract class BaseObject extends RequestMap {
 
     protected abstract OperationMetadata getOperationMetadata();
 
-
-
-
     protected static BaseObject executeOperation(final Authentication authentication, String operationUUID, final BaseObject value)
             throws ApiException {
 
@@ -78,9 +75,13 @@ public abstract class BaseObject extends RequestMap {
 
         for (Object o : (List) rawList) {
             if (o instanceof Map) {
-                T item = (T) template.clone();
-                item.putAll((Map<? extends String, ? extends Object>) o);
-                val.add(item);
+                try {
+                    T item = (T) template.getClass().newInstance();
+                    item.putAll((Map<? extends String, ? extends Object>) o);
+                    val.add(item);
+                } catch (Exception e) {
+                    //invalid cast exception, however this should never happen
+                }
             }
         }
 

@@ -505,7 +505,7 @@ class ApiControllerSpec extends Specification {
         ((HttpPost) httpRequestBase).method == "POST"
         ((HttpPost) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         ((HttpPost) httpRequestBase).getEntity().content.text == JSONValue.toJSONString(objectMap.subMap(['a','b','id']))
-        assertHeaders(httpRequestBase, headerMap);
+        assertHeaders(httpRequestBase, headerMap)
         mockBaseObject.get("x-sdk-mock-header") == null
 
         when: "getRequest for update"
@@ -517,7 +517,7 @@ class ApiControllerSpec extends Specification {
         ((HttpPut) httpRequestBase).method == "PUT"
         ((HttpPut) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         ((HttpPut) httpRequestBase).getEntity().content.text == JSONValue.toJSONString(objectMap.subMap(['a','b','id']))
-        assertHeaders(httpRequestBase, headerMap);
+        assertHeaders(httpRequestBase, headerMap)
         mockBaseObject.get("x-sdk-mock-header") == null
     }
 
@@ -525,12 +525,12 @@ class ApiControllerSpec extends Specification {
         given:
         Map<String, Object> objectMap = [a: "a", b: "b", id: 1, 'x-sdk-mock-header': "x-sdk-mock-value"]
         Map<String, Object> headerMap = ['x-sdk-mock-header': "x-sdk-mock-value"]
+
         MockBaseObject mockBaseObject = new MockBaseObject(Action.read, objectMap)
+        MockBaseObject clonedObject = new MockBaseObject(Action.read, objectMap);
 
         ApiController apiController = new ApiController()
 
-
-        MockBaseObject clonedObject = (MockBaseObject) mockBaseObject.clone()
         ApiController.subMap(clonedObject, clonedObject.getOperationConfig().getHeaderParams());
         URI uri = apiController.getURI(clonedObject.getOperationConfig(), clonedObject.getOperationMetadata(), clonedObject)
 
