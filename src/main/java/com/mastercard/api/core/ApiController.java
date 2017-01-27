@@ -28,6 +28,7 @@
 package com.mastercard.api.core;
 
 import com.mastercard.api.core.exception.*;
+import com.mastercard.api.core.http.HttpBuilder;
 import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.security.CryptographyInterceptor;
@@ -68,7 +69,7 @@ public class ApiController {
 
     private static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
-    private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
+
     public  static final String ENVIRONMENT_IDENTIFIER = "#env";
 
     /**
@@ -464,64 +465,9 @@ public class ApiController {
         return list;
     }
 
-    private static String[] split(final String s) {
-        if (TextUtils.isBlank(s)) {
-            return null;
-        }
-        return s.split(" *, *");
-    }
 
     CloseableHttpClient createHttpClient() {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        httpClientBuilder.useSystemProperties();
-        //arizzini: disabling cookie manager... we don't use cookies. REST are stateless.
-        httpClientBuilder.disableCookieManagement();
-
-        // TLSv1.1 and TLSv1.2 are disabled by default in Java 7, we want to enforce TLSv1.2
-        final String[] supportedProtocols = SUPPORTED_TLS;
-        final String[] supportedCipherSuites = split(System.getProperty("https.cipherSuites"));
-
-        if (ApiConfig.ignoreSSLErrors()) {
-            try {
-                SSLContext sslContext = SSLContext.getInstance("SSL");
-                // set up a TrustManager that trusts everything
-                sslContext.init(null, new TrustManager[]{new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(X509Certificate[] certs,
-                                                   String authType) {
-                    }
-
-                    public void checkServerTrusted(X509Certificate[] certs,
-                                                   String authType) {
-                    }
-                }}, new SecureRandom());
-
-                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                        sslContext,
-                        supportedProtocols,
-                        supportedCipherSuites,
-                        SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-                httpClientBuilder.setSSLSocketFactory(sslsf);
-
-                return httpClientBuilder.build();
-
-            } catch (Exception e) {
-                //don't worry we simply fall back on the original implementation if this doesn't work..
-            }
-        }
-
-        //arizzini: fallback
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-        (SSLSocketFactory) SSLSocketFactory.getDefault(),
-        supportedProtocols,
-        supportedCipherSuites,
-        SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-        httpClientBuilder.setSSLSocketFactory(sslsf);
-
-        return httpClientBuilder.build();
+        return HttpBuilder.getInstance().build();
     }
 
     ResponseHandler<ApiControllerResponse> createResponseHandler() {
