@@ -42,34 +42,34 @@ public class ApiException extends Exception {
 
     private String source;
     private String reasonCode;
-    private String message;
+    private String description;
     private int httpStatus;
     private CaseInsensitiveSmartMap rawErrorData;
 
     private List<Map<? extends String, ? extends Object>> errors = new ArrayList<Map<? extends String, ? extends Object>>();
 
     /**
-     * Constructs an <code>ApiException</code> with no detail message.
+     * Constructs an <code>ApiException</code> with no detail description.
      */
     public ApiException() {
         super();
     }
 
     /**
-     * Constructs an <code>ApiException</code> with the specified detail message.
+     * Constructs an <code>ApiException</code> with the specified detail description.
      *
-     * @param s the detail message.
+     * @param s the detail description.
      */
     public ApiException(String s) {
         super(s);
     }
 
     /**
-     * Constructs an <code>ApiException</code> with the specified detail message
+     * Constructs an <code>ApiException</code> with the specified detail description
      * and cause.
      *
-     * @param s     the detail message.
-     * @param cause the detail message.
+     * @param s     the detail description.
+     * @param cause the detail description.
      */
     public ApiException(String s, Throwable cause) {
         super(s, cause);
@@ -78,7 +78,7 @@ public class ApiException extends Exception {
     /**
      * Constructs an <code>ApiCommunicationException</code> with the specified cause.
      *
-     * @param cause the detail message.
+     * @param cause the detail description.
      */
     public ApiException(Throwable cause) {
         super(cause);
@@ -95,7 +95,7 @@ public class ApiException extends Exception {
      *                  expected to contain <code>String</code> value for the key  <code>"reference"</code> and
      *                  a map containing the detailed error data for the key <code>"key"</code>.  This map in turn
      *                  is expected to contain <code>String</code> values for the keys
-     *                  <code>"code"</code> and <code>"message"</code>.
+     *                  <code>"code"</code> and <code>"description"</code>.
      */
     public ApiException(int httpStatus, Map<? extends String, ? extends Object> errorData) {
         super();
@@ -124,9 +124,15 @@ public class ApiException extends Exception {
         // Use the first error
         if (errors.size() > 0) {
             Map<? extends String, ? extends Object> error = errors.get(0);
-            source = (String) error.get("Source");
-            reasonCode = (String) error.get("ReasonCode");
-            message = (String) error.get("Description");
+            if (error.containsKey("Source")) {
+                source = error.get("Source").toString();
+            }
+            if (error.containsKey("ReasonCode")) {
+                reasonCode = error.get("ReasonCode").toString();
+            }
+            if (error.containsKey("Description")) {
+                description = error.get("Description").toString();
+            }
         }
     }
 
@@ -165,18 +171,18 @@ public class ApiException extends Exception {
     }
 
     /**
-     * Returns the string detail message for this exception.
+     * Returns the string detail description for this exception.
      *
-     * @return a string representing the API error code or the message detail used to construct
+     * @return a string representing the API error code or the description detail used to construct
      * the exception (which may be <code>null</code>).
      */
     @Override
     public String getMessage() {
-        if (message == null) {
+        if (description == null) {
             return super.getMessage();
         }
 
-        return message;
+        return description;
     }
 
     /**
