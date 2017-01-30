@@ -38,7 +38,10 @@ import java.util.Map;
  */
 public class ApiException extends Exception {
 
-    private String errorCode;
+
+
+    private String source;
+    private String reasonCode;
     private String message;
     private int httpStatus;
     private CaseInsensitiveSmartMap rawErrorData;
@@ -121,7 +124,8 @@ public class ApiException extends Exception {
         // Use the first error
         if (errors.size() > 0) {
             Map<? extends String, ? extends Object> error = errors.get(0);
-            errorCode = (String) error.get("ReasonCode");
+            source = (String) error.get("Source");
+            reasonCode = (String) error.get("ReasonCode");
             message = (String) error.get("Description");
         }
     }
@@ -131,8 +135,8 @@ public class ApiException extends Exception {
      *
      * @return a string representing the API error code (which may be <code>null</code>).
      */
-    public String getErrorCode() {
-        return errorCode;
+    public String getReasonCode() {
+        return reasonCode;
     }
 
     /**
@@ -142,6 +146,14 @@ public class ApiException extends Exception {
      */
     public int getHttpStatus() {
         return httpStatus;
+    }
+
+    /**
+     * Returns the Error source
+     * @return
+     */
+    public String getSource() {
+        return source;
     }
 
     public List<Map<? extends String, ? extends Object>> getErrors() {
@@ -179,8 +191,10 @@ public class ApiException extends Exception {
                 .append(getMessage())
                 .append("\" (httpStatus: ")
                 .append(getHttpStatus())
-                .append(", error code: ")
-                .append(getErrorCode())
+                .append(", reasonCode: ")
+                .append(getReasonCode())
+                .append(", source: ")
+                .append(getSource())
                 .append(")").toString();
     }
 }
