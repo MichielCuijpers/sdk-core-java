@@ -169,13 +169,13 @@ public class CustomHttpClientBuilder {
         builder = HttpClientBuilder.create();
     }
 
-//    /**
-//     * Assigns {@link HttpRequestExecutor} instance.
-//     */
-//    public final CustomHttpClientBuilder setRequestExecutor(final HttpRequestExecutor requestExec) {
-//        builder.setRequestExecutor(requestExec);
-//        return this;
-//    }
+    /**
+     * Assigns {@link HttpRequestExecutor} instance.
+     */
+    final CustomHttpClientBuilder setRequestExecutor(final HttpRequestExecutor requestExec) {
+        builder.setRequestExecutor(requestExec);
+        return this;
+    }
 
     /**
      * Assigns {@link javax.net.ssl.HostnameVerifier} instance.
@@ -192,19 +192,19 @@ public class CustomHttpClientBuilder {
         return this;
     }
 
-//    /**
-//     * Assigns file containing public suffix matcher. Instances of this class can be created
-//     * with {@link org.apache.http.conn.util.PublicSuffixMatcherLoader}.
-//     *
-//     * @see org.apache.http.conn.util.PublicSuffixMatcher
-//     * @see org.apache.http.conn.util.PublicSuffixMatcherLoader
-//     *
-//     *   @since 4.4
-//     */
-//    public final CustomHttpClientBuilder setPublicSuffixMatcher(final PublicSuffixMatcher publicSuffixMatcher) {
-//        builder.setPublicSuffixMatcher(publicSuffixMatcher);
-//        return this;
-//    }
+    /**
+     * Assigns file containing public suffix matcher. Instances of this class can be created
+     * with {@link org.apache.http.conn.util.PublicSuffixMatcherLoader}.
+     *
+     * @see org.apache.http.conn.util.PublicSuffixMatcher
+     * @see org.apache.http.conn.util.PublicSuffixMatcherLoader
+     *
+     *   @since 4.4
+     */
+    final CustomHttpClientBuilder setPublicSuffixMatcher(final PublicSuffixMatcher publicSuffixMatcher) {
+        builder.setPublicSuffixMatcher(publicSuffixMatcher);
+        return this;
+    }
 
 
 //    /**
@@ -215,7 +215,7 @@ public class CustomHttpClientBuilder {
 //     *   org.apache.http.conn.socket.LayeredConnectionSocketFactory)} methods.
 //     * </p>
 //     */
-//    final CustomHttpClientBuilder setSSLContext(final SSLContext sslContext) {
+//    CustomHttpClientBuilder setSSLContext(final SSLContext sslContext) {
 //        builder.setSSLContext(sslContext);
 //        return this;
 //    }
@@ -227,7 +227,7 @@ public class CustomHttpClientBuilder {
 //     *   org.apache.http.conn.HttpClientConnectionManager)} method.
 //     * </p>
 //     */
-//    final CustomHttpClientBuilder setSSLSocketFactory(
+//    CustomHttpClientBuilder setSSLSocketFactory(
 //            final LayeredConnectionSocketFactory sslSocketFactory) {
 //        builder.setSSLSocketFactory(sslSocketFactory);
 //        return this;
@@ -342,15 +342,15 @@ public class CustomHttpClientBuilder {
         return this;
     }
 
-//    /**
-//     * Assigns {@link AuthenticationStrategy} instance for target
-//     * host authentication.
-//     */
-//    public final CustomHttpClientBuilder setTargetAuthenticationStrategy(
-//            final AuthenticationStrategy targetAuthStrategy) {
-//        this.builder.setTargetAuthenticationStrategy(targetAuthStrategy);
-//        return this;
-//    }
+    /**
+     * Assigns {@link AuthenticationStrategy} instance for target
+     * host authentication.
+     */
+    public CustomHttpClientBuilder setTargetAuthenticationStrategy(
+            final AuthenticationStrategy targetAuthStrategy) {
+        this.builder.setTargetAuthenticationStrategy(targetAuthStrategy);
+        return this;
+    }
 
     /**
      * Assigns {@link AuthenticationStrategy} instance for proxy
@@ -362,17 +362,17 @@ public class CustomHttpClientBuilder {
         return this;
     }
 
-//    /**
-//     * Assigns {@link UserTokenHandler} instance.
-//     * <p>
-//     * Please note this value can be overridden by the {@link #disableConnectionState()}
-//     * method.
-//     * </p>
-//     */
-//    public final CustomHttpClientBuilder setUserTokenHandler(final UserTokenHandler userTokenHandler) {
-//        this.builder.setUserTokenHandler(userTokenHandler);
-//        return this;
-//    }
+    /**
+     * Assigns {@link UserTokenHandler} instance.
+     * <p>
+     * Please note this value can be overridden by the {@link #disableConnectionState()}
+     * method.
+     * </p>
+     */
+    final CustomHttpClientBuilder setUserTokenHandler(final UserTokenHandler userTokenHandler) {
+        this.builder.setUserTokenHandler(userTokenHandler);
+        return this;
+    }
 
     /**
      * Disables connection state tracking.
@@ -391,28 +391,86 @@ public class CustomHttpClientBuilder {
         return this;
     }
 
-//    /**
-//     * Assigns {@code User-Agent} value.
-//     * <p>
-//     * Please note this value can be overridden by the {@link #setHttpProcessor(
-//     * org.apache.http.protocol.HttpProcessor)} method.
-//     * </p>
-//     */
-//    public final CustomHttpClientBuilder setUserAgent(final String userAgent) {
-//        this.builder.setUserAgent(userAgent);
-//        return this;
-//    }
+    /**
+     * Assigns {@code User-Agent} value.
+     * <p>
+     * Please note this value can be overridden by the {@link #setHttpProcessor(
+     * org.apache.http.protocol.HttpProcessor)} method.
+     * </p>
+     */
+    final CustomHttpClientBuilder setUserAgent(final String userAgent) {
+        this.builder.setUserAgent(userAgent);
+        return this;
+    }
 
-//    /**
-//     * Disables state (cookie) management.
-//     * <p>
-//     * Please note this value can be overridden by the {@link #setHttpProcessor(
-//     * org.apache.http.protocol.HttpProcessor)} method.
-//     */
-//    final CustomHttpClientBuilder disableCookieManagement() {
-//        this.builder.disableCookieManagement();
-//        return this;
-//    }
+    /**
+     * Assigns default request header values.
+     * <p>
+     * Please note this value can be overridden by the {@link #setHttpProcessor(
+     * org.apache.http.protocol.HttpProcessor)} method.
+     * </p>
+     */
+    final CustomHttpClientBuilder setDefaultHeaders(final Collection<? extends Header> defaultHeaders) {
+        this.builder.setDefaultHeaders((defaultHeaders));
+        return this;
+    }
+
+    /**
+     * Adds this protocol interceptor to the head of the protocol processing list.
+     * <p>
+     * Please note this value can be overridden by the {@link #setHttpProcessor(
+     * org.apache.http.protocol.HttpProcessor)} method.
+     * </p>
+     */
+    final CustomHttpClientBuilder addInterceptorFirst(final HttpResponseInterceptor itcp) {
+        this.builder.addInterceptorFirst(itcp);
+        return this;
+    }
+
+    /**
+     * Adds this protocol interceptor to the tail of the protocol processing list.
+     * <p>
+     * Please note this value can be overridden by the {@link #setHttpProcessor(
+     * org.apache.http.protocol.HttpProcessor)} method.
+     * </p>
+     */
+    final CustomHttpClientBuilder addInterceptorLast(final HttpResponseInterceptor itcp) {
+        this.builder.addInterceptorLast(itcp);
+        return this;
+    }
+
+    /**
+     * Adds this protocol interceptor to the head of the protocol processing list.
+     * <p>
+     * Please note this value can be overridden by the {@link #setHttpProcessor(
+     * org.apache.http.protocol.HttpProcessor)} method.
+     */
+    final CustomHttpClientBuilder addInterceptorFirst(final HttpRequestInterceptor itcp) {
+        this.builder.addInterceptorFirst(itcp);
+        return this;
+    }
+
+    /**
+     * Adds this protocol interceptor to the tail of the protocol processing list.
+     * <p>
+     * Please note this value can be overridden by the {@link #setHttpProcessor(
+     * org.apache.http.protocol.HttpProcessor)} method.
+     */
+    final CustomHttpClientBuilder addInterceptorLast(final HttpRequestInterceptor itcp) {
+        this.builder.addInterceptorLast(itcp);
+        return this;
+    }
+
+    /**
+     * Disables state (cookie) management.
+     * <p>
+     * Please note this value can be overridden by the {@link #setHttpProcessor(
+     * org.apache.http.protocol.HttpProcessor)} method.
+     */
+    public final CustomHttpClientBuilder disableCookieManagement() {
+        this.builder.disableCookieManagement();
+        return this;
+    }
 
     /**
      * Disables automatic content decompression.
@@ -436,13 +494,13 @@ public class CustomHttpClientBuilder {
         return this;
     }
 
-//    /**
-//     * Assigns {@link HttpProcessor} instance.
-//     */
-//    public final CustomHttpClientBuilder setHttpProcessor(final HttpProcessor httpprocessor) {
-//        this.builder.setHttpProcessor(httpprocessor);
-//        return this;
-//    }
+    /**
+     * Assigns {@link HttpProcessor} instance.
+     */
+    final CustomHttpClientBuilder setHttpProcessor(final HttpProcessor httpprocessor) {
+        this.builder.setHttpProcessor(httpprocessor);
+        return this;
+    }
 
     /**
      * Assigns {@link DnsResolver} instance.
@@ -538,80 +596,80 @@ public class CustomHttpClientBuilder {
         return this;
     }
 
-//    /**
-//     * Assigns default {@link CookieStore} instance which will be used for
-//     * request execution if not explicitly set in the client execution context.
-//     */
-//    final CustomHttpClientBuilder setDefaultCookieStore(final CookieStore cookieStore) {
-//        this.builder.setDefaultCookieStore( cookieStore );
-//        return this;
-//    }
+    /**
+     * Assigns default {@link CookieStore} instance which will be used for
+     * request execution if not explicitly set in the client execution context.
+     */
+    final CustomHttpClientBuilder setDefaultCookieStore(final CookieStore cookieStore) {
+        this.builder.setDefaultCookieStore( cookieStore );
+        return this;
+    }
 
-//    /**
-//     * Assigns default {@link CredentialsProvider} instance which will be used
-//     * for request execution if not explicitly set in the client execution
-//     * context.
-//     */
-//    public final CustomHttpClientBuilder setDefaultCredentialsProvider(
-//            final CredentialsProvider credentialsProvider) {
-//        this.builder.setDefaultCredentialsProvider ( credentialsProvider);
-//        return this;
-//    }
+    /**
+     * Assigns default {@link CredentialsProvider} instance which will be used
+     * for request execution if not explicitly set in the client execution
+     * context.
+     */
+    public final CustomHttpClientBuilder setDefaultCredentialsProvider(
+            final CredentialsProvider credentialsProvider) {
+        this.builder.setDefaultCredentialsProvider ( credentialsProvider);
+        return this;
+    }
 
-//    /**
-//     * Assigns default {@link org.apache.http.auth.AuthScheme} registry which will
-//     * be used for request execution if not explicitly set in the client execution
-//     * context.
-//     */
-//    public final CustomHttpClientBuilder setDefaultAuthSchemeRegistry(
-//            final Lookup<AuthSchemeProvider> authSchemeRegistry) {
-//        this.builder.setDefaultAuthSchemeRegistry (authSchemeRegistry);
-//        return this;
-//    }
+    /**
+     * Assigns default {@link org.apache.http.auth.AuthScheme} registry which will
+     * be used for request execution if not explicitly set in the client execution
+     * context.
+     */
+    public final CustomHttpClientBuilder setDefaultAuthSchemeRegistry(
+            final Lookup<AuthSchemeProvider> authSchemeRegistry) {
+        this.builder.setDefaultAuthSchemeRegistry (authSchemeRegistry);
+        return this;
+    }
 
-//    /**
-//     * Assigns default {@link org.apache.http.cookie.CookieSpec} registry which will
-//     * be used for request execution if not explicitly set in the client execution
-//     * context.
-//     *
-//     * @see org.apache.http.impl.client.CookieSpecRegistries
-//     *
-//     */
-//    public final CustomHttpClientBuilder setDefaultCookieSpecRegistry(
-//            final Lookup<CookieSpecProvider> cookieSpecRegistry) {
-//        this.builder.setDefaultCookieSpecRegistry (cookieSpecRegistry);
-//        return this;
-//    }
+    /**
+     * Assigns default {@link org.apache.http.cookie.CookieSpec} registry which will
+     * be used for request execution if not explicitly set in the client execution
+     * context.
+     *
+     * @see org.apache.http.impl.client.CookieSpecRegistries
+     *
+     */
+    public final CustomHttpClientBuilder setDefaultCookieSpecRegistry(
+            final Lookup<CookieSpecProvider> cookieSpecRegistry) {
+        this.builder.setDefaultCookieSpecRegistry (cookieSpecRegistry);
+        return this;
+    }
 
 
-//    /**
-//     * Assigns a map of {@link org.apache.http.client.entity.InputStreamFactory}s
-//     * to be used for automatic content decompression.
-//     */
-//    public final CustomHttpClientBuilder setContentDecoderRegistry(
-//            final Map<String, InputStreamFactory> contentDecoderMap) {
-//        this.builder.setContentDecoderRegistry( contentDecoderMap);
-//        return this;
-//    }
+    /**
+     * Assigns a map of {@link org.apache.http.client.entity.InputStreamFactory}s
+     * to be used for automatic content decompression.
+     */
+    public final CustomHttpClientBuilder setContentDecoderRegistry(
+            final Map<String, InputStreamFactory> contentDecoderMap) {
+        this.builder.setContentDecoderRegistry( contentDecoderMap);
+        return this;
+    }
 
-//    /**
-//     * Assigns default {@link RequestConfig} instance which will be used
-//     * for request execution if not explicitly set in the client execution
-//     * context.
-//     */
-//    public final CustomHttpClientBuilder setDefaultRequestConfig(final RequestConfig config) {
-//        this.builder.setDefaultRequestConfig(config);
-//        return this;
-//    }
-//
-//    /**
-//     * Use system properties when creating and configuring default
-//     * implementations.
-//     */
-//    public final CustomHttpClientBuilder useSystemProperties() {
-//        this.builder.useSystemProperties();
-//        return this;
-//    }
+    /**
+     * Assigns default {@link RequestConfig} instance which will be used
+     * for request execution if not explicitly set in the client execution
+     * context.
+     */
+    public final CustomHttpClientBuilder setDefaultRequestConfig(final RequestConfig config) {
+        this.builder.setDefaultRequestConfig(config);
+        return this;
+    }
+
+    /**
+     * Use system properties when creating and configuring default
+     * implementations.
+     */
+    public final CustomHttpClientBuilder useSystemProperties() {
+        this.builder.useSystemProperties();
+        return this;
+    }
 
     /**
      * Makes this instance of HttpClient proactively evict expired connections from the
