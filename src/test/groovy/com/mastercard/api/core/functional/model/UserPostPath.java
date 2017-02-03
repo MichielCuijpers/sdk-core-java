@@ -96,8 +96,7 @@ public class UserPostPath extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostPath> list()
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(null, "79f2c461-cd66-42bf-a343-77ec624d9531", new UserPostPath(), null);
     }
@@ -121,8 +120,7 @@ public class UserPostPath extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostPath> list(Authentication auth)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(auth, "79f2c461-cd66-42bf-a343-77ec624d9531", new UserPostPath(), null);
     }
@@ -146,8 +144,7 @@ public class UserPostPath extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostPath> list(RequestMap criteria)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(null, "79f2c461-cd66-42bf-a343-77ec624d9531", new UserPostPath(), criteria);
     }
@@ -172,8 +169,7 @@ public class UserPostPath extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostPath> list(Authentication auth, RequestMap criteria)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(auth, "79f2c461-cd66-42bf-a343-77ec624d9531", new UserPostPath(), criteria);
     }

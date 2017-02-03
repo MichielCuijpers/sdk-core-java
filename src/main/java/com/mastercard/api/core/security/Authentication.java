@@ -27,8 +27,8 @@
 
 package com.mastercard.api.core.security;
 
+import com.mastercard.api.core.exception.SdkException;
 import com.mastercard.api.core.model.HttpMethod;
-import com.mastercard.api.core.exception.MessageSignerException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 
@@ -46,7 +46,7 @@ public interface Authentication {
      * @param body
      * @param message
      * @return
-     * @throws MessageSignerException
+     * @throws SdkException
      */
-    HttpRequestBase sign(URI uri, HttpMethod httpMethod, ContentType contentType, Object body, HttpRequestBase message) throws MessageSignerException;
+    HttpRequestBase sign(URI uri, HttpMethod httpMethod, ContentType contentType, Object body, HttpRequestBase message) throws SdkException;
 }

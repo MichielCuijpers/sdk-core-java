@@ -1,26 +1,26 @@
 /*
  * Copyright 2015 MasterCard International.
  *
- * Redistribution and use in source and binary forms, with or without modification, are 
+ * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
  *
- * Redistributions of source code must retain the above copyright notice, this list of 
+ * Redistributions of source code must retain the above copyright notice, this list of
  * conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of 
- * conditions and the following disclaimer in the documentation and/or other materials 
+ * Redistributions in binary form must reproduce the above copyright notice, this list of
+ * conditions and the following disclaimer in the documentation and/or other materials
  * provided with the distribution.
- * Neither the name of the MasterCard International Incorporated nor the names of its 
- * contributors may be used to endorse or promote products derived from this software 
+ * Neither the name of the MasterCard International Incorporated nor the names of its
+ * contributors may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
  */
@@ -28,6 +28,7 @@
 package com.mastercard.api.core;
 
 import com.mastercard.api.core.exception.*;
+import com.mastercard.api.core.http.HttpBuilder;
 import com.mastercard.api.core.model.*;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.security.CryptographyInterceptor;
@@ -68,7 +69,7 @@ public class ApiController {
 
     private static String USER_AGENT = null; // User agent string sent with requests.
     private static String HEADER_SEPARATOR = ";";
-    private static String[] SUPPORTED_TLS = new String[] { "TLSv1.1", "TLSv1.2" };
+
     public  static final String ENVIRONMENT_IDENTIFIER = "#env";
 
     /**
@@ -100,8 +101,12 @@ public class ApiController {
         return s;
     }
 
-    String urlEncode(Object stringToEncode) throws UnsupportedEncodingException {
-        return URLEncoder.encode(stringToEncode.toString(), "UTF-8");
+    String urlEncode(Object stringToEncode)  {
+        try {
+            return URLEncoder.encode(stringToEncode.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return stringToEncode.toString();
+        }
     }
 
     /**
@@ -140,8 +145,7 @@ public class ApiController {
         return tmpResult;
     }
 
-    private URI getURI(OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)
-            throws UnsupportedEncodingException, IllegalStateException {
+    private URI getURI(OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject) {
         URI uri;
 
         //arizzini: if host config or environment config changes betweeen calls
@@ -231,8 +235,7 @@ public class ApiController {
     }
 
     private HttpRequestBase getRequest(Authentication authentication, OperationConfig operationConfig,
-            OperationMetadata operationMetadata, RequestMap requestObject)
-            throws InvalidRequestException, MessageSignerException, NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, IllegalBlockSizeException {
+            OperationMetadata operationMetadata, RequestMap requestObject) {
 
 
 
@@ -250,7 +253,7 @@ public class ApiController {
         // Try set default authentication if no authentication provided
         if (authentication == null) {
             if (ApiConfig.getAuthentication() == null) {
-                throw new MessageSignerException(
+                throw new SdkException(
                         "Authentication is null. Set \"ApiConfig.authentication\" or pass an instance of com.mastercard.api.core.security.Authentication to the method call");
             }
 
@@ -273,7 +276,7 @@ public class ApiController {
             try {
                 createEntity = new StringEntity(payload);
             } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException("Unsupported encoding for create action.", e);
+                throw new SdkException("Unsupported encoding for create action.", e);
             }
             ((HttpPost) message).setEntity(createEntity);
 
@@ -297,7 +300,7 @@ public class ApiController {
             try {
                 updateEntity = new StringEntity(payload);
             } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException("Unsupported encoding for update action.", e);
+                throw new SdkException("Unsupported encoding for update action.", e);
             }
             ((HttpPut) message).setEntity(updateEntity);
 
@@ -338,8 +341,7 @@ public class ApiController {
     }
 
     public Map<? extends String, ? extends Object> execute(Authentication auth, OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, IllegalArgumentException, SystemException {
+            throws ApiException{
 
 
         CloseableHttpClient httpClient = createHttpClient();
@@ -398,21 +400,7 @@ public class ApiController {
                     }
                 } else {
                     int status = apiResponse.getStatus();
-
-                    if (status == HttpStatus.SC_BAD_REQUEST) {
-                        throw new InvalidRequestException((Map<? extends String, ? extends Object>) response);
-                    } else if (status == HttpStatus.SC_UNAUTHORIZED) {
-                        throw new AuthenticationException((Map<? extends String, ? extends Object>) response);
-                    } else if (status == HttpStatus.SC_NOT_FOUND) {
-                        throw new ObjectNotFoundException((Map<? extends String, ? extends Object>) response);
-                    } else if (status == HttpStatus.SC_FORBIDDEN) {
-                        throw new NotAllowedException((Map<? extends String, ? extends Object>) response);
-                    } else if (status == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-                        throw new SystemException((Map<? extends String, ? extends Object>) response);
-                    } else {
-                        throw new ApiCommunicationException(
-                                (Map<? extends String, ? extends Object>) response);
-                    }
+                    throw new ApiException(status, (Map<? extends String, ? extends Object>) response);
                 }
             }
 
@@ -421,30 +409,12 @@ public class ApiController {
         } catch (UnsupportedEncodingException e) {
                 throw new IllegalStateException(e);
         } catch (HttpResponseException e) {
-            throw new ApiCommunicationException(
+            throw new ApiException(
                     "Failed to communicate with response code " + String.format("%d", e.getStatusCode()), e);
         } catch (ClientProtocolException e) {
-            throw new ApiCommunicationException("HttpClient exception", e);
+            throw new ApiException("HttpClient exception", e);
         } catch (IOException e) {
-            throw new ApiCommunicationException("I/O error", e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new SystemException("Cryptography Error", e);
-        } catch (CertificateEncodingException e) {
-            throw new SystemException("Cryptography Error", e);
-        } catch (DecoderException e) {
-            throw new SystemException("Cryptography Error", e);
-        } catch (NoSuchProviderException e) {
-            throw new SystemException("Cryptography Error", e);
-        } catch (InvalidKeyException e) {
-            throw new SystemException("Cryptography Error", e);
-        } catch (BadPaddingException e) {
-            throw new SystemException("Cryptography Error", e);
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new SystemException("Cryptography Error", e);
-        } catch (NoSuchPaddingException e) {
-            throw new SystemException("Cryptography Error", e);
-        } catch (IllegalBlockSizeException e) {
-            throw new SystemException("Cryptography Error", e);
+            throw new ApiException("I/O error", e);
         } finally {
             try {
                 httpClient.close();
@@ -495,64 +465,9 @@ public class ApiController {
         return list;
     }
 
-    private static String[] split(final String s) {
-        if (TextUtils.isBlank(s)) {
-            return null;
-        }
-        return s.split(" *, *");
-    }
 
     CloseableHttpClient createHttpClient() {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        httpClientBuilder.useSystemProperties();
-        //arizzini: disabling cookie manager... we don't use cookies. REST are stateless.
-        httpClientBuilder.disableCookieManagement();
-
-        // TLSv1.1 and TLSv1.2 are disabled by default in Java 7, we want to enforce TLSv1.2
-        final String[] supportedProtocols = SUPPORTED_TLS;
-        final String[] supportedCipherSuites = split(System.getProperty("https.cipherSuites"));
-
-        if (ApiConfig.ignoreSSLErrors()) {
-            try {
-                SSLContext sslContext = SSLContext.getInstance("SSL");
-                // set up a TrustManager that trusts everything
-                sslContext.init(null, new TrustManager[]{new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(X509Certificate[] certs,
-                                                   String authType) {
-                    }
-
-                    public void checkServerTrusted(X509Certificate[] certs,
-                                                   String authType) {
-                    }
-                }}, new SecureRandom());
-
-                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                        sslContext,
-                        supportedProtocols,
-                        supportedCipherSuites,
-                        SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-                httpClientBuilder.setSSLSocketFactory(sslsf);
-
-                return httpClientBuilder.build();
-
-            } catch (Exception e) {
-                //don't worry we simply fall back on the original implementation if this doesn't work..
-            }
-        }
-
-        //arizzini: fallback
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-        (SSLSocketFactory) SSLSocketFactory.getDefault(),
-        supportedProtocols,
-        supportedCipherSuites,
-        SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-        httpClientBuilder.setSSLSocketFactory(sslsf);
-
-        return httpClientBuilder.build();
+        return HttpBuilder.getInstance().build();
     }
 
     ResponseHandler<ApiControllerResponse> createResponseHandler() {

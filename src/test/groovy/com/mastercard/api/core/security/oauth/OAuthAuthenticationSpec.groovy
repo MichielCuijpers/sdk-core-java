@@ -1,6 +1,7 @@
 package com.mastercard.api.core.security.oauth
 
 import com.mastercard.api.core.Constants
+import com.mastercard.api.core.exception.SdkException
 import com.mastercard.api.core.model.HttpMethod
 import oauth.signpost.OAuth
 import oauth.signpost.basic.DefaultOAuthConsumer
@@ -48,7 +49,7 @@ public class OAuthAuthenticationSpec extends Specification {
         new OAuthAuthentication(consumerKey, null, alias, password)
 
         then:
-        def ex = thrown(IllegalArgumentException)
+        def ex = thrown(SdkException)
         ex.message == "InputStream cannot null"
     }
 
@@ -58,7 +59,7 @@ public class OAuthAuthenticationSpec extends Specification {
         new OAuthAuthentication(null, is, alias, password)
 
         then:
-        def ex = thrown(IllegalArgumentException)
+        def ex = thrown(SdkException)
         ex.message == "ConsumerKey cannot null"
     }
 
@@ -68,7 +69,7 @@ public class OAuthAuthenticationSpec extends Specification {
         new OAuthAuthentication(consumerKey, is, "unknown", password)
 
         then:
-        def ex = thrown(IllegalArgumentException)
+        def ex = thrown(SdkException)
         ex.message == "No key found for alias [unknown]"
     }
 
@@ -78,7 +79,7 @@ public class OAuthAuthenticationSpec extends Specification {
         new OAuthAuthentication(consumerKey, is, alias, "invalid")
 
         then:
-        thrown(IOException)
+        thrown(SdkException)
     }
 
     def 'test sign' () {

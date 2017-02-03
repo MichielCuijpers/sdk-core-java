@@ -27,7 +27,7 @@
 
 package com.mastercard.api.core.exception;
 
-import com.mastercard.api.core.model.RequestMap;
+import com.mastercard.api.core.model.map.CaseInsensitiveSmartMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,36 +36,40 @@ import java.util.Map;
 /**
  * Base class for all API exceptions.
  */
-public abstract class ApiException extends Exception {
+public class ApiException extends Exception {
 
-    private String errorCode;
-    private String message;
-    private int status;
+
+
+    private String source;
+    private String reasonCode;
+    private String description;
+    private int httpStatus;
+    private CaseInsensitiveSmartMap rawErrorData;
 
     private List<Map<? extends String, ? extends Object>> errors = new ArrayList<Map<? extends String, ? extends Object>>();
 
     /**
-     * Constructs an <code>ApiException</code> with no detail message.
+     * Constructs an <code>ApiException</code> with no detail description.
      */
     public ApiException() {
         super();
     }
 
     /**
-     * Constructs an <code>ApiException</code> with the specified detail message.
+     * Constructs an <code>ApiException</code> with the specified detail description.
      *
-     * @param s the detail message.
+     * @param s the detail description.
      */
     public ApiException(String s) {
         super(s);
     }
 
     /**
-     * Constructs an <code>ApiException</code> with the specified detail message
+     * Constructs an <code>ApiException</code> with the specified detail description
      * and cause.
      *
-     * @param s     the detail message.
-     * @param cause the detail message.
+     * @param s     the detail description.
+     * @param cause the detail description.
      */
     public ApiException(String s, Throwable cause) {
         super(s, cause);
@@ -74,48 +78,61 @@ public abstract class ApiException extends Exception {
     /**
      * Constructs an <code>ApiCommunicationException</code> with the specified cause.
      *
-     * @param cause the detail message.
+     * @param cause the detail description.
      */
     public ApiException(Throwable cause) {
         super(cause);
     }
 
+
+
     /**
-     * Constructs an <code>ApiException</code> with the specified details status
+     * Constructs an <code>ApiException</code> with the specified details httpStatus
      * and error data.
      *
-     * @param status    the HTTP status code
+     * @param httpStatus    the HTTP httpStatus code
      * @param errorData a map representing the error details returned by the API.  The map is
      *                  expected to contain <code>String</code> value for the key  <code>"reference"</code> and
      *                  a map containing the detailed error data for the key <code>"key"</code>.  This map in turn
      *                  is expected to contain <code>String</code> values for the keys
-     *                  <code>"code"</code> and <code>"message"</code>.
+     *                  <code>"code"</code> and <code>"description"</code>.
      */
-    public ApiException(int status, Map<? extends String, ? extends Object> errorData) {
+    public ApiException(int httpStatus, Map<? extends String, ? extends Object> errorData) {
         super();
 
-        this.status = status;
+        this.httpStatus = httpStatus;
 
-        // Use RequestMap for easy traversing
-        RequestMap requestMap = new RequestMap((Map<String, Object>) errorData);
 
-        if (!requestMap.containsKey("Errors.Error"))
+        Map tmpMap = (Map<String,Object>) errorData;
+
+        // Use SmartMap for easy traversing
+        this.rawErrorData = new CaseInsensitiveSmartMap(tmpMap);
+
+
+        if (! (rawErrorData.containsKey("Errors.Error")))
             return;
 
-        Object o = requestMap.get("Errors.Error");
+        Object o = rawErrorData.get("Errors.Error");
 
         if (o instanceof Map) {
-            errors.add((Map<? extends String, ? extends Object>) o);
+            errors.add((Map<String,Object>) o);
         }
         else if (o instanceof List) {
-            errors = (List<Map<? extends String, ? extends Object>>) o;
+            errors= (List<Map<? extends String, ? extends Object>>) o;
         }
 
         // Use the first error
         if (errors.size() > 0) {
             Map<? extends String, ? extends Object> error = errors.get(0);
-            errorCode = (String) error.get("ReasonCode");
-            message = (String) error.get("Description");
+            if (error.containsKey("Source")) {
+                source = error.get("Source").toString();
+            }
+            if (error.containsKey("ReasonCode")) {
+                reasonCode = error.get("ReasonCode").toString();
+            }
+            if (error.containsKey("Description")) {
+                description = error.get("Description").toString();
+            }
         }
     }
 
@@ -124,34 +141,48 @@ public abstract class ApiException extends Exception {
      *
      * @return a string representing the API error code (which may be <code>null</code>).
      */
-    public String getErrorCode() {
-        return errorCode;
+    public String getReasonCode() {
+        return reasonCode;
     }
 
     /**
-     * Returns the HTTP status code for this exception.
+     * Returns the HTTP httpStatus code for this exception.
      *
-     * @return an integer representing the HTTP status code for this API error (or 0 if there is no status)
+     * @return an integer representing the HTTP httpStatus code for this API error (or 0 if there is no httpStatus)
      */
-    public abstract int getStatus();
+    public int getHttpStatus() {
+        return httpStatus;
+    }
+
+    /**
+     * Returns the Error source
+     * @return
+     */
+    public String getSource() {
+        return source;
+    }
 
     public List<Map<? extends String, ? extends Object>> getErrors() {
         return errors;
     }
 
+    public CaseInsensitiveSmartMap getRawErrorData() {
+        return rawErrorData;
+    }
+
     /**
-     * Returns the string detail message for this exception.
+     * Returns the string detail description for this exception.
      *
-     * @return a string representing the API error code or the message detail used to construct
+     * @return a string representing the API error code or the description detail used to construct
      * the exception (which may be <code>null</code>).
      */
     @Override
     public String getMessage() {
-        if (message == null) {
+        if (description == null) {
             return super.getMessage();
         }
 
-        return message;
+        return description;
     }
 
     /**
@@ -164,10 +195,12 @@ public abstract class ApiException extends Exception {
         return sb.append(getClass().getSimpleName())
                 .append(": \"")
                 .append(getMessage())
-                .append("\" (status: ")
-                .append(getStatus())
-                .append(", error code: ")
-                .append(getErrorCode())
+                .append("\" (httpStatus: ")
+                .append(getHttpStatus())
+                .append(", reasonCode: ")
+                .append(getReasonCode())
+                .append(", source: ")
+                .append(getSource())
                 .append(")").toString();
     }
 }

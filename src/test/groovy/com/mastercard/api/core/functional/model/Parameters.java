@@ -78,8 +78,7 @@ public class Parameters extends BaseObject  {
      * @throws      SystemException
      */
     public static Parameters query(Map query)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         return query(null, query);
     }
@@ -101,8 +100,7 @@ public class Parameters extends BaseObject  {
      * @throws      SystemException
      */
     public static Parameters query(Authentication auth, Map query)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         Parameters val = new Parameters();
         if (query != null)  val.putAll(query);

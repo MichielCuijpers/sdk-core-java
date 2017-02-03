@@ -46,20 +46,15 @@ public abstract class BaseObject extends RequestMap {
 
     protected abstract OperationMetadata getOperationMetadata();
 
-
-
-
     protected static BaseObject executeOperation(final Authentication authentication, String operationUUID, final BaseObject value)
-            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
-            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
+            throws ApiException {
 
         return execute(authentication, operationUUID, value);
     }
 
     protected static <T extends BaseObject> ResourceList<T> executeListOperation(
             final Authentication authentication, String operationUUID, T template, Map criteria)
-            throws ApiCommunicationException, AuthenticationException, ObjectNotFoundException,
-            InvalidRequestException, NotAllowedException, SystemException, MessageSignerException {
+            throws ApiException {
 
         ResourceList<T> listResults = new ResourceList<T>();
         Action list = Action.list;
@@ -80,9 +75,13 @@ public abstract class BaseObject extends RequestMap {
 
         for (Object o : (List) rawList) {
             if (o instanceof Map) {
-                T item = (T) template.clone();
-                item.putAll((Map<? extends String, ? extends Object>) o);
-                val.add(item);
+                try {
+                    T item = (T) template.getClass().newInstance();
+                    item.putAll((Map<? extends String, ? extends Object>) o);
+                    val.add(item);
+                } catch (Exception e) {
+                    //invalid cast exception, however this should never happen
+                }
             }
         }
 
@@ -111,8 +110,7 @@ public abstract class BaseObject extends RequestMap {
 
 
     private static BaseObject execute(Authentication authentication, String operationUUID,  BaseObject requestObject)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            ObjectNotFoundException, NotAllowedException, SystemException, MessageSignerException {
+            throws ApiException {
 
         Map<? extends String, ? extends Object> response = apiController.execute(authentication, requestObject.getOperationConfig(operationUUID), requestObject.getOperationMetadata(), requestObject);
 
