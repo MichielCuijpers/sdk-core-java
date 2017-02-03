@@ -13,6 +13,7 @@ import com.mastercard.api.core.security.Authentication
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
 import org.apache.http.HttpHost
 import org.apache.http.impl.client.CustomHttpClientBuilder
+import org.junit.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Specification
 
@@ -21,6 +22,7 @@ import spock.lang.Specification
  */
 
 
+@Ignore
 class ProxySpec extends Specification {
 
 
