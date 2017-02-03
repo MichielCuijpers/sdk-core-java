@@ -1,7 +1,7 @@
 package com.mastercard.api.core.functional
 import com.mastercard.api.core.ApiConfig
 import com.mastercard.api.core.ApiController
-import com.mastercard.api.core.exception.ApiCommunicationException
+import com.mastercard.api.core.exception.ApiException
 import com.mastercard.api.core.functional.model.MultiplePathUserPost
 import com.mastercard.api.core.functional.model.Post
 import com.mastercard.api.core.functional.model.ResourceConfig
@@ -72,7 +72,7 @@ class NodeJSMockServerSpec extends Specification {
         Post returned = Post.read(null, "aaa");
 
         then:
-        def ex = thrown(ApiCommunicationException)
+        def ex = thrown(ApiException)
         ex.message == "I/O error"
 
     }
@@ -562,17 +562,13 @@ class NodeJSMockServerSpec extends Specification {
 
     def 'test_get_user_posts_with_mutplie_path'() throws Exception {
 
-
-
         when:
         RequestMap map = new RequestMap();
         map.set("user_id","1");
         map.set("post_id","2");
 
-
         ResourceList<MultiplePathUserPost> responseList = MultiplePathUserPost.list(map);
         MultiplePathUserPost response = responseList.getList().get(0);
-
 
         then:
         response.get("id") == 1

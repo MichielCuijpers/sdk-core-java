@@ -82,8 +82,7 @@ public class AccountInquiry extends BaseObject  {
      * @throws      SystemException
      */
     public AccountInquiry update()
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         BaseObject object = this.executeOperation(null, "uuid", this);
         this.putAll(object);
@@ -111,8 +110,7 @@ public class AccountInquiry extends BaseObject  {
      * @throws      SystemException
      */
     public AccountInquiry update(Authentication auth)
-        throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-        MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+        throws ApiException {
 
         BaseObject object = this.executeOperation(auth, "uuid", this);
         this.putAll(object);

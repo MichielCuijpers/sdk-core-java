@@ -25,9 +25,9 @@
  *
  */
 
-package com.mastercard.api.core.model;
+package com.mastercard.api.core.model.map;
 
-import com.mastercard.api.core.model.map.SmartMap;
+import org.json.simple.JSONValue;
 
 import java.util.*;
 
@@ -72,14 +72,15 @@ import java.util.*;
  * Both of these examples construct a RequestMap containing the keys 'currency', 'amount' and 'card'.  The
  * value for the 'card' key is a map containing the key 'number', 'cvc', 'expMonth' and 'expYear'.
  */
-public class RequestMap extends SmartMap {
+public class SmartMap extends AbstractSmartMap {
+
 
 
     /**
      * Constructs an empty map with the default capacity and load factor.
      */
-    public RequestMap() {
-        super();
+    public SmartMap() {
+        store = createMap();
     }
 
     /**
@@ -87,8 +88,8 @@ public class RequestMap extends SmartMap {
      *
      * @param map the map whose mappings are to be placed in this map
      */
-    public RequestMap(Map<String, Object> map) {
-        super(map);
+    public SmartMap(Map<String, Object> map) {
+        store = createMap(map);
     }
 
     /**
@@ -96,8 +97,8 @@ public class RequestMap extends SmartMap {
      *
      * @param jsonMapString the JSON string used to construct the map
      */
-    public RequestMap(String jsonMapString) {
-        super(jsonMapString);
+    public SmartMap(String jsonMapString) {
+        store = createMap((Map<String,Object>) JSONValue.parse(jsonMapString));
     }
 
     /**
@@ -105,8 +106,39 @@ public class RequestMap extends SmartMap {
      * @param keyPath key path with which the specified value is to be associated.
      * @param value value to be associated with the specified key path.
      */
-    public RequestMap(String keyPath, Object value) {
-        super(keyPath, value);
+    public SmartMap(String keyPath, Object value) {
+        store = createMap();
+        put(keyPath, value);
     }
+
+
+
+    /**
+     * Associates the specified value to the specified key path and returns a reference to
+     * this map.
+     *
+     * @param keyPath key path to which the specified value is to be associated.
+     * @param value   the value which is to be associated with the specified key path.
+     * @return this map
+     * @throws IllegalArgumentException  if part of the key path does not match the expected type.
+     * @throws IndexOutOfBoundsException if using an array index in the key path is out of bounds.
+     */
+    public SmartMap set(String keyPath, Object value) {
+        put(keyPath, value);
+        return this;
+    }
+
+
+    @Override
+    protected Map<String, Object> createMap() {
+        return new LinkedHashMap<String,Object>();
+    }
+
+    @Override
+    protected Map<String, Object> createMap(Map<String,Object> map) {
+        return new LinkedHashMap<String,Object>(map);
+    }
+
+
 
 }

@@ -2,6 +2,7 @@ package com.mastercard.api.core.security
 import com.mastercard.api.core.security.util.CryptUtil
 import com.mastercard.api.core.security.util.KeyType
 import groovy.json.JsonBuilder
+import org.junit.Ignore
 import spock.lang.Specification
 
 import javax.crypto.Cipher
@@ -14,6 +15,7 @@ import java.security.PublicKey
 /**
  * Created by eamondoyle on 16/02/2016.
  */
+@Ignore
 class EncryptDecryptSpec extends Specification {
 
 

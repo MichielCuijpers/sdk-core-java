@@ -27,7 +27,7 @@
 
 package com.mastercard.api.core.security.oauth;
 
-import com.mastercard.api.core.exception.MessageSignerException;
+import com.mastercard.api.core.exception.SdkException;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.model.HttpMethod;
 import oauth.signpost.OAuth;
@@ -64,31 +64,35 @@ public class OAuthAuthentication implements Authentication {
      * @throws KeyStoreException
      * @throws IOException
      */
-    public OAuthAuthentication(String consumerKey, InputStream is, String alias, String password) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public OAuthAuthentication(String consumerKey, InputStream is, String alias, String password) throws SdkException {
         if(consumerKey == null) {
-            throw new IllegalArgumentException("ConsumerKey cannot null");
+            throw new SdkException("ConsumerKey cannot null");
         }
 
         if(is == null) {
-            throw new IllegalArgumentException("InputStream cannot null");
+            throw new SdkException("InputStream cannot null");
         }
 
         this.consumerKey = consumerKey;
         setP12(is, alias, password);
     }
 
-    private void setP12(InputStream is, String alias, String password) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
-        KeyStore ks = KeyStore.getInstance("PKCS12");
-        ks.load(is, password.toCharArray());
-        this.privateKey = (PrivateKey) ks.getKey(alias, password.toCharArray());
-
-        if (this.privateKey == null) {
-            throw new IllegalArgumentException("No key found for alias ["+ alias +"]");
+    private void setP12(InputStream is, String alias, String password) throws SdkException {
+        try {
+            KeyStore ks = KeyStore.getInstance("PKCS12");
+            ks.load(is, password.toCharArray());
+            this.privateKey = (PrivateKey) ks.getKey(alias, password.toCharArray());
+            if (this.privateKey == null) {
+                throw new SdkException("No key found for alias ["+ alias +"]");
+            }
+        } catch (Exception e) {
+            throw new SdkException(e.getMessage(), e);
         }
+
     }
 
     @Override
-    public HttpRequestBase sign(URI uri, HttpMethod httpMethod, ContentType contentType, Object body, HttpRequestBase message) throws MessageSignerException {
+    public HttpRequestBase sign(URI uri, HttpMethod httpMethod, ContentType contentType, Object body, HttpRequestBase message) throws SdkException {
         // Set the OAuthRequest
         OAuthRequest request = new OAuthRequest();
         request.setMethod(httpMethod);
@@ -102,7 +106,7 @@ public class OAuthAuthentication implements Authentication {
             params.put(OAuthConstants.OAUTH_BODY_HASH, request.getOauthBodyHash(), true);
         }
         catch (Exception e) {
-            throw new MessageSignerException(e);
+            throw new SdkException(e.getMessage(), e);
         }
 
         // Create Signer
@@ -117,7 +121,7 @@ public class OAuthAuthentication implements Authentication {
             oAuthConsumer.sign(request);
         }
         catch (Exception e) {
-            throw new MessageSignerException(e);
+            throw new SdkException(e.getMessage(), e);
         }
 
         // Set the oauth authorization header

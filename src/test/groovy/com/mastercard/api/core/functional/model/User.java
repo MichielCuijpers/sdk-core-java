@@ -101,8 +101,7 @@ public class User extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<User> list()
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(null, "4f7d3051-9774-4df1-b826-2a275e42e169", new User(), null);
     }
@@ -126,8 +125,7 @@ public class User extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<User> list(Authentication auth)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(auth, "4f7d3051-9774-4df1-b826-2a275e42e169", new User(), null);
     }
@@ -151,8 +149,7 @@ public class User extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<User> list(RequestMap criteria)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(null, "4f7d3051-9774-4df1-b826-2a275e42e169", new User(), criteria);
     }
@@ -177,8 +174,7 @@ public class User extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<User> list(Authentication auth, RequestMap criteria)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(auth, "4f7d3051-9774-4df1-b826-2a275e42e169", new User(), criteria);
     }
@@ -205,8 +201,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User create(RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return create(null, map);
     }
@@ -228,8 +223,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User create(Authentication auth, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return new User(BaseObject.executeOperation(auth, "c749141f-fa78-4bcd-b63c-5a499c40ddac", new User(map)));
     }
@@ -261,8 +255,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User read(String id)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return read(null, id, null);
     }
@@ -284,8 +277,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User read(String id, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return read(null, id, map);
     }
@@ -307,8 +299,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User read(Authentication auth, String id)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return read(auth, id, null);
     }
@@ -331,8 +322,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User read(Authentication auth, String id, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         User val = new User();
         if (id != null) val.put("id", id);
@@ -358,8 +348,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public User update()
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(null, "32b223c4-165d-4f56-a199-97b38c4741c1", this);
         this.putAll(object);
@@ -382,8 +371,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public User update(Authentication auth)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(auth, "32b223c4-165d-4f56-a199-97b38c4741c1", this);
         this.putAll(object);
@@ -413,8 +401,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public User delete()
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(null, "8bc7d3c4-fbe9-4f10-8c57-2734da24cd71", this);
         this.clear();
@@ -438,8 +425,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public User delete(Authentication auth)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(auth, "8bc7d3c4-fbe9-4f10-8c57-2734da24cd71", this);
         this.clear();
@@ -463,8 +449,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete(String id)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return delete(null, id);
     }
@@ -486,8 +471,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete(Authentication auth, String id)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         User object = new User(new RequestMap("id", id));
         return object.delete(auth);
@@ -510,8 +494,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete(String id, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return delete(null, id, map);
     }
@@ -534,8 +517,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete(Authentication auth, String id, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         User object = new User(new RequestMap("id", id));
         if (map != null)  object.putAll(map);
@@ -562,8 +544,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public User delete200()
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(null, "ec489c56-f8e7-470e-b9c0-74836b69c5ed", this);
         this.clear();
@@ -587,8 +568,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public User delete200(Authentication auth)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(auth, "ec489c56-f8e7-470e-b9c0-74836b69c5ed", this);
         this.clear();
@@ -612,8 +592,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete200(String id)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return delete200(null, id);
     }
@@ -635,8 +614,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete200(Authentication auth, String id)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         User object = new User(new RequestMap("id", id));
         return object.delete200(auth);
@@ -659,8 +637,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete200(String id, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return delete200(null, id, map);
     }
@@ -683,8 +660,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete200(Authentication auth, String id, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         User object = new User(new RequestMap("id", id));
         if (map != null)  object.putAll(map);
@@ -711,8 +687,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public User delete204()
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(null, "efa98230-cc3d-4e87-a964-dd08d2819273", this);
         this.clear();
@@ -736,8 +711,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public User delete204(Authentication auth)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         BaseObject object = BaseObject.executeOperation(auth, "efa98230-cc3d-4e87-a964-dd08d2819273", this);
         this.clear();
@@ -761,8 +735,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete204(String id)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return delete204(null, id);
     }
@@ -784,8 +757,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete204(Authentication auth, String id)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         User object = new User(new RequestMap("id", id));
         return object.delete204(auth);
@@ -808,8 +780,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete204(String id, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return delete204(null, id, map);
     }
@@ -832,8 +803,7 @@ public class User extends BaseObject {
      * @throws      SystemException
      */
     public static User delete204(Authentication auth, String id, RequestMap map)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         User object = new User(new RequestMap("id", id));
         if (map != null)  object.putAll(map);

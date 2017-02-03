@@ -1,5 +1,6 @@
-package com.mastercard.api.core.security.jws;
+package com.mastercard.api.core.security.jws
 
+import com.mastercard.api.core.exception.SdkException;
 import spock.lang.Specification;
 
 public class JwsAuthenticationSpec extends Specification {
@@ -67,7 +68,7 @@ public class JwsAuthenticationSpec extends Specification {
         authentication.sign(null, null, null, null, null)
 
         then:
-        thrown(UnsupportedOperationException)
+        thrown(SdkException)
     }
 
 }

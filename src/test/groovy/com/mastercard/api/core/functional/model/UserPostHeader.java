@@ -96,8 +96,7 @@ public class UserPostHeader extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostHeader> list()
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(null, "378b52fa-47e7-4acc-b414-68fb2604ab39", new UserPostHeader(), null);
     }
@@ -121,8 +120,7 @@ public class UserPostHeader extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostHeader> list(Authentication auth)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(auth, "378b52fa-47e7-4acc-b414-68fb2604ab39", new UserPostHeader(), null);
     }
@@ -146,8 +144,7 @@ public class UserPostHeader extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostHeader> list(RequestMap criteria)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(null, "378b52fa-47e7-4acc-b414-68fb2604ab39", new UserPostHeader(), criteria);
     }
@@ -172,8 +169,7 @@ public class UserPostHeader extends BaseObject {
      * @see ResourceList
      */
     public static ResourceList<UserPostHeader> list(Authentication auth, RequestMap criteria)
-            throws ApiCommunicationException, AuthenticationException, InvalidRequestException,
-            MessageSignerException, NotAllowedException, ObjectNotFoundException, SystemException {
+            throws ApiException {
 
         return BaseObject.executeListOperation(auth, "378b52fa-47e7-4acc-b414-68fb2604ab39", new UserPostHeader(), criteria);
     }

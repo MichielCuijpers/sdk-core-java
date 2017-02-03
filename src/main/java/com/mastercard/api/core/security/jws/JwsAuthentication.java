@@ -27,6 +27,7 @@
 
 package com.mastercard.api.core.security.jws;
 
+import com.mastercard.api.core.exception.SdkException;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.model.HttpMethod;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -72,6 +73,6 @@ public class JwsAuthentication implements Authentication {
 
     @Override
     public HttpRequestBase sign(URI uri, HttpMethod httpMethod, ContentType contentType, Object body, HttpRequestBase message) {
-        throw new UnsupportedOperationException("JWS is not currently supported");
+        throw new SdkException("JWS is not currently supported");
     }
 }
