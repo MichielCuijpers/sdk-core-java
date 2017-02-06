@@ -203,6 +203,37 @@ public class ApiExceptionSpec extends Specification {
         ApiException.getHttpStatus() == 500
         ApiException.getCause() == null
 
+
+        //{"errors":[{"source":"OpenAPIClientId","reasonCode":"AUTHORIZATION_FAILED","key":"050007","description":"Unauthorized Access","recoverable":false,"requestId":null,"details":{"details":[{"name":"ErrorDetailCode","value":"050007"}]}}]}
+
+        when:
+        errorData =
+                [
+                        "errors":
+                                [
+                                        [
+                                                "source":"OpenAPIClientId",
+                                                "reasonCode":"AUTHORIZATION_FAILED",
+                                                "key":"050007",
+                                                "description":"Unauthorized Access",
+                                                "recoverable":false,
+                                                "requestId":null,
+
+                                        ]
+                                ]
+                ]
+
+        ApiException = new ApiException(500, errorData)
+
+        then:
+        ApiException.getReasonCode() == "AUTHORIZATION_FAILED"
+        ApiException.getErrors().size() == 1
+        ApiException.getErrors() == errorData.errors
+        ApiException.getMessage() == "Unauthorized Access"
+        ApiException.getSource() == "OpenAPIClientId"
+        ApiException.getHttpStatus() == 500
+        ApiException.getCause() == null
+
         when:
         errorData = [:]
 

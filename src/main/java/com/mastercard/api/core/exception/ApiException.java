@@ -109,31 +109,36 @@ public class ApiException extends Exception {
         this.rawErrorData = new CaseInsensitiveSmartMap(tmpMap);
 
 
-        if (! (rawErrorData.containsKey("Errors.Error")))
-            return;
+        if (rawErrorData.containsKey("Errors")) {
+            Object o = rawErrorData.get("Errors");
 
-        Object o = rawErrorData.get("Errors.Error");
+            if (o instanceof Map && ((Map) o).containsKey("Error")) {
+                o = ((Map) o).get("Error");
+            }
 
-        if (o instanceof Map) {
-            errors.add((Map<String,Object>) o);
-        }
-        else if (o instanceof List) {
-            errors= (List<Map<? extends String, ? extends Object>>) o;
+            if (o instanceof List) {
+                errors= (List<Map<? extends String, ? extends Object>>) o;
+            } else if (o instanceof Map){
+                errors.add((Map<? extends String, ? extends Object>) o);
+            }
+
+            // Use the first error
+            if (errors.size() > 0) {
+                Map<? extends String, ? extends Object> error = errors.get(0);
+                if (error.containsKey("Source")) {
+                    source = error.get("Source").toString();
+                }
+                if (error.containsKey("ReasonCode")) {
+                    reasonCode = error.get("ReasonCode").toString();
+                }
+                if (error.containsKey("Description")) {
+                    description = error.get("Description").toString();
+                }
+            }
         }
 
-        // Use the first error
-        if (errors.size() > 0) {
-            Map<? extends String, ? extends Object> error = errors.get(0);
-            if (error.containsKey("Source")) {
-                source = error.get("Source").toString();
-            }
-            if (error.containsKey("ReasonCode")) {
-                reasonCode = error.get("ReasonCode").toString();
-            }
-            if (error.containsKey("Description")) {
-                description = error.get("Description").toString();
-            }
-        }
+
+
     }
 
     /**
