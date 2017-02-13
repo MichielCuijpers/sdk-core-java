@@ -4,6 +4,7 @@ import com.mastercard.api.core.exception.SdkException;
 import com.mastercard.api.core.model.RequestMap;
 import com.mastercard.api.core.security.CryptographyInterceptor;
 import com.mastercard.api.core.security.util.CryptUtil;
+import com.mastercard.api.core.security.util.KeyType;
 import org.apache.commons.codec.DecoderException;
 import org.json.simple.JSONValue;
 
@@ -29,12 +30,39 @@ public class MDESCryptography implements CryptographyInterceptor {
     private final List<String> objectsToEncrypt;
     private final List<String> objectsToDecrypt;
 
-
-    public MDESCryptography(InputStream issuerKeyInputStream, InputStream privateKeyInputStream)
+    public MDESCryptography(InputStream masterCardPublicCert, InputStream masterCardPrivateKeyP12, String privateKeyAlias, String privateKeyPassword)
             throws SdkException {
         try {
-            this.issuerCertificate = CryptUtil.loadCertificate("X.509", issuerKeyInputStream);
-            this.privateKey = CryptUtil.loadPrivateKey("RSA", privateKeyInputStream);
+            this.issuerCertificate = CryptUtil.loadCertificate("X.509", masterCardPublicCert);
+            this.privateKey = (PrivateKey) CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", masterCardPrivateKeyP12, privateKeyAlias, privateKeyPassword );
+            this.triggeringEndPath = Arrays.asList("/tokenize", "/searchTokens", "/getToken", "/transact", "/notifyTokenUpdated");
+            this.objectsToEncrypt = Arrays.asList("cardInfo.encryptedData", "encryptedPayload.encryptedData");
+            this.objectsToDecrypt = Arrays.asList("encryptedPayload.encryptedData", "tokenDetail.encryptedData");
+        } catch (Exception e) {
+            throw new SdkException(e.getMessage(), e);
+        }
+
+    }
+
+    public MDESCryptography(InputStream masterCardPublicCert, InputStream masterCardPrivateKeyP12, String privateKeyAlias, String privateKeyPassword, List<String> triggeringEndPath, List<String> objectsToEncrypt, List<String> objectsToDecrypt)
+            throws SdkException {
+        try {
+            this.issuerCertificate = CryptUtil.loadCertificate("X.509", masterCardPublicCert);
+            this.privateKey = (PrivateKey) CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", masterCardPrivateKeyP12, privateKeyAlias, privateKeyPassword );
+            this.triggeringEndPath = triggeringEndPath;
+            this.objectsToEncrypt = objectsToEncrypt;
+            this.objectsToDecrypt = objectsToDecrypt;
+        } catch (Exception e) {
+            throw new SdkException(e.getMessage(), e);
+        }
+
+    }
+
+    public MDESCryptography(InputStream masterCardPublicCert, InputStream masterCardPrivateKey)
+            throws SdkException {
+        try {
+            this.issuerCertificate = CryptUtil.loadCertificate("X.509", masterCardPublicCert);
+            this.privateKey = CryptUtil.loadPrivateKey("RSA", masterCardPrivateKey);
             this.triggeringEndPath = Arrays.asList("/tokenize", "/searchTokens", "/getToken", "/transact", "/notifyTokenUpdated");
             this.objectsToEncrypt = Arrays.asList("cardInfo.encryptedData", "encryptedPayload.encryptedData");
             this.objectsToDecrypt = Arrays.asList("encryptedPayload.encryptedData", "tokenDetail.encryptedData");
@@ -45,13 +73,13 @@ public class MDESCryptography implements CryptographyInterceptor {
     }
 
 
-    public MDESCryptography(InputStream issuerKeyInputStream, InputStream privateKeyInputStream, List<String> triggeringEndPath, List<String> objectsToEncrypt, List<String> objectsToDecrypt)
+    public MDESCryptography(InputStream masterCardPublicCert, InputStream masterCardPrivateKey, List<String> triggeringEndPath, List<String> objectsToEncrypt, List<String> objectsToDecrypt)
             throws SdkException {
 
         try {
 
-        this.issuerCertificate = CryptUtil.loadCertificate("X.509", issuerKeyInputStream);
-        this.privateKey = CryptUtil.loadPrivateKey("RSA", privateKeyInputStream);
+        this.issuerCertificate = CryptUtil.loadCertificate("X.509", masterCardPublicCert);
+        this.privateKey = CryptUtil.loadPrivateKey("RSA", masterCardPrivateKey);
         this.triggeringEndPath = triggeringEndPath;
         this.objectsToEncrypt = objectsToEncrypt;
         this.objectsToDecrypt = objectsToDecrypt;
