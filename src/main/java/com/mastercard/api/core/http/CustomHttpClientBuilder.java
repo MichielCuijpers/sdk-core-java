@@ -181,8 +181,7 @@ public class CustomHttpClientBuilder {
      * Assigns {@link javax.net.ssl.HostnameVerifier} instance.
      * <p>
      * Please note this value can be overridden by the {@link #setConnectionManager(
-     *   org.apache.http.conn.HttpClientConnectionManager)} and the {@link #setSSLSocketFactory(
-     *   org.apache.http.conn.socket.LayeredConnectionSocketFactory)} methods.
+     *   org.apache.http.conn.HttpClientConnectionManager)}.
      * </p>
      *
      *   @since 4.4

@@ -58,11 +58,6 @@ public class OAuthAuthentication implements Authentication {
      * @param alias alias of the private key
      * @param password password for private key
      *
-     * @throws UnrecoverableKeyException
-     * @throws CertificateException
-     * @throws NoSuchAlgorithmException
-     * @throws KeyStoreException
-     * @throws IOException
      */
     public OAuthAuthentication(String consumerKey, InputStream is, String alias, String password) throws SdkException {
         if(consumerKey == null) {
