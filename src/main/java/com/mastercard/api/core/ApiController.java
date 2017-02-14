@@ -315,7 +315,9 @@ public class ApiController {
         }
 
         // Set JSON
-        message.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        if (hasBody(message)) {
+            message.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        }
         message.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
 
         // Set other headers
@@ -338,6 +340,17 @@ public class ApiController {
                 .sign(uri, HttpMethod.fromAction(operationConfig.getAction()), ContentType.APPLICATION_JSON, payload, message);
 
         return message;
+    }
+
+    private boolean hasBody(HttpRequestBase message) {
+        if (message instanceof HttpGet || message instanceof HttpDelete)
+            return false;
+
+        if (message instanceof HttpEntityEnclosingRequestBase) {
+            return ((HttpEntityEnclosingRequestBase) message).getEntity() != null;
+        }
+
+        return true;
     }
 
     public Map<? extends String, ? extends Object> execute(Authentication auth, OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)

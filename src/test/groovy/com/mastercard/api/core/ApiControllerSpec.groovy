@@ -506,6 +506,7 @@ class ApiControllerSpec extends Specification {
         ((HttpPost) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         ((HttpPost) httpRequestBase).getEntity().content.text == JSONValue.toJSONString(objectMap.subMap(['a','b','id']))
         assertHeaders(httpRequestBase, headerMap)
+        httpRequestBase.getFirstHeader("Content-Type").value == "application/json"
         mockBaseObject.get("x-sdk-mock-header") == null
 
         when: "getRequest for update"
@@ -518,6 +519,7 @@ class ApiControllerSpec extends Specification {
         ((HttpPut) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         ((HttpPut) httpRequestBase).getEntity().content.text == JSONValue.toJSONString(objectMap.subMap(['a','b','id']))
         assertHeaders(httpRequestBase, headerMap)
+        httpRequestBase.getFirstHeader("Content-Type").value == "application/json"
         mockBaseObject.get("x-sdk-mock-header") == null
     }
 
@@ -542,6 +544,7 @@ class ApiControllerSpec extends Specification {
         ((HttpGet) httpRequestBase).method == "GET"
         ((HttpGet) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         assertHeaders(httpRequestBase, headerMap);
+        httpRequestBase.getFirstHeader("Content-Type") == null
 
         when: "getRequest for list"
         mockBaseObject = new MockBaseObject(Action.list, objectMap)
@@ -552,6 +555,7 @@ class ApiControllerSpec extends Specification {
         ((HttpGet) httpRequestBase).method == "GET"
         ((HttpGet) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         assertHeaders(httpRequestBase, headerMap);
+        httpRequestBase.getFirstHeader("Content-Type") == null
 
         when: "getRequest for delete"
         mockBaseObject = new MockBaseObject(Action.delete, objectMap)
@@ -562,6 +566,7 @@ class ApiControllerSpec extends Specification {
         ((HttpDelete) httpRequestBase).method == "DELETE"
         ((HttpDelete) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         assertHeaders(httpRequestBase, headerMap);
+        httpRequestBase.getFirstHeader("Content-Type") == null
     }
 
     def "test getRequest with USER_AGENT" () {
