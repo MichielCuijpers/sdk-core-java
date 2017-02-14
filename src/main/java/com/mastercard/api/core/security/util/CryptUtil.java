@@ -5,6 +5,8 @@ import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +15,7 @@ import java.security.cert.*;
 import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 /**
@@ -129,8 +132,6 @@ public class CryptUtil {
         return currentCipher.doFinal(clearText);
     }
 
-
-
     /**
      *
      * @param algorithm
@@ -153,16 +154,48 @@ public class CryptUtil {
 
         Cipher currentCipher = null;
 
+
+
         if (provider != null) {
             currentCipher = Cipher.getInstance(algorithm, provider);
         } else {
             currentCipher = Cipher.getInstance(algorithm);
         }
 
-        currentCipher.init(Cipher.WRAP_MODE, key);
+        if (algorithm.contains("OAEPWith")) {
+            currentCipher.init(Cipher.WRAP_MODE, key, getOAEPParameterSpec(algorithm, null));
+        } else {
+            currentCipher.init(Cipher.WRAP_MODE, key);
+        }
+
 
 
         return currentCipher.wrap(keyToWrap);
+    }
+
+    private static OAEPParameterSpec getOAEPParameterSpec(String algorithm, String oaepHashingAlgorithm) {
+        if (algorithm.contains("OAEPWith")) {
+
+            //OAEPWith<digest>And<mgf>Padding
+            // String template = "OAEPWith<digest>And<mgf>Padding";
+            int startDigest = algorithm.indexOf("OAEPWith") + 8;
+            int endDigest = algorithm.indexOf("And");
+
+            int startPadding = endDigest + 3;
+            int endPadding = algorithm.indexOf("Padding");
+
+
+            String digest = algorithm.substring(startDigest, endDigest);
+            String padding = algorithm.substring(startPadding, endPadding);
+
+            if (oaepHashingAlgorithm != null) {
+                return new OAEPParameterSpec(digest, padding, new MGF1ParameterSpec(oaepHashingAlgorithm), PSource.PSpecified.DEFAULT);
+            } else {
+                return new OAEPParameterSpec(digest, padding, new MGF1ParameterSpec(digest), PSource.PSpecified.DEFAULT);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -196,9 +229,53 @@ public class CryptUtil {
             currentCipher = Cipher.getInstance(algorithm);
         }
 
-        currentCipher.init(Cipher.UNWRAP_MODE, key);
+
+        if (algorithm.contains("OAEPWith")) {
+            currentCipher.init(Cipher.UNWRAP_MODE, key, getOAEPParameterSpec(algorithm, null));
+        } else {
+            currentCipher.init(Cipher.UNWRAP_MODE, key);
+        }
+        return currentCipher.unwrap(keyToUnwrap, keyAlgorithmToUnwrap, keyTypeToUnwrap);
+    }
+
+    /**
+     *
+     *
+     * @param algorithm
+     * @param provider
+     * @param key
+     * @param keyToUnwrap
+     * @param keyAlgorithmToUnwrap
+     * @param oaepHashingAlgorithm
+     * @param keyTypeToUnwrap
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws NoSuchProviderException
+     */
+    public static Key unwrap(String algorithm, String oaepHashingAlgorithm, String provider, Key key, byte[] keyToUnwrap, String keyAlgorithmToUnwrap, int keyTypeToUnwrap)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+            InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException,
+            NoSuchProviderException {
+
+        Cipher currentCipher = null;
+
+        if (provider != null) {
+            currentCipher = Cipher.getInstance(algorithm, provider);
+        } else {
+            currentCipher = Cipher.getInstance(algorithm);
+        }
 
 
+        if (algorithm.contains("OAEPWith")) {
+            currentCipher.init(Cipher.WRAP_MODE, key, getOAEPParameterSpec(algorithm, oaepHashingAlgorithm));
+        } else {
+            currentCipher.init(Cipher.UNWRAP_MODE, key);
+        }
         return currentCipher.unwrap(keyToUnwrap, keyAlgorithmToUnwrap, keyTypeToUnwrap);
     }
 

@@ -123,7 +123,7 @@ public class MDESCryptography implements CryptographyInterceptor {
                     String hexEncryptedData = CryptUtil.byteArrayToHexString(encryptedData);
 
                     // 7) encrypt secretKey with issuer key
-                    byte[] encryptedSecretKey = CryptUtil.wrap("RSA/ECB/PKCS1Padding", "SunJCE", this.issuerCertificate.getPublicKey(), secretKey);
+                    byte[] encryptedSecretKey = CryptUtil.wrap("RSA/ECB/OAEPWithSHA-512AndMGF1Padding", "SunJCE", this.issuerCertificate.getPublicKey(), secretKey);
                     String hexEncryptedKey = CryptUtil.byteArrayToHexString(encryptedSecretKey);
 
                     byte[] certificateFingerprint = CryptUtil.generateFingerprint("SHA-1", this.issuerCertificate);
@@ -131,9 +131,12 @@ public class MDESCryptography implements CryptographyInterceptor {
 
                     HashMap encryptedMap = new HashMap();
                     encryptedMap.put("publicKeyFingerprint", fingerprintHexString);
-                    encryptedMap.put("encryptedKey", hexEncryptedKey);
                     encryptedMap.put("iv", hexIv);
+                    encryptedMap.put("encryptedKey", hexEncryptedKey);
                     encryptedMap.put("encryptedData", hexEncryptedData);
+                    encryptedMap.put("oaepHashingAlgorithm", "SHA512");
+
+
                     String keyMap = objectToEncryt.substring(0, objectToEncryt.indexOf("."));
                     smartMap.put(keyMap, encryptedMap);
                     break;
@@ -167,9 +170,17 @@ public class MDESCryptography implements CryptographyInterceptor {
                         String encryptedKey = (String) enclosingBlock.remove("encryptedKey");
                         byte[] encryptedKeyByteArray = CryptUtil.hexStringToByteArray(encryptedKey);
 
-                        //need to decryt with RSA
-                        //need to decrypt the key
-                        SecretKey secretKey = (SecretKey) CryptUtil.unwrap("RSA/ECB/PKCS1Padding", "SunJCE", this.privateKey, encryptedKeyByteArray, "AES", Cipher.SECRET_KEY);
+                        SecretKey secretKey = null;
+                        if (!enclosingBlock.containsKey("oaepHashingAlgorithm")) {
+                            secretKey = (SecretKey) CryptUtil.unwrap("RSA/ECB/PKCS1Padding", "SunJCE", this.privateKey, encryptedKeyByteArray, "AES", Cipher.SECRET_KEY);
+                        } else  {
+                            //arizzini: we need to able to provide different digest hasing coming back from the server. sha-256 / sha-512
+                            String oaepHashingAlgorithm = (String) enclosingBlock.remove("oaepHashingAlgorithm");
+                            if (!oaepHashingAlgorithm.contains("-")) {
+                                oaepHashingAlgorithm = oaepHashingAlgorithm.replace("SHA", "SHA-");
+                            }
+                            secretKey = (SecretKey) CryptUtil.unwrap("RSA/ECB/OAEPWith"+oaepHashingAlgorithm+"AndMGF1Padding", "SunJCE", this.privateKey, encryptedKeyByteArray, "AES", Cipher.SECRET_KEY);
+                        }
 
                         //need to read the iv
                         String ivString = (String) enclosingBlock.remove("iv");
