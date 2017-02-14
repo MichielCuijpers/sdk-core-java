@@ -7,6 +7,7 @@ import com.mastercard.api.core.functional.model.*
 import com.mastercard.api.core.http.HttpBuilder
 import com.mastercard.api.core.mocks.MockAuthentication
 import com.mastercard.api.core.mocks.MockBaseObject
+import com.mastercard.api.core.model.Environment
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.model.ResourceList
 import com.mastercard.api.core.security.Authentication
@@ -36,8 +37,6 @@ class ProxySpec extends Specification {
         CustomHttpClientBuilder builder = HttpBuilder.getInstance();
         HttpHost proxy = new HttpHost("127.0.0.1", 9999)
         builder.setProxy(proxy);
-
-
 
         try {
             InputStream is = new FileInputStream("src/test/resources/mcapi_sandbox_key.p12");
