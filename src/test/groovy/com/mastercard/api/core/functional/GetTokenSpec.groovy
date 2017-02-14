@@ -78,11 +78,8 @@ public class GetTokenSpec extends Specification {
         response.get("responseId").toString().equalsIgnoreCase("123456");
         response.get("token.tokenUniqueReference").toString().equalsIgnoreCase("DWSPMC000000000132d72d4fcb2f4136a0532d3093ff1a45");
         response.get("token.status").toString().equalsIgnoreCase("ACTIVE");
-        response.get("token.productConfig.brandLogoAssetId").toString().equalsIgnoreCase("800200c9-629d-11e3-949a-0739d27e5a66");
+        response.get("token.productConfig.brandLogoAssetId").toString().equalsIgnoreCase("800200c9-629d-11e3-949a-0739d27e5a67");
         response.get("token.productConfig.isCoBranded").toString().equalsIgnoreCase("true");
-        response.get("token.productConfig.coBrandName").toString().equalsIgnoreCase("Co brand partner");
-        response.get("token.productConfig.coBrandLogoAssetId").toString().equalsIgnoreCase("dbc55444-496a-4896-b41c-5d5e2dd431e2");
-        response.get("token.productConfig.cardBackgroundCombinedAssetId").toString().equalsIgnoreCase("739d27e5-629d-11e3-949a0800200c9a66");
         response.get("token.productConfig.foregroundColor").toString().equalsIgnoreCase("000000");
         response.get("token.productConfig.issuerName").toString().equalsIgnoreCase("Issuing Bank");
         response.get("token.productConfig.shortDescription").toString().equalsIgnoreCase("Bank Rewards MasterCard");
@@ -92,10 +89,10 @@ public class GetTokenSpec extends Specification {
         response.get("token.productConfig.privacyPolicyUrl").toString().equalsIgnoreCase("https://bank.com/privacy");
         response.get("token.productConfig.issuerProductConfigCode").toString().equalsIgnoreCase("123456");
         response.get("token.tokenInfo.tokenPanSuffix").toString().equalsIgnoreCase("1234");
-        response.get("token.tokenInfo.accountPanSuffix").toString().equalsIgnoreCase("6789");
+        response.get("token.tokenInfo.accountPanSuffix").toString().equalsIgnoreCase("5675");
         response.get("token.tokenInfo.tokenExpiry").toString().equalsIgnoreCase("1018");
         response.get("token.tokenInfo.dsrpCapable").toString().equalsIgnoreCase("true");
-        response.get("token.tokenInfo.tokenAssuranceLevel").toString().equalsIgnoreCase("0");
+        response.get("token.tokenInfo.tokenAssuranceLevel").toString().equalsIgnoreCase("1");
 
     }
 
