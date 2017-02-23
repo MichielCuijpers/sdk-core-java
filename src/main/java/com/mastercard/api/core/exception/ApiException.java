@@ -43,7 +43,7 @@ public class ApiException extends Exception {
     private String source;
     private String reasonCode;
     private String description;
-    private int httpStatus;
+    private Integer httpStatus;
     private CaseInsensitiveSmartMap rawErrorData;
 
     private List<Map<? extends String, ? extends Object>> errors = new ArrayList<Map<? extends String, ? extends Object>>();
@@ -155,7 +155,7 @@ public class ApiException extends Exception {
      *
      * @return an integer representing the HTTP httpStatus code for this API error (or 0 if there is no httpStatus)
      */
-    public int getHttpStatus() {
+    public Integer getHttpStatus() {
         return httpStatus;
     }
 
