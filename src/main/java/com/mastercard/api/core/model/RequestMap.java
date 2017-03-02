@@ -109,4 +109,8 @@ public class RequestMap extends SmartMap {
         super(keyPath, value);
     }
 
+    public RequestMap set(String keyPath, Object value) {
+        super.set(keyPath, value);
+        return this;
+    }
 }
