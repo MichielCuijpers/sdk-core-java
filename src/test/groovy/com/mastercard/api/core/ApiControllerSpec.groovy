@@ -100,6 +100,27 @@ class ApiControllerSpec extends Specification {
 
     }
 
+    def "test getUri json native"() {
+        given:
+        ResourceConfig config = ResourceConfig.getInstance();
+        OperationConfig operationConfig = new OperationConfig("/mdes/digitization/#env/1/0/getToken", Action.create, [], [])
+
+        when:
+        ApiController controller = new ApiController()
+        OperationMetadata operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext());
+        URI uri = controller.getURI(operationConfig, operationMetadata, new RequestMap());
+
+        then:
+        uri.toURL().toString() == "https://sandbox.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
+
+        when:
+        controller = new ApiController()
+        operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext(), true);
+        uri = controller.getURI(operationConfig, operationMetadata, new RequestMap());
+
+        then:
+        uri.toURL().toString() == "https://sandbox.api.mastercard.com/mdes/digitization/1/0/getToken"
+    }
 
     def "test appendToQueryString" () {
         given:

@@ -222,8 +222,10 @@ public class ApiController {
             }
         }
 
-        // Use JSON
-        s = appendToQueryString(s, "Format=JSON");
+        // Use JSON (If JSON native passing this parameter can cause issues)
+        if (!operationMetadata.isJsonNative()) {
+            s = appendToQueryString(s, "Format=JSON");
+        }
 
         try {
             uri = new URI(String.format(s.toString(), objectList.toArray()));
