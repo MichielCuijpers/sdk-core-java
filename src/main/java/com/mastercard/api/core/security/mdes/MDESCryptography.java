@@ -5,18 +5,13 @@ import com.mastercard.api.core.model.RequestMap;
 import com.mastercard.api.core.security.CryptographyInterceptor;
 import com.mastercard.api.core.security.util.CryptUtil;
 import com.mastercard.api.core.security.util.KeyType;
-import org.apache.commons.codec.DecoderException;
 import org.json.simple.JSONValue;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.*;
-import java.security.cert.*;
 import java.security.cert.Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 /**
@@ -24,17 +19,17 @@ import java.util.*;
  */
 public class MDESCryptography implements CryptographyInterceptor {
 
-    private final Certificate issuerCertificate;
+    private final Certificate publicCertificate;
     private final PrivateKey privateKey;
     private final List<String> triggeringEndPath;
     private final List<String> objectsToEncrypt;
     private final List<String> objectsToDecrypt;
 
-    public MDESCryptography(InputStream masterCardPublicCert, InputStream masterCardPrivateKeyP12, String privateKeyAlias, String privateKeyPassword)
+    public MDESCryptography(InputStream publicCertificate, InputStream keystore, String privateKeyAlias, String privateKeyPassword)
             throws SdkException {
         try {
-            this.issuerCertificate = CryptUtil.loadCertificate("X.509", masterCardPublicCert);
-            this.privateKey = (PrivateKey) CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", masterCardPrivateKeyP12, privateKeyAlias, privateKeyPassword );
+            this.publicCertificate = CryptUtil.loadCertificate("X.509", publicCertificate);
+            this.privateKey = (PrivateKey) CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", keystore, privateKeyAlias, privateKeyPassword );
             this.triggeringEndPath = Arrays.asList("/tokenize", "/searchTokens", "/getToken", "/transact", "/notifyTokenUpdated");
             this.objectsToEncrypt = Arrays.asList("cardInfo.encryptedData", "encryptedPayload.encryptedData");
             this.objectsToDecrypt = Arrays.asList("encryptedPayload.encryptedData", "tokenDetail.encryptedData");
@@ -44,11 +39,11 @@ public class MDESCryptography implements CryptographyInterceptor {
 
     }
 
-    public MDESCryptography(InputStream masterCardPublicCert, InputStream masterCardPrivateKeyP12, String privateKeyAlias, String privateKeyPassword, List<String> triggeringEndPath, List<String> objectsToEncrypt, List<String> objectsToDecrypt)
+    public MDESCryptography(InputStream publicCertificate, InputStream keystore, String privateKeyAlias, String privateKeyPassword, List<String> triggeringEndPath, List<String> objectsToEncrypt, List<String> objectsToDecrypt)
             throws SdkException {
         try {
-            this.issuerCertificate = CryptUtil.loadCertificate("X.509", masterCardPublicCert);
-            this.privateKey = (PrivateKey) CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", masterCardPrivateKeyP12, privateKeyAlias, privateKeyPassword );
+            this.publicCertificate = CryptUtil.loadCertificate("X.509", publicCertificate);
+            this.privateKey = (PrivateKey) CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", keystore, privateKeyAlias, privateKeyPassword );
             this.triggeringEndPath = triggeringEndPath;
             this.objectsToEncrypt = objectsToEncrypt;
             this.objectsToDecrypt = objectsToDecrypt;
@@ -58,10 +53,10 @@ public class MDESCryptography implements CryptographyInterceptor {
 
     }
 
-    public MDESCryptography(InputStream masterCardPublicCert, InputStream masterCardPrivateKey)
+    public MDESCryptography(InputStream publicCertificate, InputStream masterCardPrivateKey)
             throws SdkException {
         try {
-            this.issuerCertificate = CryptUtil.loadCertificate("X.509", masterCardPublicCert);
+            this.publicCertificate = CryptUtil.loadCertificate("X.509", publicCertificate);
             this.privateKey = CryptUtil.loadPrivateKey("RSA", masterCardPrivateKey);
             this.triggeringEndPath = Arrays.asList("/tokenize", "/searchTokens", "/getToken", "/transact", "/notifyTokenUpdated");
             this.objectsToEncrypt = Arrays.asList("cardInfo.encryptedData", "encryptedPayload.encryptedData");
@@ -73,12 +68,12 @@ public class MDESCryptography implements CryptographyInterceptor {
     }
 
 
-    public MDESCryptography(InputStream masterCardPublicCert, InputStream masterCardPrivateKey, List<String> triggeringEndPath, List<String> objectsToEncrypt, List<String> objectsToDecrypt)
+    public MDESCryptography(InputStream publicCertificate, InputStream masterCardPrivateKey, List<String> triggeringEndPath, List<String> objectsToEncrypt, List<String> objectsToDecrypt)
             throws SdkException {
 
         try {
 
-        this.issuerCertificate = CryptUtil.loadCertificate("X.509", masterCardPublicCert);
+        this.publicCertificate = CryptUtil.loadCertificate("X.509", publicCertificate);
         this.privateKey = CryptUtil.loadPrivateKey("RSA", masterCardPrivateKey);
         this.triggeringEndPath = triggeringEndPath;
         this.objectsToEncrypt = objectsToEncrypt;
@@ -123,10 +118,10 @@ public class MDESCryptography implements CryptographyInterceptor {
                     String hexEncryptedData = CryptUtil.byteArrayToHexString(encryptedData);
 
                     // 7) encrypt secretKey with issuer key
-                    byte[] encryptedSecretKey = CryptUtil.wrap("RSA/ECB/OAEPWithSHA-512AndMGF1Padding", "SunJCE", this.issuerCertificate.getPublicKey(), secretKey);
+                    byte[] encryptedSecretKey = CryptUtil.wrap("RSA/ECB/OAEPWithSHA-512AndMGF1Padding", "SunJCE", this.publicCertificate.getPublicKey(), secretKey);
                     String hexEncryptedKey = CryptUtil.byteArrayToHexString(encryptedSecretKey);
 
-                    byte[] certificateFingerprint = CryptUtil.generateFingerprint("SHA-1", this.issuerCertificate);
+                    byte[] certificateFingerprint = CryptUtil.generateFingerprint("SHA-1", this.publicCertificate);
                     String fingerprintHexString = CryptUtil.byteArrayToHexString(certificateFingerprint);
 
                     HashMap encryptedMap = new HashMap();
@@ -218,7 +213,7 @@ public class MDESCryptography implements CryptographyInterceptor {
 
 
     public boolean equals(MDESCryptography o) {
-        if (this.issuerCertificate.getType().compareTo(o.issuerCertificate.getType()) == 0) {
+        if (this.publicCertificate.getType().compareTo(o.publicCertificate.getType()) == 0) {
             return true;
         } else {
             return false;
@@ -228,6 +223,6 @@ public class MDESCryptography implements CryptographyInterceptor {
     public int hashCode() {
         return new StringBuilder(). // two randomly chosen prime numbers
                 // if deriving: appendSuper(super.hashCode()).
-                append(this.issuerCertificate.getType()).hashCode();
+                append(this.publicCertificate.getType()).hashCode();
     }
 }
