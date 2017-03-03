@@ -506,7 +506,7 @@ class ApiControllerSpec extends Specification {
         ((HttpPost) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         ((HttpPost) httpRequestBase).getEntity().content.text == JSONValue.toJSONString(objectMap.subMap(['a','b','id']))
         assertHeaders(httpRequestBase, headerMap)
-        httpRequestBase.getFirstHeader("Content-Type").value == "application/json"
+        httpRequestBase.getFirstHeader("Content-Type").value == "application/json; charset=UTF-8"
         mockBaseObject.get("x-sdk-mock-header") == null
 
         when: "getRequest for update"
@@ -519,7 +519,7 @@ class ApiControllerSpec extends Specification {
         ((HttpPut) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         ((HttpPut) httpRequestBase).getEntity().content.text == JSONValue.toJSONString(objectMap.subMap(['a','b','id']))
         assertHeaders(httpRequestBase, headerMap)
-        httpRequestBase.getFirstHeader("Content-Type").value == "application/json"
+        httpRequestBase.getFirstHeader("Content-Type").value == "application/json; charset=UTF-8"
         mockBaseObject.get("x-sdk-mock-header") == null
     }
 
@@ -591,7 +591,7 @@ class ApiControllerSpec extends Specification {
     }
 
     private void assertHeaders(HttpRequestBase httpRequestBase, Map<String, String> customHeaders) {
-        assert httpRequestBase.getFirstHeader("Accept").value == "application/json"
+        assert httpRequestBase.getFirstHeader("Accept").value == "application/json; charset=UTF-8"
         assert httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/0.0.1" as String
         assert httpRequestBase.getFirstHeader("MockAuthentication").value == "MockValue"
 
