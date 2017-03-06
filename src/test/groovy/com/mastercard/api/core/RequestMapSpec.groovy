@@ -1,6 +1,9 @@
 package com.mastercard.api.core
+
 import com.mastercard.api.core.model.RequestMap
+import groovy.transform.TypeChecked
 import spock.lang.Specification
+
 /**
  * Created by eamondoyle on 16/02/2016.
  */
@@ -138,6 +141,7 @@ class RequestMapSpec extends Specification {
         requestMap.get("d.aa") == 11
     }
 
+    @TypeChecked
     def 'test set and get' () {
         given:
         RequestMap requestMap = new RequestMap()

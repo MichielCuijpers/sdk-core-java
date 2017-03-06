@@ -7,6 +7,7 @@ public class OperationMetadata {
     String apiVersion;
     String host;
     String context;
+    boolean jsonNative;
 
     public OperationMetadata(String apiVersion, String host) {
         this.apiVersion = apiVersion;
@@ -19,6 +20,13 @@ public class OperationMetadata {
         this.context = context;
     }
 
+    public OperationMetadata(String apiVersion, String host, String context, boolean jsonNative) {
+        this.apiVersion = apiVersion;
+        this.host = host;
+        this.context = context;
+        this.jsonNative = jsonNative;
+    }
+
     public String getApiVersion() {
         return apiVersion;
     }
@@ -29,5 +37,9 @@ public class OperationMetadata {
 
     public String getContext() {
         return context;
+    }
+
+    public boolean isJsonNative() {
+        return jsonNative;
     }
 }

@@ -100,6 +100,27 @@ class ApiControllerSpec extends Specification {
 
     }
 
+    def "test getUri json native"() {
+        given:
+        ResourceConfig config = ResourceConfig.getInstance();
+        OperationConfig operationConfig = new OperationConfig("/mdes/digitization/#env/1/0/getToken", Action.create, [], [])
+
+        when:
+        ApiController controller = new ApiController()
+        OperationMetadata operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext());
+        URI uri = controller.getURI(operationConfig, operationMetadata, new RequestMap());
+
+        then:
+        uri.toURL().toString() == "https://sandbox.api.mastercard.com/mdes/digitization/1/0/getToken?Format=JSON"
+
+        when:
+        controller = new ApiController()
+        operationMetadata = new OperationMetadata("0.0.1", config.getHost(), config.getContext(), true);
+        uri = controller.getURI(operationConfig, operationMetadata, new RequestMap());
+
+        then:
+        uri.toURL().toString() == "https://sandbox.api.mastercard.com/mdes/digitization/1/0/getToken"
+    }
 
     def "test appendToQueryString" () {
         given:
@@ -506,6 +527,7 @@ class ApiControllerSpec extends Specification {
         ((HttpPost) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         ((HttpPost) httpRequestBase).getEntity().content.text == JSONValue.toJSONString(objectMap.subMap(['a','b','id']))
         assertHeaders(httpRequestBase, headerMap)
+        httpRequestBase.getFirstHeader("Content-Type").value == "application/json; charset=UTF-8"
         mockBaseObject.get("x-sdk-mock-header") == null
 
         when: "getRequest for update"
@@ -518,6 +540,7 @@ class ApiControllerSpec extends Specification {
         ((HttpPut) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         ((HttpPut) httpRequestBase).getEntity().content.text == JSONValue.toJSONString(objectMap.subMap(['a','b','id']))
         assertHeaders(httpRequestBase, headerMap)
+        httpRequestBase.getFirstHeader("Content-Type").value == "application/json; charset=UTF-8"
         mockBaseObject.get("x-sdk-mock-header") == null
     }
 
@@ -542,6 +565,7 @@ class ApiControllerSpec extends Specification {
         ((HttpGet) httpRequestBase).method == "GET"
         ((HttpGet) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         assertHeaders(httpRequestBase, headerMap);
+        httpRequestBase.getFirstHeader("Content-Type") == null
 
         when: "getRequest for list"
         mockBaseObject = new MockBaseObject(Action.list, objectMap)
@@ -552,6 +576,7 @@ class ApiControllerSpec extends Specification {
         ((HttpGet) httpRequestBase).method == "GET"
         ((HttpGet) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         assertHeaders(httpRequestBase, headerMap);
+        httpRequestBase.getFirstHeader("Content-Type") == null
 
         when: "getRequest for delete"
         mockBaseObject = new MockBaseObject(Action.delete, objectMap)
@@ -562,6 +587,7 @@ class ApiControllerSpec extends Specification {
         ((HttpDelete) httpRequestBase).method == "DELETE"
         ((HttpDelete) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         assertHeaders(httpRequestBase, headerMap);
+        httpRequestBase.getFirstHeader("Content-Type") == null
     }
 
     def "test getRequest with USER_AGENT" () {
@@ -586,7 +612,7 @@ class ApiControllerSpec extends Specification {
     }
 
     private void assertHeaders(HttpRequestBase httpRequestBase, Map<String, String> customHeaders) {
-        assert httpRequestBase.getFirstHeader("Accept").value == "application/json"
+        assert httpRequestBase.getFirstHeader("Accept").value == "application/json; charset=UTF-8"
         assert httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/0.0.1" as String
         assert httpRequestBase.getFirstHeader("MockAuthentication").value == "MockValue"
 

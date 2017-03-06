@@ -58,6 +58,7 @@ import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.security.*;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -222,8 +223,10 @@ public class ApiController {
             }
         }
 
-        // Use JSON
-        s = appendToQueryString(s, "Format=JSON");
+        // Use JSON (If JSON native passing this parameter can cause issues)
+        if (!operationMetadata.isJsonNative()) {
+            s = appendToQueryString(s, "Format=JSON");
+        }
 
         try {
             uri = new URI(String.format(s.toString(), objectList.toArray()));
@@ -272,12 +275,7 @@ public class ApiController {
             payload = JSONValue.toJSONString(objectMap);
             message = new HttpPost(uri);
 
-            HttpEntity createEntity;
-            try {
-                createEntity = new StringEntity(payload);
-            } catch (UnsupportedEncodingException e) {
-                throw new SdkException("Unsupported encoding for create action.", e);
-            }
+            HttpEntity createEntity = new StringEntity(payload, ContentType.APPLICATION_JSON);
             ((HttpPost) message).setEntity(createEntity);
 
             break;
@@ -296,12 +294,7 @@ public class ApiController {
             payload = JSONValue.toJSONString(objectMap);
             message = new HttpPut(uri);
 
-            HttpEntity updateEntity;
-            try {
-                updateEntity = new StringEntity(payload);
-            } catch (UnsupportedEncodingException e) {
-                throw new SdkException("Unsupported encoding for update action.", e);
-            }
+            HttpEntity updateEntity = new StringEntity(payload, ContentType.APPLICATION_JSON);
             ((HttpPut) message).setEntity(updateEntity);
 
             break;
@@ -315,8 +308,10 @@ public class ApiController {
         }
 
         // Set JSON
-        message.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-        message.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
+        if (hasBody(message)) {
+            message.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
+        }
+        message.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.toString());
 
         // Set other headers
         for (Map.Entry<String, Object> entry : headerMap.entrySet()) {
@@ -338,6 +333,17 @@ public class ApiController {
                 .sign(uri, HttpMethod.fromAction(operationConfig.getAction()), ContentType.APPLICATION_JSON, payload, message);
 
         return message;
+    }
+
+    private boolean hasBody(HttpRequestBase message) {
+        if (message instanceof HttpGet || message instanceof HttpDelete)
+            return false;
+
+        if (message instanceof HttpEntityEnclosingRequestBase) {
+            return ((HttpEntityEnclosingRequestBase) message).getEntity() != null;
+        }
+
+        return true;
     }
 
     public Map<? extends String, ? extends Object> execute(Authentication auth, OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)
@@ -482,7 +488,7 @@ public class ApiController {
 
                 //arizzini: entity == null when HTTP 200
                 if (entity != null) {
-                    String payload = EntityUtils.toString(entity);
+                    String payload = EntityUtils.toString(entity, ContentType.APPLICATION_JSON.getCharset());
 
                     //arizzini: if we have content, we try to parse it
                     if (!payload.isEmpty()) {
@@ -499,7 +505,7 @@ public class ApiController {
                             }
                         }
 
-                        if (responseContentType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
+                        if (ContentType.parse(responseContentType).getMimeType().equals(ContentType.APPLICATION_JSON.getMimeType())) {
                             apiResponse.setPayload(payload);
                         } else {
                             throw new IOException(
