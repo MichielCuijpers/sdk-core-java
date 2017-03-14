@@ -2,9 +2,16 @@ package com.mastercard.api.core.security.fle;
 
 import com.mastercard.api.core.exception.SdkException;
 import com.mastercard.api.core.security.util.DataEncoding;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
+import sun.jvm.hotspot.runtime.ObjectMonitor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by e049519 on 3/14/17.
@@ -105,6 +112,66 @@ public class Config {
         tmpConfig.dataEncoding = DataEncoding.HEX;
 
         return tmpConfig;
+    }
+
+    public final static Config parseFromJson(String json) {
+        JSONObject object =(JSONObject) JSONValue.parse(json);
+        Config tmpConfig = new Config();
+        if (object.containsKey("triggeringEndPath") && object.get("triggeringEndPath") instanceof JSONArray) {
+            ArrayList<String> tmp = new ArrayList<String>();
+            for (ListIterator<String> iterator = ((JSONArray)object.get("triggeringEndPath")).listIterator(); iterator.hasNext();) {
+                tmp.add(iterator.next());
+            }
+            tmpConfig.triggeringEndPath = tmp;
+        }
+
+        if (object.containsKey("fieldsToEncrypt") && object.get("fieldsToEncrypt") instanceof JSONArray) {
+            ArrayList<String> tmp = new ArrayList<String>();
+            for (ListIterator<String> iterator = ((JSONArray)object.get("fieldsToEncrypt")).listIterator(); iterator.hasNext();) {
+                tmp.add(iterator.next());
+            }
+            tmpConfig.fieldsToEncrypt = tmp;
+        }
+
+        if (object.containsKey("fieldsToDecrypt") && object.get("fieldsToDecrypt") instanceof JSONArray) {
+            ArrayList<String> tmp = new ArrayList<String>();
+            for (ListIterator<String> iterator = ((JSONArray)object.get("fieldsToDecrypt")).listIterator(); iterator.hasNext();) {
+                tmp.add(iterator.next());
+            }
+            tmpConfig.fieldsToDecrypt = tmp;
+        }
+
+        tmpConfig.symmetricAlgorithm = (String) object.get("symmetricAlgorithm");
+        tmpConfig.symmetricCipher = (String) object.get("symmetricCipher");
+        if(object.containsKey("symmetricKeysize")) {
+            try{
+                tmpConfig.symmetricKeysize = Integer.parseInt(object.get("symmetricKeysize").toString());
+            } catch (NumberFormatException e) {
+            }
+
+        }
+
+        tmpConfig.asymmetricCipher = (String) object.get("asymmetricCipher");
+        tmpConfig.oaepHashingAlgorithm = (String) object.get("oaepHashingAlgorithm");
+        tmpConfig.digestAlgorithm = (String) object.get("digestAlgorithm");
+
+        tmpConfig.ivFieldName = (String) object.get("ivFieldName");
+        tmpConfig.oaepHashingAlgorithmFieldName = (String) object.get("oaepHashingAlgorithmFieldName");
+        tmpConfig.encryptedKeyFiledName = (String) object.get("encryptedKeyFiledName");
+        tmpConfig.encryptedDataFieldName = (String) object.get("encryptedDataFieldName");
+        tmpConfig.publicKeyFingerprintFiledName = (String) object.get("publicKeyFingerprintFiledName");
+
+        String dataEncoding = (String) object.get("dataEncoding");
+        if (dataEncoding.toLowerCase().compareTo("hex") == 0) {
+            tmpConfig.dataEncoding = DataEncoding.HEX;
+        } else {
+            tmpConfig.dataEncoding = DataEncoding.BASE64;
+        }
+
+        tmpConfig.validate();
+
+        return tmpConfig;
+
     }
 
 

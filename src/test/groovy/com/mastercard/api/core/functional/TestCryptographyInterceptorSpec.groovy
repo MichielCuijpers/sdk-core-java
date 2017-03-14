@@ -29,8 +29,11 @@ package com.mastercard.api.core.functional
 
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.CryptographyInterceptor
+import com.mastercard.api.core.security.fle.Config
 import com.mastercard.api.core.security.installments.InstallementCryptography
 import com.mastercard.api.core.security.mdes.MDESCryptography
+import com.mastercard.api.core.security.util.DataEncoding
+import org.json.simple.JSONValue
 import spock.lang.Specification
 
 public class TestCryptographyInterceptorSpec extends Specification {
@@ -134,6 +137,43 @@ public class TestCryptographyInterceptorSpec extends Specification {
         encryptedMap.containsKey("calculatorReqData.wrappedKey")
         encryptedMap.containsKey("calculatorReqData.primaryAccountNumber")
         encryptedMap.containsKey("calculatorReqData.publicKeyFingerprint") == false
+
+    }
+
+
+    def 'test config from json'() {
+        setup:
+        def inputMap = [
+                triggeringEndPath: ['test1', 'test2'],
+                fieldsToEncrypt: ["fieldsToEncrypt"],
+                fieldsToDecrypt: ["fieldsToDecrypt"],
+                symmetricAlgorithm: "symmetricAlgorithm",
+                symmetricCipher: "symmetricCipher",
+                symmetricKeysize: "128",
+                asymmetricCipher: "asymmetricCipher",
+                oaepHashingAlgorithm: "oaepHashingAlgorithm",
+                asymmetricCipher: "asymmetricCipher",
+                oaepHashingAlgorithm: "oaepHashingAlgorithm",
+                digestAlgorithm: "digestAlgorithm",
+                ivFieldName: "ivFieldName",
+                oaepHashingAlgorithmFieldName: "oaepHashingAlgorithmFieldName",
+                encryptedKeyFiledName: "encryptedKeyFiledName",
+                encryptedDataFieldName: "encryptedDataFieldName",
+                publicKeyFingerprintFiledName: "publicKeyFingerprintFiledName",
+                dataEncoding: "hex"
+        ]
+
+
+
+
+        when:
+
+        Config tmpConfig = Config.parseFromJson(JSONValue.toJSONString(inputMap));
+
+
+        then:
+        tmpConfig != null;
+
 
     }
 }
