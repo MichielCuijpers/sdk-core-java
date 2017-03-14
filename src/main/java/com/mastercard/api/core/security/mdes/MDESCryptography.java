@@ -121,7 +121,7 @@ public class MDESCryptography implements CryptographyInterceptor {
                     byte[] encryptedSecretKey = CryptUtil.wrap("RSA/ECB/OAEPWithSHA-512AndMGF1Padding", "SunJCE", this.publicCertificate.getPublicKey(), secretKey);
                     String hexEncryptedKey = CryptUtil.byteArrayToHexString(encryptedSecretKey);
 
-                    byte[] certificateFingerprint = CryptUtil.generateFingerprint("SHA-1", this.publicCertificate);
+                    byte[] certificateFingerprint = CryptUtil.generateFingerprint("SHA-256", this.publicCertificate);
                     String fingerprintHexString = CryptUtil.byteArrayToHexString(certificateFingerprint);
 
                     HashMap encryptedMap = new HashMap();
