@@ -213,7 +213,9 @@ public class MDESCryptography implements CryptographyInterceptor {
 
 
     public boolean equals(MDESCryptography o) {
-        if (this.publicCertificate.getType().compareTo(o.publicCertificate.getType()) == 0) {
+        if (this.triggeringEndPath.equals(o.triggeringEndPath) &&
+                this.objectsToDecrypt.equals(o.objectsToDecrypt) &&
+                this.objectsToEncrypt.equals(o.objectsToEncrypt)) {
             return true;
         } else {
             return false;
@@ -221,8 +223,10 @@ public class MDESCryptography implements CryptographyInterceptor {
     }
     @Override
     public int hashCode() {
-        return new StringBuilder(). // two randomly chosen prime numbers
+        return new StringBuilder() // two randomly chosen prime numbers
                 // if deriving: appendSuper(super.hashCode()).
-                append(this.publicCertificate.getType()).hashCode();
+                .append(this.triggeringEndPath.hashCode())
+                .append(this.objectsToDecrypt.hashCode())
+                .append(this.objectsToEncrypt.hashCode()).hashCode();
     }
 }
