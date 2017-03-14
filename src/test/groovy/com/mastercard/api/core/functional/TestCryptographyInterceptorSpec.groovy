@@ -27,14 +27,10 @@
 
 package com.mastercard.api.core.functional
 
-import com.mastercard.api.core.ApiConfig
-import com.mastercard.api.core.functional.model.Tokenize
 import com.mastercard.api.core.model.RequestMap
-import com.mastercard.api.core.security.Authentication
 import com.mastercard.api.core.security.CryptographyInterceptor
-import com.mastercard.api.core.security.fle.ConfigurableFieldLevelEncryption
+import com.mastercard.api.core.security.installments.InstallementCryptography
 import com.mastercard.api.core.security.mdes.MDESCryptography
-import com.mastercard.api.core.security.oauth.OAuthAuthentication
 import spock.lang.Specification
 
 public class TestCryptographyInterceptorSpec extends Specification {
@@ -46,7 +42,7 @@ public class TestCryptographyInterceptorSpec extends Specification {
         setup:
         InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");
         InputStream is3 = new FileInputStream("src/test/resources/mastercard_private.key");
-        CryptographyInterceptor interceptor = new ConfigurableFieldLevelEncryption(is2, is3);
+        CryptographyInterceptor interceptor = new MDESCryptography(is2, is3);
 
         when:
 
@@ -85,7 +81,7 @@ public class TestCryptographyInterceptorSpec extends Specification {
         setup:
         InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");
         InputStream is3 = new FileInputStream("src/test/resources/mastercard_private.key");
-        CryptographyInterceptor interceptor = new ConfigurableFieldLevelEncryption(is2, is3);
+        CryptographyInterceptor interceptor = new MDESCryptography(is2, is3);
 
         when:
 
@@ -115,55 +111,14 @@ public class TestCryptographyInterceptorSpec extends Specification {
 
     }
 
-    def 'test encrypt map with configFields'() {
-        setup:
-        InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");
-        InputStream is3 = new FileInputStream("src/test/resources/mastercard_private.key");
-        CryptographyInterceptor interceptor = new ConfigurableFieldLevelEncryption(is2, is3);
-        interceptor.configFields("iv2", "oaepHashingAlgorithm2", "encryptedKey2", "encryptedData2", "publicKeyFingerprint2")
-
-        when:
-
-        RequestMap requestMap = new RequestMap();
-        requestMap.set("tokenRequestorId", "12345678901" );
-        requestMap.set("requestId", "123456");
-        requestMap.set("tokenType", "CLOUD");
-        requestMap.set("taskId", "123456");
-        requestMap.set("cardInfo.encryptedData.source", "CARD_ON_FILE");
-        requestMap.set("cardInfo.encryptedData.accountNumber", "5123456789012345");
-        requestMap.set("cardInfo.encryptedData.expiryMonth", "12");
-        requestMap.set("cardInfo.encryptedData.expiryYear", "18");
-        requestMap.set("cardInfo.encryptedData.securityCode", "123");
-        requestMap.set("cardInfo.encryptedData.billingAddress.line", "100 1st Street");
-        requestMap.set("cardInfo.encryptedData.billingAddress.line2", "Apt. 4B");
-        requestMap.set("cardInfo.encryptedData.billingAddress.city", "St. Louis");
-        requestMap.set("cardInfo.encryptedData.billingAddress.countrySubdivision", "MO");
-        requestMap.set("cardInfo.encryptedData.billingAddress.postalCode", "61000");
-        requestMap.set("cardInfo.encryptedData.billingAddress.country", "USA");
-
-        RequestMap encryptedMap = interceptor.encrypt(requestMap)
-
-
-        then:
-        encryptedMap.containsKey("cardInfo.publicKeyFingerprint2")
-        encryptedMap.containsKey("cardInfo.oaepHashingAlgorithm2")
-        encryptedMap.containsKey("cardInfo.iv2")
-        encryptedMap.containsKey("cardInfo.encryptedKey2")
-        encryptedMap.containsKey("cardInfo.encryptedData2")
-
-    }
 
 
     def 'test encrypt string payload'() {
         setup:
         InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");
         InputStream is3 = new FileInputStream("src/test/resources/mastercard_private.key");
-        CryptographyInterceptor interceptor = new ConfigurableFieldLevelEncryption(is2, is3);
-        interceptor.configFields("iv", "oaepHashingAlgorithm", "wrappedKey", "primaryAccountNumber", "publicKeyFingerprint")
+        CryptographyInterceptor interceptor = new InstallementCryptography(is2, is3);
 
-        interceptor.configTrigger(Arrays.asList(""),
-                Arrays.asList("calculatorReqData.primaryAccountNumber"),
-                Arrays.asList("calculatorReqData.primaryAccountNumber"))
 
         when:
 
@@ -175,10 +130,10 @@ public class TestCryptographyInterceptorSpec extends Specification {
 
         then:
         encryptedMap.containsKey("calculatorReqData.iv")
-        encryptedMap.containsKey("calculatorReqData.oaepHashingAlgorithm")
+        encryptedMap.containsKey("calculatorReqData.oaepHashingAlgorithm") == false
         encryptedMap.containsKey("calculatorReqData.wrappedKey")
         encryptedMap.containsKey("calculatorReqData.primaryAccountNumber")
-        encryptedMap.containsKey("calculatorReqData.publicKeyFingerprint")
+        encryptedMap.containsKey("calculatorReqData.publicKeyFingerprint") == false
 
     }
 }

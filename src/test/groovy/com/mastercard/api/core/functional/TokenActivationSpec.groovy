@@ -31,10 +31,8 @@ import com.mastercard.api.core.functional.model.Tokenize
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.Authentication
 import com.mastercard.api.core.security.CryptographyInterceptor
-import com.mastercard.api.core.security.fle.ConfigurableFieldLevelEncryption
 import com.mastercard.api.core.security.mdes.MDESCryptography
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
-import spock.lang.Ignore
 import spock.lang.Specification
 
 
@@ -65,7 +63,7 @@ public class TokenActivationSpec extends Specification {
         setup:
         InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");
         InputStream is3 = new FileInputStream("src/test/resources/mastercard_private.key");
-        CryptographyInterceptor interceptor = new ConfigurableFieldLevelEncryption(is2, is3);
+        CryptographyInterceptor interceptor = new MDESCryptography(is2, is3);
         ApiConfig.addCryptographyInterceptor(interceptor);
 
         when:
