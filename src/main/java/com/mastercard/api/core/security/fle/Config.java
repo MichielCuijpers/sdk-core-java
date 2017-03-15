@@ -5,8 +5,6 @@ import com.mastercard.api.core.security.util.DataEncoding;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
-import sun.jvm.hotspot.runtime.ObjectMonitor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -177,8 +175,8 @@ public class Config {
 
     public final static Config Installments() {
         Config tmpConfig = new Config();
-        tmpConfig.triggeringEndPath = Arrays.asList("/calculateInstalment", "/processInstalment");
-        tmpConfig.fieldsToEncrypt = Arrays.asList("calculatorReqData.primaryAccountNumber", "processInstalmentReqData.primaryAccountNumber");
+        tmpConfig.triggeringEndPath = Arrays.asList("/instalmentConfigdata","/calculateInstalment", "/processInstalment");
+        tmpConfig.fieldsToEncrypt = Arrays.asList("configReqData.primaryAccountNumber", "calculatorReqData.primaryAccountNumber", "processInstalmentReqData.primaryAccountNumber");
         tmpConfig.fieldsToDecrypt = Arrays.asList("");
 
         tmpConfig.symmetricAlgorithm = "AES/CBC/PKCS5Padding";

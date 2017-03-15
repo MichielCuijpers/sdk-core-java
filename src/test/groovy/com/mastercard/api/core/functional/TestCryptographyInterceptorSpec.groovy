@@ -30,9 +30,8 @@ package com.mastercard.api.core.functional
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.CryptographyInterceptor
 import com.mastercard.api.core.security.fle.Config
-import com.mastercard.api.core.security.installments.InstallementCryptography
+import com.mastercard.api.core.security.installments.InstallmentCryptography
 import com.mastercard.api.core.security.mdes.MDESCryptography
-import com.mastercard.api.core.security.util.DataEncoding
 import org.json.simple.JSONValue
 import spock.lang.Specification
 
@@ -99,17 +98,6 @@ public class TestCryptographyInterceptorSpec extends Specification {
         decryptedMap.containsKey("tokenDetail.expiryMonth");
         decryptedMap.containsKey("tokenDetail.expiryYear");
         decryptedMap.containsKey("tokenDetail.tokenUniqueReference");
-//        requestMap.set("cardInfo.encryptedData.accountNumber", "5123456789012345");
-//        requestMap.set("cardInfo.encryptedData.expiryMonth", "12");
-//        requestMap.set("cardInfo.encryptedData.expiryYear", "18");
-//        requestMap.set("cardInfo.encryptedData.securityCode", "123");
-//        requestMap.set("cardInfo.encryptedData.billingAddress.line", "100 1st Street");
-//        requestMap.set("cardInfo.encryptedData.billingAddress.line2", "Apt. 4B");
-//        requestMap.set("cardInfo.encryptedData.billingAddress.city", "St. Louis");
-//        requestMap.set("cardInfo.encryptedData.billingAddress.countrySubdivision", "MO");
-//        requestMap.set("cardInfo.encryptedData.billingAddress.postalCode", "61000");
-//        requestMap.set("cardInfo.encryptedData.billingAddress.country", "USA");
-
 
 
     }
@@ -120,7 +108,7 @@ public class TestCryptographyInterceptorSpec extends Specification {
         setup:
         InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");
         InputStream is3 = new FileInputStream("src/test/resources/mastercard_private.key");
-        CryptographyInterceptor interceptor = new InstallementCryptography(is2, is3);
+        CryptographyInterceptor interceptor = new InstallmentCryptography(is2, is3);
 
 
         when:
@@ -162,9 +150,6 @@ public class TestCryptographyInterceptorSpec extends Specification {
                 publicKeyFingerprintFiledName: "publicKeyFingerprintFiledName",
                 dataEncoding: "hex"
         ]
-
-
-
 
         when:
 
