@@ -27,7 +27,7 @@ public class Config {
     public int symmetricKeysize = -1;
     public String asymmetricCipher = null;
     public String oaepHashingAlgorithm = null;
-    public String digestAlgorithm = null;
+    public String publicKeyFingerprintHashing = null;
 
 
     public String ivFieldName = null;
@@ -38,7 +38,7 @@ public class Config {
 
     public DataEncoding dataEncoding;
 
-    private Config() {
+    public Config() {
 
     }
 
@@ -67,8 +67,8 @@ public class Config {
         if (oaepHashingAlgorithm == null) {
             throw new SdkException("Config: oaepHashingAlgorithm is null");
         }
-        if (digestAlgorithm == null) {
-            throw new SdkException("Config: digestAlgorithm is null");
+        if (publicKeyFingerprintHashing == null) {
+            throw new SdkException("Config: publicKeyFingerprintHashing is null");
         }
         if (ivFieldName == null) {
             throw new SdkException("Config: ivFieldName is null");
@@ -85,31 +85,6 @@ public class Config {
         if (publicKeyFingerprintFiledName == null) {
             throw new SdkException("Config: publicKeyFingerprintFiledName is null");
         }
-    }
-
-
-    public final static Config MDES() {
-        Config tmpConfig = new Config();
-        tmpConfig.triggeringEndPath = Arrays.asList("/tokenize", "/searchTokens", "/getToken", "/transact", "/notifyTokenUpdated");
-        tmpConfig.fieldsToEncrypt = Arrays.asList("cardInfo.encryptedData", "encryptedPayload.encryptedData");
-        tmpConfig.fieldsToDecrypt = Arrays.asList("encryptedPayload.encryptedData", "tokenDetail.encryptedData");
-
-        tmpConfig.symmetricAlgorithm = "AES/CBC/PKCS5Padding";
-        tmpConfig.symmetricCipher = "AES";
-        tmpConfig.symmetricKeysize = 128;
-
-        tmpConfig.asymmetricCipher = "RSA/ECB/OAEPWithSHA-512AndMGF1Padding";
-        tmpConfig.oaepHashingAlgorithm = "SHA512";
-        tmpConfig.digestAlgorithm = "SHA-256";
-
-        tmpConfig.ivFieldName = "iv";
-        tmpConfig.oaepHashingAlgorithmFieldName = "oaepHashingAlgorithm";
-        tmpConfig.encryptedKeyFiledName = "encryptedKey";
-        tmpConfig.encryptedDataFieldName = "encryptedData";
-        tmpConfig.publicKeyFingerprintFiledName = "publicKeyFingerprint";
-        tmpConfig.dataEncoding = DataEncoding.HEX;
-
-        return tmpConfig;
     }
 
     public final static Config parseFromJson(String json) {
@@ -151,7 +126,7 @@ public class Config {
 
         tmpConfig.asymmetricCipher = (String) object.get("asymmetricCipher");
         tmpConfig.oaepHashingAlgorithm = (String) object.get("oaepHashingAlgorithm");
-        tmpConfig.digestAlgorithm = (String) object.get("digestAlgorithm");
+        tmpConfig.publicKeyFingerprintHashing = (String) object.get("publicKeyFingerprintHashing");
 
         tmpConfig.ivFieldName = (String) object.get("ivFieldName");
         tmpConfig.oaepHashingAlgorithmFieldName = (String) object.get("oaepHashingAlgorithmFieldName");
@@ -171,33 +146,6 @@ public class Config {
         return tmpConfig;
 
     }
-
-
-    public final static Config Installments() {
-        Config tmpConfig = new Config();
-        tmpConfig.triggeringEndPath = Arrays.asList("/instalmentConfigdata","/calculateInstalment", "/processInstalment");
-        tmpConfig.fieldsToEncrypt = Arrays.asList("configReqData.primaryAccountNumber", "calculatorReqData.primaryAccountNumber", "processInstalmentReqData.primaryAccountNumber");
-        tmpConfig.fieldsToDecrypt = Arrays.asList("");
-
-        tmpConfig.symmetricAlgorithm = "AES/CBC/PKCS5Padding";
-        tmpConfig.symmetricCipher = "AES";
-        tmpConfig.symmetricKeysize = 128;
-
-        tmpConfig.asymmetricCipher = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
-        tmpConfig.oaepHashingAlgorithm = "SHA256";
-        tmpConfig.digestAlgorithm = "SHA-256";
-
-        tmpConfig.ivFieldName = "iv";
-        tmpConfig.oaepHashingAlgorithmFieldName = null;
-        tmpConfig.encryptedKeyFiledName = "wrappedKey";
-        tmpConfig.encryptedDataFieldName = "primaryAccountNumber";
-        tmpConfig.publicKeyFingerprintFiledName = null;
-        tmpConfig.dataEncoding = DataEncoding.BASE64;
-
-
-        return tmpConfig;
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -221,7 +169,7 @@ public class Config {
             return false;
         if (oaepHashingAlgorithm != null ? !oaepHashingAlgorithm.equals(config.oaepHashingAlgorithm) : config.oaepHashingAlgorithm != null)
             return false;
-        if (digestAlgorithm != null ? !digestAlgorithm.equals(config.digestAlgorithm) : config.digestAlgorithm != null)
+        if (publicKeyFingerprintHashing != null ? !publicKeyFingerprintHashing.equals(config.publicKeyFingerprintHashing) : config.publicKeyFingerprintHashing != null)
             return false;
         if (ivFieldName != null ? !ivFieldName.equals(config.ivFieldName) : config.ivFieldName != null) return false;
         if (oaepHashingAlgorithmFieldName != null ? !oaepHashingAlgorithmFieldName.equals(config.oaepHashingAlgorithmFieldName) : config.oaepHashingAlgorithmFieldName != null)
@@ -243,7 +191,7 @@ public class Config {
         result = 31 * result + symmetricKeysize;
         result = 31 * result + (asymmetricCipher != null ? asymmetricCipher.hashCode() : 0);
         result = 31 * result + (oaepHashingAlgorithm != null ? oaepHashingAlgorithm.hashCode() : 0);
-        result = 31 * result + (digestAlgorithm != null ? digestAlgorithm.hashCode() : 0);
+        result = 31 * result + (publicKeyFingerprintHashing != null ? publicKeyFingerprintHashing.hashCode() : 0);
         result = 31 * result + (ivFieldName != null ? ivFieldName.hashCode() : 0);
         result = 31 * result + (oaepHashingAlgorithmFieldName != null ? oaepHashingAlgorithmFieldName.hashCode() : 0);
         result = 31 * result + (encryptedKeyFiledName != null ? encryptedKeyFiledName.hashCode() : 0);

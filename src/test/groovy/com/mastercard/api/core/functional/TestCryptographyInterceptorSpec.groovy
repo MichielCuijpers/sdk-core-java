@@ -94,9 +94,9 @@ public class TestCryptographyInterceptorSpec extends Specification {
 
         then:
 
-        decryptedMap.containsKey("tokenDetail.tokenNumber");
-        decryptedMap.containsKey("tokenDetail.expiryMonth");
-        decryptedMap.containsKey("tokenDetail.expiryYear");
+        decryptedMap.containsKey("tokenDetail.encryptedData.tokenNumber");
+        decryptedMap.containsKey("tokenDetail.encryptedData.expiryMonth");
+        decryptedMap.containsKey("tokenDetail.encryptedData.expiryYear");
         decryptedMap.containsKey("tokenDetail.tokenUniqueReference");
 
 
@@ -142,7 +142,7 @@ public class TestCryptographyInterceptorSpec extends Specification {
                 oaepHashingAlgorithm: "oaepHashingAlgorithm",
                 asymmetricCipher: "asymmetricCipher",
                 oaepHashingAlgorithm: "oaepHashingAlgorithm",
-                digestAlgorithm: "digestAlgorithm",
+                publicKeyFingerprintHashing: "sha-256",
                 ivFieldName: "ivFieldName",
                 oaepHashingAlgorithmFieldName: "oaepHashingAlgorithmFieldName",
                 encryptedKeyFiledName: "encryptedKeyFiledName",
