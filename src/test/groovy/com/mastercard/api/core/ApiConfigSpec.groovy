@@ -48,6 +48,10 @@ class ApiConfigSpec extends Specification {
     }
 
     def 'test default values' () {
+
+        setup:
+        ApiConfig.authentication = null;
+
         expect:
         ApiConfig.authentication == null
         !ApiConfig.debug
