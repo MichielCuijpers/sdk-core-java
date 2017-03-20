@@ -14,7 +14,7 @@ public class JSONEcho extends BaseObject {
     public JSONEcho() {
     }
 
-    private static String host = "https://stage.api.mastercard.com";
+    private static String host = "https://stage .api.mastercard.com";
 
     public JSONEcho(BaseObject o) {
         putAll(o);

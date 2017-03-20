@@ -6,7 +6,9 @@ import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.security.CryptographyInterceptor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -16,7 +18,7 @@ public final class ApiConfig {
     private static boolean debug = false;
     private static boolean ignoreSSLErrors = false;
     private static Authentication authentication;
-    private static Map<String,CryptographyInterceptor> cryptographyMap = new HashMap<String,CryptographyInterceptor>();
+    private static Set<CryptographyInterceptor> cryptographyInterceptorSet = new HashSet<CryptographyInterceptor>();
     private static Environment currentEnvironment = Environment.SANDBOX;
     private static Map<String,ResourceConfigInterface> registeredInstances = new HashMap<String,ResourceConfigInterface>();
 
@@ -133,10 +135,7 @@ public final class ApiConfig {
      * @param cryptographyInterceptor
      */
     public static void addCryptographyInterceptor(CryptographyInterceptor cryptographyInterceptor) {
-
-        if (!cryptographyMap.containsKey(cryptographyInterceptor.getClass().getName())){
-            cryptographyMap.put(cryptographyInterceptor.getClass().getName(), cryptographyInterceptor);
-        }
+        cryptographyInterceptorSet.add(cryptographyInterceptor);
     }
 
     /**
@@ -151,19 +150,12 @@ public final class ApiConfig {
     }
 
     /**
-     *
-     */
-    public static void clearResourceConfig() {
-        registeredInstances.clear();
-    }
-
-    /**
      * this methid return the crypto interceptor
      * @param basePath
      * @return
      */
     public static CryptographyInterceptor getCryptographyInterceptor(String basePath) {
-        for (CryptographyInterceptor interceptor : cryptographyMap.values()) {
+        for (CryptographyInterceptor interceptor : cryptographyInterceptorSet) {
             for (String triggeringPath : interceptor.getTriggeringEndPath())
             if (triggeringPath.compareTo(basePath) == 0 || basePath.endsWith(triggeringPath)) {
                 return interceptor;
