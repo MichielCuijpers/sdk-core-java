@@ -15,7 +15,6 @@ import java.security.PublicKey
 /**
  * Created by eamondoyle on 16/02/2016.
  */
-@Ignore
 class EncryptDecryptSpec extends Specification {
 
 
@@ -48,7 +47,7 @@ class EncryptDecryptSpec extends Specification {
         iv != null
 
         when: 'create a random private key (SK)'
-        SecretKey secretKey = CryptUtil.generateSecretKey("AES", 256)
+        SecretKey secretKey = CryptUtil.generateSecretKey("AES", "SunJCE", 128)
 
         then:
         secretKey != null

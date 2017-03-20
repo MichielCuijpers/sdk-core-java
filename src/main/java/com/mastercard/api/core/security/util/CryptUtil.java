@@ -1,12 +1,14 @@
 package com.mastercard.api.core.security.util;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +19,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Arrays;
 
 /**
  * Created by andrearizzini on 13/05/2016.
@@ -37,8 +40,13 @@ public class CryptUtil {
      * @param bytes
      * @return
      */
-    public static String byteArrayToHexString(byte[] bytes) {
-        return new String(Hex.encodeHex(bytes));
+    public static String byteArrayToString(byte[] bytes, DataEncoding encoding) {
+        if (encoding == DataEncoding.HEX) {
+            return new String(Hex.encodeHex(bytes));
+        } else {
+            return Base64.encodeBase64String(bytes);
+        }
+
     }
 
     /**
@@ -46,8 +54,13 @@ public class CryptUtil {
      * @param s
      * @return
      */
-    public static byte[] hexStringToByteArray(String s) throws DecoderException {
-        return Hex.decodeHex(s.toCharArray());
+    public static byte[] stringToByteArray(String s, DataEncoding encoding) throws DecoderException {
+        if (encoding == DataEncoding.HEX) {
+            return Hex.decodeHex(s.toCharArray());
+        } else {
+            return Base64.decodeBase64(s);
+        }
+
     }
 
     /**
@@ -68,11 +81,16 @@ public class CryptUtil {
      * @return
      * @throws NoSuchAlgorithmException
      */
-    public static SecretKey generateSecretKey(String algorithm, int size) throws NoSuchAlgorithmException, NoSuchProviderException {
+    public static SecretKey generateSecretKey(String algorithm, int size, String digestAlgorithm ) throws NoSuchAlgorithmException, NoSuchProviderException {
         KeyGenerator keyGen = KeyGenerator.getInstance(algorithm, "SunJCE");
         keyGen.init(size);
-        return keyGen.generateKey();
+        MessageDigest messageDigest = MessageDigest.getInstance(digestAlgorithm, "SUN");
+        messageDigest.reset();
+        byte[] keyValue = messageDigest.digest(keyGen.generateKey().getEncoded());
+        keyValue = Arrays.copyOf(keyValue, 16);
+        return new SecretKeySpec(keyValue, algorithm);
     }
+
 
     /**
      * this is the method to generate AES secret key
