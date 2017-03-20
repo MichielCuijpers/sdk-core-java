@@ -51,6 +51,8 @@ class ApiConfigSpec extends Specification {
 
         setup:
         ApiConfig.authentication = null;
+        ApiConfig.debug = false;
+        ApiConfig.environment = Environment.SANDBOX;
 
         expect:
         ApiConfig.authentication == null
