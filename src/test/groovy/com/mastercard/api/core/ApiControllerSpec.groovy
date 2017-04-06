@@ -633,7 +633,7 @@ class ApiControllerSpec extends Specification {
         apiController.execute(null, mockBaseObject.getOperationConfig(), mockBaseObject.getOperationMetadata(), mockBaseObject)
 
         then:
-        thrown(IllegalStateException)
+        thrown(ApiException)
     }
 
     @Unroll
@@ -753,7 +753,7 @@ class ApiControllerSpec extends Specification {
         apiController.execute(null, mockBaseObject.getOperationConfig(), mockBaseObject.getOperationMetadata(), mockBaseObject)
 
         then:
-        thrown(IllegalStateException)
+        thrown(ApiException)
 
     }
 

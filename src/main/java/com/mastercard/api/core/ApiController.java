@@ -412,15 +412,10 @@ public class ApiController {
 
             return null;
 
-        } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException(e);
         } catch (HttpResponseException e) {
-            throw new ApiException(
-                    "Failed to communicate with response code " + String.format("%d", e.getStatusCode()), e);
-        } catch (ClientProtocolException e) {
-            throw new ApiException("HttpClient exception", e);
-        } catch (IOException e) {
-            throw new ApiException("I/O error", e);
+            throw new ApiException( "Failed to communicate with response code " + String.format("%d", e.getStatusCode()), e);
+        } catch (Exception e) {
+            throw new ApiException(e.getMessage(), e);
         } finally {
             try {
                 httpClient.close();
