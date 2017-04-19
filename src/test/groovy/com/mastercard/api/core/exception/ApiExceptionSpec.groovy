@@ -101,15 +101,15 @@ public class ApiExceptionSpec extends Specification {
         ]
 
         when:
-        ApiException ApiException = new ApiException(500,errorData)
+        ApiException exception = new ApiException(500,errorData)
 
         then:
-        ApiException.getReasonCode() == "SYSTEM_ERROR"
-        ApiException.getErrors().size() == 1
-        ApiException.getErrors() == [errorData.Errors.Error]
-        ApiException.getMessage() == "Unknown Error"
-        ApiException.getHttpStatus() == 500
-        ApiException.getCause() == null
+        exception.getReasonCode() == "SYSTEM_ERROR"
+        exception.getErrors().size() == 1
+        exception.getErrors() == [errorData.Errors.Error]
+        exception.getMessage() == "Unknown Error"
+        exception.getHttpStatus() == 500
+        exception.getCause() == null
 
         when:
         errorData =
@@ -126,15 +126,15 @@ public class ApiExceptionSpec extends Specification {
                                 ]
                 ]
 
-        ApiException = new ApiException(500,errorData)
+        exception = new ApiException(500,errorData)
 
         then:
-        ApiException.getReasonCode() == "SYSTEM_ERROR"
-        ApiException.getErrors().size() == 1
-        ApiException.getErrors() == [errorData.errors.error]
-        ApiException.getMessage() == "Unknown Error"
-        ApiException.getHttpStatus() == 500
-        ApiException.getCause() == null
+        exception.getReasonCode() == "SYSTEM_ERROR"
+        exception.getErrors().size() == 1
+        exception.getErrors() == [errorData.errors.error]
+        exception.getMessage() == "Unknown Error"
+        exception.getHttpStatus() == 500
+        exception.getCause() == null
 
         when:
         errorData =
@@ -159,15 +159,15 @@ public class ApiExceptionSpec extends Specification {
             ]
         ]
 
-        ApiException = new ApiException(500, errorData)
+        exception = new ApiException(500, errorData)
 
         then:
-        ApiException.getReasonCode() == "SYSTEM_ERROR1"
-        ApiException.getErrors().size() == 2
-        ApiException.getErrors() == errorData.Errors.Error
-        ApiException.getMessage() == "Unknown Error1"
-        ApiException.getHttpStatus() == 500
-        ApiException.getCause() == null
+        exception.getReasonCode() == "SYSTEM_ERROR1"
+        exception.getErrors().size() == 2
+        exception.getErrors() == errorData.Errors.Error
+        exception.getMessage() == "Unknown Error1"
+        exception.getHttpStatus() == 500
+        exception.getCause() == null
 
 
         when:
@@ -193,15 +193,15 @@ public class ApiExceptionSpec extends Specification {
                     ]
             ]
 
-        ApiException = new ApiException(500, errorData)
+        exception = new ApiException(500, errorData)
 
         then:
-        ApiException.getReasonCode() == "SYSTEM_ERROR1"
-        ApiException.getErrors().size() == 2
-        ApiException.getErrors() == errorData.errors.error
-        ApiException.getMessage() == "Unknown Error1"
-        ApiException.getHttpStatus() == 500
-        ApiException.getCause() == null
+        exception.getReasonCode() == "SYSTEM_ERROR1"
+        exception.getErrors().size() == 2
+        exception.getErrors() == errorData.errors.error
+        exception.getMessage() == "Unknown Error1"
+        exception.getHttpStatus() == 500
+        exception.getCause() == null
 
 
         //{"errors":[{"source":"OpenAPIClientId","reasonCode":"AUTHORIZATION_FAILED","key":"050007","description":"Unauthorized Access","recoverable":false,"requestId":null,"details":{"details":[{"name":"ErrorDetailCode","value":"050007"}]}}]}
@@ -223,29 +223,57 @@ public class ApiExceptionSpec extends Specification {
                                 ]
                 ]
 
-        ApiException = new ApiException(500, errorData)
+        exception = new ApiException(500, errorData)
 
         then:
-        ApiException.getReasonCode() == "AUTHORIZATION_FAILED"
-        ApiException.getErrors().size() == 1
-        ApiException.getErrors() == errorData.errors
-        ApiException.getMessage() == "Unauthorized Access"
-        ApiException.getSource() == "OpenAPIClientId"
-        ApiException.getHttpStatus() == 500
-        ApiException.getCause() == null
+        exception.getReasonCode() == "AUTHORIZATION_FAILED"
+        exception.getErrors().size() == 1
+        exception.getErrors() == errorData.errors
+        exception.getMessage() == "Unauthorized Access"
+        exception.getSource() == "OpenAPIClientId"
+        exception.getHttpStatus() == 500
+        exception.getCause() == null
+
+        when:
+        List<Map<String, Object>> errorDataList = [
+
+                    [
+                        "source":"OpenAPIClientId",
+                        "reasonCode":"AUTHORIZATION_FAILED",
+                        "key":"050007",
+                        "description":"Unauthorized Access",
+                        "recoverable":false,
+                        "requestId":null,
+
+                    ]
+                    ]
+
+
+        exception = new ApiException(500, errorDataList)
+
+        then:
+        exception.getReasonCode() == "AUTHORIZATION_FAILED"
+        exception.getErrors().size() == 1
+        exception.getErrors() == errorData.errors
+        exception.getMessage() == "Unauthorized Access"
+        exception.getSource() == "OpenAPIClientId"
+        exception.getHttpStatus() == 500
+        exception.getCause() == null
 
         when:
         errorData = [:]
 
-        ApiException = new ApiException(500, errorData)
+        exception = new ApiException(500, errorData)
 
         then:
-        ApiException.getReasonCode() == null
-        ApiException.getErrors().size() == 0
-        ApiException.getErrors() == []
-        ApiException.getMessage() == null
-        ApiException.getHttpStatus() == 500
-        ApiException.getCause() == null
+        exception.getReasonCode() == null
+        exception.getErrors().size() == 0
+        exception.getErrors() == []
+        exception.getMessage() == null
+        exception.getHttpStatus() == 500
+        exception.getCause() == null
+
+
     }
 
     def 'test describe' () {

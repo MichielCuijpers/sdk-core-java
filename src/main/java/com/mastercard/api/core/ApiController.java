@@ -406,7 +406,7 @@ public class ApiController {
                     }
                 } else {
                     int status = apiResponse.getStatus();
-                    throw new ApiException(status, (Map<? extends String, ? extends Object>) response);
+                    throw new ApiException(status, response);
                 }
             }
 

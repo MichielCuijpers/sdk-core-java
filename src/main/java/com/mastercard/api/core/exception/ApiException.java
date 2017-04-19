@@ -29,9 +29,7 @@ package com.mastercard.api.core.exception;
 
 import com.mastercard.api.core.model.map.CaseInsensitiveSmartMap;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Base class for all API exceptions.
@@ -46,7 +44,7 @@ public class ApiException extends Exception {
     private int httpStatus;
     private CaseInsensitiveSmartMap rawErrorData;
 
-    private List<Map<? extends String, ? extends Object>> errors = new ArrayList<Map<? extends String, ? extends Object>>();
+    private List<Map<String,Object>> errors = new ArrayList<Map<String,Object>>();
 
     /**
      * Constructs an <code>ApiException</code> with no detail description.
@@ -97,48 +95,95 @@ public class ApiException extends Exception {
      *                  is expected to contain <code>String</code> values for the keys
      *                  <code>"code"</code> and <code>"description"</code>.
      */
-    public ApiException(int httpStatus, Map<? extends String, ? extends Object> errorData) {
+    public ApiException(int httpStatus, Object errorData) {
         super();
 
         this.httpStatus = httpStatus;
 
 
-        Map tmpMap = (Map<String,Object>) errorData;
+        parseErrors(errorData);
+        setFirstError();
+    }
 
-        // Use SmartMap for easy traversing
-        this.rawErrorData = new CaseInsensitiveSmartMap(tmpMap);
 
-
-        if (rawErrorData.containsKey("Errors")) {
-            Object o = rawErrorData.get("Errors");
-
-            if (o instanceof Map && ((Map) o).containsKey("Error")) {
-                o = ((Map) o).get("Error");
-            }
-
-            if (o instanceof List) {
-                errors= (List<Map<? extends String, ? extends Object>>) o;
-            } else if (o instanceof Map){
-                errors.add((Map<? extends String, ? extends Object>) o);
-            }
-
-            // Use the first error
-            if (errors.size() > 0) {
-                Map<? extends String, ? extends Object> error = errors.get(0);
-                if (error.containsKey("Source")) {
-                    source = error.get("Source").toString();
-                }
-                if (error.containsKey("ReasonCode")) {
-                    reasonCode = error.get("ReasonCode").toString();
-                }
-                if (error.containsKey("Description")) {
-                    description = error.get("Description").toString();
-                }
-            }
+    protected void parseErrors(Object response) {
+        List<Map<String,Object>> tmpList = new ArrayList<Map<String, Object>>();
+        if (response instanceof List) {
+            tmpList.addAll((List<Map<String,Object>>) response);
+        } else if (response instanceof Map) {
+            tmpList.add((Map<String,Object>) response);
         }
 
+        for (Map<String,Object> tmpErrorMap : tmpList) {
+            CaseInsensitiveSmartMap tmpCaseInsensitiveMap = new CaseInsensitiveSmartMap(tmpErrorMap);
+            try {
+                if (tmpCaseInsensitiveMap.containsKey("Errors.Error.Description")) {
+                    //errors object with a list of error object
+                    Map<String,Object> tmpErrorObj = (Map<String,Object>) tmpCaseInsensitiveMap.get("Errors.Error");
+                    parseError(tmpErrorObj);
+                    continue;
+                }
+            } catch (Exception e) {
 
+            }
 
+            try {
+                if (tmpCaseInsensitiveMap.containsKey("Errors.Error[0].Description")) {
+                    //errors object with a list of error object
+                    List<Map<String,Object>> tmpErrorList = (List<Map<String,Object>>) tmpCaseInsensitiveMap.get("Errors.Error");
+                    parseError(tmpErrorList);
+                    continue;
+                }
+            } catch (Exception e) {
+
+            }
+
+            try {
+                if (tmpCaseInsensitiveMap.containsKey("Errors[0].Description")) {
+                    List<Map<String,Object>> tmpErrorList = (List<Map<String,Object>>) tmpCaseInsensitiveMap.get("Errors");
+                    parseError(tmpErrorList);
+                    continue;
+                }
+            } catch (Exception e) {
+
+            }
+
+            try {
+
+                if (tmpCaseInsensitiveMap.containsKey("Description")) {
+                    parseError(tmpCaseInsensitiveMap);
+                    continue;
+                }
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    protected void parseError(List<Map<String,Object>> errorList) {
+        for (Map<String,Object> errorObj : errorList) {
+            parseError(errorObj);
+        }
+    }
+
+    protected void parseError(Map<String,Object> errorMap) {
+        errors.add(errorMap);
+    }
+
+    protected void setFirstError() {
+        if (!errors.isEmpty()) {
+            Map<String,Object> tmpErrorMap = errors.get(0);
+            rawErrorData = new CaseInsensitiveSmartMap(tmpErrorMap);
+            if (rawErrorData.get("Source") != null) {
+                source = rawErrorData.get("Source").toString();
+            }
+            if (rawErrorData.get("ReasonCode") != null) {
+                reasonCode = rawErrorData.get("ReasonCode").toString();
+            }
+            if (rawErrorData.get("Description") != null) {
+                description = rawErrorData.get("Description").toString();
+            }
+        }
     }
 
     /**
@@ -167,7 +212,7 @@ public class ApiException extends Exception {
         return source;
     }
 
-    public List<Map<? extends String, ? extends Object>> getErrors() {
+    public List<Map<String,Object>> getErrors() {
         return errors;
     }
 

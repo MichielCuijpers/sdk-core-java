@@ -107,8 +107,8 @@ public class OAuthAuthentication implements Authentication {
         // Create Signer
         OAuthSigner oAuthSigner = new OAuthSigner(privateKey);
 
-        // Create OAuthConsumer
-        OAuthConsumer oAuthConsumer = new DefaultOAuthConsumer(consumerKey, "");
+        // Create CustomOAuthConsumer
+        OAuthConsumer oAuthConsumer = new CustomOAuthConsumer(consumerKey, "");
         oAuthConsumer.setMessageSigner(oAuthSigner);
         oAuthConsumer.setAdditionalParameters(params);
 
