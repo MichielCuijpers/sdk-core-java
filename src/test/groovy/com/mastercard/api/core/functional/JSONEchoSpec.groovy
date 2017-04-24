@@ -82,6 +82,8 @@ public class JSONEchoSpec extends Specification {
 
 
         when:
+
+        JSONEcho.setHost("http://sandbox.api.mastercard.com")
         String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
         RequestMap request = new RequestMap();
         request.set("JSONEcho.string", utf8);

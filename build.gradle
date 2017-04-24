@@ -38,16 +38,13 @@ repositories {
     }
 
     maven {
-        url "http://artifactory.mastercard.com:16364/artifactory/public-snapshots/"
-    }
-
-    maven {
-        url "http://artifactory.mastercard.com:16364/artifactory/public/"
-    }
-
-    maven {
         url "http://artifactory.mastercard.com:16364/artifactory/snapshots/"
     }
+
+    maven {
+        url "http://artifactory.mastercard.com:16364/artifactory/releases/"
+    }
+
 
     maven {
         url 'http://labs.mastercard.com/artifactory/repo'

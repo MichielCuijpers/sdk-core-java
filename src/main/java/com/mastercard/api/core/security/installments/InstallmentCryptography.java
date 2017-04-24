@@ -29,8 +29,8 @@ public class InstallmentCryptography extends FieldLevelEncryption {
 
     public final static Config Installments() {
         Config tmpConfig = new Config();
-        tmpConfig.triggeringEndPath = Arrays.asList("/instalmentConfigdata","/calculateInstalment", "/processInstalment");
-        tmpConfig.fieldsToEncrypt = Arrays.asList("configReqData.primaryAccountNumber", "calculatorReqData.primaryAccountNumber", "processInstalmentReqData.primaryAccountNumber");
+        tmpConfig.triggeringEndPath = Arrays.asList("/instalmentConfigdata","/calculateInstalment", "/processInstalment", "/receiveApproval");
+        tmpConfig.fieldsToEncrypt = Arrays.asList("configReqData.primaryAccountNumber", "calculatorReqData.primaryAccountNumber", "processInstalmentReqData.primaryAccountNumber", "receiveIssuerApprReqData.primaryAccountNumber");
         tmpConfig.fieldsToDecrypt = Arrays.asList("");
 
         tmpConfig.symmetricAlgorithm = "AES/CBC/PKCS5Padding";
