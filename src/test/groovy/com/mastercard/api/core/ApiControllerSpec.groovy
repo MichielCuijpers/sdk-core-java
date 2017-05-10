@@ -687,7 +687,37 @@ class ApiControllerSpec extends Specification {
     }
 
     @Unroll
-    def "test execute exceptions mockHttpResponse #mockHttpResponse thrownEx #thrownEx" () {
+    def "test execute exceptions hasResponseCode #responseCode and check exception " () {
+        given:
+        MockBaseObject mockBaseObject = new MockBaseObject(Action.create, [id: 1])
+        MockHttpClient mockHttpClient = new MockHttpClient(mockHttpResponse)
+
+        ApiController apiController = Spy(ApiController, constructorArgs: []) {
+            createHttpClient() >> mockHttpClient
+        }
+
+        when:
+        Map<String,Object> responseObj = apiController.execute(null, mockBaseObject.getOperationConfig(), mockBaseObject.getOperationMetadata(), mockBaseObject)
+
+        then:
+        ApiException ex = thrown()
+        ex.getHttpStatus() == responseCode
+        ex.getReasonCode() == reasonCode
+        ex.getMessage() == description
+        mockHttpClient.closed == true
+
+
+        where:
+        mockHttpResponse              | responseCode    | source            | reasonCode              | description
+        new MockHttpResponse(400, "{\"errors\": { \"error\": {\"source\":\"OpenAPIClientId\",\"reasonCode\":\"AUTHORIZATION_FAILED\",\"description\":\"Unauthorized Access\",\"recoverable\":false }}}")  | 400         | "OpenAPIClientId"  | "AUTHORIZATION_FAILED"    | "Unauthorized Access"
+        new MockHttpResponse(401, "{\"Errors\":{\"Error\":[{\"Source\":\"OpenAPIClientId\",\"ReasonCode\":\"AUTHORIZATION_FAILED\",\"Description\":\"Unauthorized Access\",\"Recoverable\":false}]}}") | 401            | "OpenAPIClientId"  | "AUTHORIZATION_FAILED"    | "Unauthorized Access"
+        new MockHttpResponse(403, "{\"errors\":[{\"source\":\"OpenAPIClientId\",\"reasonCode\":\"AUTHORIZATION_FAILED\",\"description\":\"Unauthorized Access\",\"recoverable\":false}]}") | 403       | "OpenAPIClientId"  | "AUTHORIZATION_FAILED"    | "Unauthorized Access"
+        new MockHttpResponse(404, "[{\"source\":\"OpenAPIClientId\",\"reasonCode\":\"AUTHORIZATION_FAILED\",\"description\":\"Unauthorized Access\",\"recoverable\":false }]") | 404         | "OpenAPIClientId"  | "AUTHORIZATION_FAILED"    | "Unauthorized Access"
+    }
+
+
+    @Unroll
+    def "test execute exceptions and check exception for responseCode: #responseCode and error" () {
         given:
         MockBaseObject mockBaseObject = new MockBaseObject(Action.create, [id: 1])
         MockHttpClient mockHttpClient = new MockHttpClient(mockHttpResponse)
@@ -700,20 +730,23 @@ class ApiControllerSpec extends Specification {
         apiController.execute(null, mockBaseObject.getOperationConfig(), mockBaseObject.getOperationMetadata(), mockBaseObject)
 
         then:
-        thrown(thrownEx)
+        ApiException ex = thrown()
+        ex.getClass() == thrownEx
+        ex.getHttpStatus() == responseCode
         mockHttpClient.closed == true
 
+
         where:
-        mockHttpResponse                            | thrownEx
-        new MockHttpResponse(400, [error: "error"]) | ApiException
-        new MockHttpResponse(401, [error: "error"]) | ApiException
-        new MockHttpResponse(403, [error: "error"]) | ApiException
-        new MockHttpResponse(404, [error: "error"]) | ApiException
-        new MockHttpResponse(500, [error: "error"]) | ApiException
-        new MockHttpResponse(503, [error: "error"]) | ApiException
-        new MockHttpResponse(503, [error: "error"], { throw new HttpResponseException(503, "mock") }) | ApiException
-        new MockHttpResponse(503, [error: "error"], { throw new ClientProtocolException() }) | ApiException
-        new MockHttpResponse(503, [error: "error"], { throw new IOException() }) | ApiException
+        mockHttpResponse                            | responseCode    | thrownEx
+        new MockHttpResponse(400, [error: "error"]) | 400            | ApiException
+        new MockHttpResponse(401, [error: "error"]) | 401            | ApiException
+        new MockHttpResponse(403, [error: "error"]) | 403            | ApiException
+        new MockHttpResponse(404, [error: "error"]) | 404            | ApiException
+        new MockHttpResponse(500, [error: "error"]) | 500            | ApiException
+        new MockHttpResponse(503, [error: "error"]) | 503            | ApiException
+        new MockHttpResponse(503, [error: "error"], { throw new HttpResponseException(503, "mock") }) | 0            | ApiException
+        new MockHttpResponse(503, [error: "error"], { throw new ClientProtocolException() }) | 0            | ApiException
+        new MockHttpResponse(503, [error: "error"], { throw new IOException() }) | 0            | ApiException
     }
 
     @Unroll

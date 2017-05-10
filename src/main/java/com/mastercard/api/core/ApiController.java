@@ -47,6 +47,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.http.util.TextUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -405,15 +406,16 @@ public class ApiController {
                         }
                     }
                 } else {
-                    int status = apiResponse.getStatus();
-                    throw new ApiException(status, response);
+                    throw new ApiException(apiResponse.getStatus(), response);
                 }
             }
 
             return null;
 
         } catch (HttpResponseException e) {
-            throw new ApiException( "Failed to communicate with response code " + String.format("%d", e.getStatusCode()), e);
+            throw new ApiException("Failed to communicate with response code " + String.format("%d", e.getStatusCode()), e);
+        } catch (ApiException e)  {
+            throw e;
         } catch (Exception e) {
             throw new ApiException(e.getMessage(), e);
         } finally {

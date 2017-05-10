@@ -23,18 +23,32 @@ class MockHttpResponse<T extends Object> implements CloseableHttpResponse {
     public String contentType = ContentType.APPLICATION_JSON.mimeType
 
     int status
-    T jsonRespone;
+    String jsonRespone;
     Closure c
 
-    MockHttpResponse(int status, T jsonResponse) {
+    MockHttpResponse(int status, T jsonResponseObject) {
         this.status = status
-        this.jsonRespone = jsonResponse
+        parseJson(jsonResponseObject);
+
     }
 
-    MockHttpResponse(int status, T jsonResponse, Closure c) {
+    MockHttpResponse(int status, T jsonResponseObject, Closure c) {
         this.status = status
-        this.jsonRespone = jsonResponse
+        parseJson(jsonResponseObject);
         this.c = c
+    }
+
+    private void parseJson(T jsonResponseObject) {
+        if (jsonResponseObject != null) {
+            if (jsonResponseObject instanceof String) {
+                this.jsonRespone = jsonResponseObject
+            } else {
+                this.jsonRespone = org.json.simple.JSONValue.toJSONString(jsonResponseObject)
+            }
+
+        } else {
+            this.jsonRespone = ""
+        }
     }
 
     @Override
@@ -80,7 +94,7 @@ class MockHttpResponse<T extends Object> implements CloseableHttpResponse {
         if (jsonRespone == null)
             return null
 
-        byte[] bytes = org.json.simple.JSONValue.toJSONString(jsonRespone)
+        byte[] bytes = this.jsonRespone.bytes
         BasicHttpEntity basicHttpEntity = new BasicHttpEntity()
         basicHttpEntity.content = new ByteArrayInputStream(bytes);
         basicHttpEntity.contentLength = bytes.length

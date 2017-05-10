@@ -102,12 +102,14 @@ public class ApiException extends Exception {
 
 
         parseErrors(errorData);
-        setFirstError();
+        parseFirstErrorToMemberVariables();
     }
 
 
     protected void parseErrors(Object response) {
+
         List<Map<String,Object>> tmpList = new ArrayList<Map<String, Object>>();
+
         if (response instanceof List) {
             tmpList.addAll((List<Map<String,Object>>) response);
         } else if (response instanceof Map) {
@@ -120,7 +122,7 @@ public class ApiException extends Exception {
                 if (tmpCaseInsensitiveMap.containsKey("Errors.Error.Description")) {
                     //errors object with a list of error object
                     Map<String,Object> tmpErrorObj = (Map<String,Object>) tmpCaseInsensitiveMap.get("Errors.Error");
-                    parseError(tmpErrorObj);
+                    addError(tmpErrorObj);
                     continue;
                 }
             } catch (Exception e) {
@@ -131,7 +133,7 @@ public class ApiException extends Exception {
                 if (tmpCaseInsensitiveMap.containsKey("Errors.Error[0].Description")) {
                     //errors object with a list of error object
                     List<Map<String,Object>> tmpErrorList = (List<Map<String,Object>>) tmpCaseInsensitiveMap.get("Errors.Error");
-                    parseError(tmpErrorList);
+                    addError(tmpErrorList);
                     continue;
                 }
             } catch (Exception e) {
@@ -141,7 +143,7 @@ public class ApiException extends Exception {
             try {
                 if (tmpCaseInsensitiveMap.containsKey("Errors[0].Description")) {
                     List<Map<String,Object>> tmpErrorList = (List<Map<String,Object>>) tmpCaseInsensitiveMap.get("Errors");
-                    parseError(tmpErrorList);
+                    addError(tmpErrorList);
                     continue;
                 }
             } catch (Exception e) {
@@ -151,7 +153,7 @@ public class ApiException extends Exception {
             try {
 
                 if (tmpCaseInsensitiveMap.containsKey("Description")) {
-                    parseError(tmpCaseInsensitiveMap);
+                    addError(tmpCaseInsensitiveMap);
                     continue;
                 }
             } catch (Exception e) {
@@ -160,17 +162,17 @@ public class ApiException extends Exception {
         }
     }
 
-    protected void parseError(List<Map<String,Object>> errorList) {
+    protected void addError(List<Map<String,Object>> errorList) {
         for (Map<String,Object> errorObj : errorList) {
-            parseError(errorObj);
+            addError(errorObj);
         }
     }
 
-    protected void parseError(Map<String,Object> errorMap) {
+    protected void addError(Map<String,Object> errorMap) {
         errors.add(errorMap);
     }
 
-    protected void setFirstError() {
+    protected void parseFirstErrorToMemberVariables() {
         if (!errors.isEmpty()) {
             Map<String,Object> tmpErrorMap = errors.get(0);
             rawErrorData = new CaseInsensitiveSmartMap(tmpErrorMap);
