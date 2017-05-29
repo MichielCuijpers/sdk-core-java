@@ -72,6 +72,27 @@ public class OAuthAuthentication implements Authentication {
         setP12(is, alias, password);
     }
 
+
+
+    /**
+     *
+     * @param consumerKey consumer key for your project
+     * @param privateKey PrivateKey loaded from whatever
+     *
+     */
+    public OAuthAuthentication(String consumerKey, PrivateKey privateKey) throws SdkException {
+        if(consumerKey == null) {
+            throw new SdkException("ConsumerKey cannot null");
+        }
+
+        if(privateKey == null) {
+            throw new SdkException("PrivateKet cannot null");
+        }
+
+        this.consumerKey = consumerKey;
+        this.privateKey = privateKey;
+    }
+
     private void setP12(InputStream is, String alias, String password) throws SdkException {
         try {
             KeyStore ks = KeyStore.getInstance("PKCS12");
