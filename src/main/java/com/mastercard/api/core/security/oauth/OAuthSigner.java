@@ -1,5 +1,7 @@
 package com.mastercard.api.core.security.oauth;
 
+import com.mastercard.api.core.security.util.CryptUtil;
+import com.mastercard.api.core.security.util.DataEncoding;
 import oauth.signpost.OAuth;
 import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.http.HttpParameters;
@@ -34,10 +36,8 @@ public class OAuthSigner extends OAuthMessageSigner {
             String sbs = new SignatureBaseString(request, requestParams).generate();
             OAuth.debugOut("SBS", sbs);
             byte[] text = sbs.getBytes(OAuth.ENCODING);
-
             signer.update(text);
-
-            return base64Encode(signer.sign());
+            return CryptUtil.byteArrayToString(signer.sign(), DataEncoding.BASE64);
         }
         catch (Exception e) {
             throw new OAuthMessageSignerException(e);

@@ -11,6 +11,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.List;
@@ -196,7 +197,7 @@ public class FieldLevelEncryption implements CryptographyInterceptor {
                         byte[] encryptedDataByteArray = CryptUtil.stringToByteArray(encryptedData, config.dataEncoding);
 
                         byte[] decryptedDataArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, config.symmetricAlgorithm, "SunJCE", secretKey, iv, encryptedDataByteArray);
-                        String decryptedDataString = new String(decryptedDataArray);
+                        String decryptedDataString = new String(decryptedDataArray, Charset.forName("UTF-8"));
 
                         if (decryptedDataString.startsWith("{")) {
                             Map<String, Object> decryptedDataMap = (Map<String, Object>) JSONValue.parse(decryptedDataString);

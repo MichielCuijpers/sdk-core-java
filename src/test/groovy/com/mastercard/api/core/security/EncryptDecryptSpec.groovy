@@ -9,6 +9,7 @@ import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import java.nio.charset.Charset
 import java.security.PrivateKey
 import java.security.PublicKey
 
@@ -98,7 +99,7 @@ class EncryptDecryptSpec extends Specification {
         byte[] decryptedBytesArray = CryptUtil.crypt(Cipher.DECRYPT_MODE, "AES/CBC/PKCS5Padding", originalKey, iv, encryptedData);
 
         then: "check if decrypted text matches the input text"
-        cardInfoJsonEscape == new String(decryptedBytesArray);
+        cardInfoJsonEscape == new String(decryptedBytesArray, Charset.forName("UTF-8"));
 
     }
 
