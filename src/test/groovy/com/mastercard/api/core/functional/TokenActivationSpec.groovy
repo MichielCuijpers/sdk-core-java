@@ -94,6 +94,9 @@ public class TokenActivationSpec extends Specification {
         response.get("tokenInfo.accountPanSuffix").toString().equalsIgnoreCase("2345")
         response.get("tokenInfo.tokenExpiry").toString().equalsIgnoreCase("1218")
 
+        cleanup:
+        ApiConfig.cryptographyInterceptorSet.clear();
+
     }
 
 
@@ -131,6 +134,9 @@ public class TokenActivationSpec extends Specification {
         response.get("responseId").toString().equalsIgnoreCase("123456")
         response.get("tokenInfo.accountPanSuffix").toString().equalsIgnoreCase("2345")
         response.get("tokenInfo.tokenExpiry").toString().equalsIgnoreCase("1218")
+
+        cleanup:
+        ApiConfig.cryptographyInterceptorSet.clear();
 
     }
 }
