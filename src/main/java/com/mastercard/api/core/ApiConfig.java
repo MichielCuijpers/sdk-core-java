@@ -37,11 +37,10 @@ public final class ApiConfig {
 
     public static void setSandbox(boolean sandbox) {
         if (sandbox) {
-            currentEnvironment = Environment.SANDBOX;
+            setEnvironment(Environment.SANDBOX);
         } else {
-            currentEnvironment = Environment.PRODUCTION;
+            setEnvironment(Environment.PRODUCTION);
         }
-        setEnvironment(currentEnvironment);
     }
 
 
