@@ -323,7 +323,7 @@ public class ApiController {
         }
 
         // Add user agent
-        String userAgent = "Java-SDK/" + operationMetadata.getApiVersion();
+        String userAgent = Constants.getCoreVersion()+"/" + operationMetadata.getApiVersion();
         if (USER_AGENT != null) {
             userAgent = userAgent + " " + USER_AGENT;
         }
