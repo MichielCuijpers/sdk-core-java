@@ -278,6 +278,7 @@ public class ApiController {
 
             HttpEntity createEntity = new StringEntity(payload, ContentType.APPLICATION_JSON);
             ((HttpPost) message).setEntity(createEntity);
+            message.setHeader(createEntity.getContentType());
 
             break;
 
@@ -297,6 +298,7 @@ public class ApiController {
 
             HttpEntity updateEntity = new StringEntity(payload, ContentType.APPLICATION_JSON);
             ((HttpPut) message).setEntity(updateEntity);
+            message.setHeader(updateEntity.getContentType());
 
             break;
 
@@ -308,10 +310,6 @@ public class ApiController {
             break;
         }
 
-        // Set JSON
-        if (hasBody(message)) {
-            message.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
-        }
         message.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.toString());
 
         // Set other headers
@@ -335,17 +333,17 @@ public class ApiController {
 
         return message;
     }
-
-    private boolean hasBody(HttpRequestBase message) {
-        if (message instanceof HttpGet || message instanceof HttpDelete)
-            return false;
-
-        if (message instanceof HttpEntityEnclosingRequestBase) {
-            return ((HttpEntityEnclosingRequestBase) message).getEntity() != null;
-        }
-
-        return true;
-    }
+//
+//    private boolean hasBody(HttpRequestBase message) {
+//        if (message instanceof HttpGet || message instanceof HttpDelete)
+//            return false;
+//
+//        if (message instanceof HttpEntityEnclosingRequestBase) {
+//            return ((HttpEntityEnclosingRequestBase) message).getEntity() != null;
+//        }
+//
+//        return true;
+//    }
 
     public Map<? extends String, ? extends Object> execute(Authentication auth, OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)
             throws ApiException{
