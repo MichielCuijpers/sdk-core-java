@@ -29,7 +29,7 @@ package com.mastercard.api.core;
 
 final class Constants {
 
-    public static final String SDK = "Java-SDK";
+    public static final String SDK = "sdk-api-core";
     public static final String VERSION = Constants.class.getPackage().getImplementationVersion();
 
     public static String getCoreVersion() {
