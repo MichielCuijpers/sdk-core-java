@@ -238,7 +238,7 @@ public class ApiController {
         return uri;
     }
 
-    private HttpRequestBase getRequest(Authentication authentication, OperationConfig operationConfig,
+    protected HttpRequestBase getRequest(Authentication authentication, OperationConfig operationConfig,
             OperationMetadata operationMetadata, RequestMap requestObject) {
 
 
@@ -283,7 +283,6 @@ public class ApiController {
             break;
 
         case delete:
-            payload = "";
             message = new HttpDelete(uri);
             break;
 
@@ -305,7 +304,6 @@ public class ApiController {
         case read:
         case list:
         case query:
-            payload = "";
             message = new HttpGet(uri);
             break;
         }
