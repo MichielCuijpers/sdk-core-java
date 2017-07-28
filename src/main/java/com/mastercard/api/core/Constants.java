@@ -28,6 +28,11 @@
 package com.mastercard.api.core;
 
 final class Constants {
-    public static final String API_BASE_LIVE_URL = "https://api.mastercard.com";
-    public static final String API_BASE_SANDBOX_URL = "https://sandbox.api.mastercard.com";
+
+    public static final String SDK = "Java-SDK";
+    public static final String VERSION = Constants.class.getPackage().getImplementationVersion();
+
+    public static String getCoreVersion() {
+        return SDK+":"+((VERSION == null) ? "dev" : VERSION);
+    }
 }

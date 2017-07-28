@@ -605,7 +605,53 @@ class ApiControllerSpec extends Specification {
         HttpRequestBase httpRequestBase = apiController.getRequest(null, mockBaseObject.getOperationConfig(), mockBaseObject.getOperationMetadata(), mockBaseObject)
 
         then:
-        httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/0.0.1 mock" as String
+        httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK:dev/mock:0.0.1 mock" as String
+
+        cleanup:
+        ApiController.USER_AGENT = null
+    }
+
+    def "test getRequest for POST" () {
+        given:
+        ApiController.USER_AGENT = "mock"
+
+        MockBaseObject mockBaseObject = new MockBaseObject()
+        mockBaseObject.action = Action.create
+
+        ApiController apiController = new ApiController()
+
+        when:
+        HttpRequestBase request = apiController.getRequest(null, mockBaseObject.getOperationConfig(), mockBaseObject.getOperationMetadata(), mockBaseObject)
+
+        then:
+        request.getMethod() == "POST"
+        request.getURI().toString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
+        request.getFirstHeader("Accept").value == "application/json; charset=UTF-8" as String
+        request.getFirstHeader("Content-Type").value == "application/json; charset=UTF-8" as String
+        request.getFirstHeader("Authorization").value.contains("oauth_body_hash") == true
+
+        cleanup:
+        ApiController.USER_AGENT = null
+    }
+
+    def "test getRequest for GET" () {
+        given:
+        ApiController.USER_AGENT = "mock"
+
+        MockBaseObject mockBaseObject = new MockBaseObject()
+        mockBaseObject.action = Action.query
+
+        ApiController apiController = new ApiController()
+
+        when:
+        HttpRequestBase request = apiController.getRequest(null, mockBaseObject.getOperationConfig(), mockBaseObject.getOperationMetadata(), mockBaseObject)
+
+        then:
+        request.getMethod() == "GET"
+        request.getURI().toString() == "https://sandbox.api.mastercard.com/mock/MockObject?Format=JSON"
+        request.getFirstHeader("Accept").value == "application/json; charset=UTF-8" as String
+        request.getFirstHeader("Content-Type") == null
+        request.getFirstHeader("Authorization").value.contains("oauth_body_hash") == false
 
         cleanup:
         ApiController.USER_AGENT = null
@@ -613,7 +659,7 @@ class ApiControllerSpec extends Specification {
 
     private void assertHeaders(HttpRequestBase httpRequestBase, Map<String, String> customHeaders) {
         assert httpRequestBase.getFirstHeader("Accept").value == "application/json; charset=UTF-8"
-        assert httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK/0.0.1" as String
+        assert httpRequestBase.getFirstHeader("User-Agent").value == "Java-SDK:dev/mock:0.0.1" as String
         assert httpRequestBase.getFirstHeader("MockAuthentication").value == "MockValue"
 
         customHeaders.each {

@@ -238,7 +238,7 @@ public class ApiController {
         return uri;
     }
 
-    private HttpRequestBase getRequest(Authentication authentication, OperationConfig operationConfig,
+    protected HttpRequestBase getRequest(Authentication authentication, OperationConfig operationConfig,
             OperationMetadata operationMetadata, RequestMap requestObject) {
 
 
@@ -278,11 +278,11 @@ public class ApiController {
 
             HttpEntity createEntity = new StringEntity(payload, ContentType.APPLICATION_JSON);
             ((HttpPost) message).setEntity(createEntity);
+            message.setHeader(createEntity.getContentType());
 
             break;
 
         case delete:
-            payload = "";
             message = new HttpDelete(uri);
             break;
 
@@ -297,21 +297,17 @@ public class ApiController {
 
             HttpEntity updateEntity = new StringEntity(payload, ContentType.APPLICATION_JSON);
             ((HttpPut) message).setEntity(updateEntity);
+            message.setHeader(updateEntity.getContentType());
 
             break;
 
         case read:
         case list:
         case query:
-            payload = "";
             message = new HttpGet(uri);
             break;
         }
 
-        // Set JSON
-        if (hasBody(message)) {
-            message.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
-        }
         message.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.toString());
 
         // Set other headers
@@ -323,7 +319,7 @@ public class ApiController {
         }
 
         // Add user agent
-        String userAgent = "Java-SDK/" + operationMetadata.getApiVersion();
+        String userAgent = Constants.getCoreVersion()+"/" + operationMetadata.getApiVersion();
         if (USER_AGENT != null) {
             userAgent = userAgent + " " + USER_AGENT;
         }
@@ -335,17 +331,17 @@ public class ApiController {
 
         return message;
     }
-
-    private boolean hasBody(HttpRequestBase message) {
-        if (message instanceof HttpGet || message instanceof HttpDelete)
-            return false;
-
-        if (message instanceof HttpEntityEnclosingRequestBase) {
-            return ((HttpEntityEnclosingRequestBase) message).getEntity() != null;
-        }
-
-        return true;
-    }
+//
+//    private boolean hasBody(HttpRequestBase message) {
+//        if (message instanceof HttpGet || message instanceof HttpDelete)
+//            return false;
+//
+//        if (message instanceof HttpEntityEnclosingRequestBase) {
+//            return ((HttpEntityEnclosingRequestBase) message).getEntity() != null;
+//        }
+//
+//        return true;
+//    }
 
     public Map<? extends String, ? extends Object> execute(Authentication auth, OperationConfig operationConfig, OperationMetadata operationMetadata, RequestMap requestObject)
             throws ApiException{

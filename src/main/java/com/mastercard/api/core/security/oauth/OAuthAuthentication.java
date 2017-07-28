@@ -114,16 +114,19 @@ public class OAuthAuthentication implements Authentication {
         request.setMethod(httpMethod);
         request.setRequestUrl(uri.toString());
         request.setContentType(contentType);
-        request.setBody((String) body);
 
         // Set the additional OAuth Parameters
         HttpParameters params = new HttpParameters();
-        try {
-            params.put(OAuthConstants.OAUTH_BODY_HASH, request.getOauthBodyHash(), true);
+        if (body != null) {
+            try {
+                request.setBody((String) body);
+                params.put(OAuthConstants.OAUTH_BODY_HASH, request.getOauthBodyHash(), true);
+            }
+            catch (Exception e) {
+                throw new SdkException(e.getMessage(), e);
+            }
         }
-        catch (Exception e) {
-            throw new SdkException(e.getMessage(), e);
-        }
+
 
         // Create Signer
         OAuthSigner oAuthSigner = new OAuthSigner(privateKey);
