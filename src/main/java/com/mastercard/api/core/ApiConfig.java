@@ -89,8 +89,8 @@ public final class ApiConfig {
 
             System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
             System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
-            System.setProperty("org.apache.commons.logging.simplelog.log.org.httpclient.wire", "debug");
-            System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.wire", "debug");
+            System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "DEBUG");
+            System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.headers", "ERROR");
 
         } else {
             java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(Level.OFF);
