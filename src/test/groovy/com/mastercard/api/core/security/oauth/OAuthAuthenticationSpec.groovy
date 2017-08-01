@@ -90,7 +90,7 @@ public class OAuthAuthenticationSpec extends Specification {
         InputStream is = OAuthAuthentication.class.getClassLoader().getResourceAsStream(keystoreName)
         OAuthAuthentication authentication = new OAuthAuthentication(consumerKey, is, alias, password)
 
-        URI uri = new URI("$Constants.API_BASE_SANDBOX_URL/api/mock")
+        URI uri = new URI("https://sandbox.api.mastercard.com/api/mock")
         HttpMethod post = HttpMethod.POST
         ContentType json = ContentType.APPLICATION_JSON
         String body = "{\"Account\":{\"Status\":\"true\",\"Listed\":\"true\",\"ReasonCode\":\"S\",\"Reason\":\"STOLEN\"}"
