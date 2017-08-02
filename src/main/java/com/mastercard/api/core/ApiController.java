@@ -466,7 +466,7 @@ public class ApiController {
 
 
     CloseableHttpClient createHttpClient() {
-        return HttpBuilder.getInstance().build();
+        return ApiConfig.getHttpClientBuilder().build();
     }
 
     ResponseHandler<ApiControllerResponse> createResponseHandler() {
