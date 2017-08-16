@@ -29,7 +29,6 @@ package com.mastercard.api.core.functional
 
 import com.mastercard.api.core.ApiConfig
 import com.mastercard.api.core.functional.model.GetToken
-import com.mastercard.api.core.functional.model.Tokenize
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.Authentication
 import com.mastercard.api.core.security.mdes.MDESCryptography
@@ -62,6 +61,7 @@ public class GetTokenSpec extends Specification {
 
     }
 
+    @spock.lang.Ignore
     def 'get token request (orginal keys)'() {
 
         when:
