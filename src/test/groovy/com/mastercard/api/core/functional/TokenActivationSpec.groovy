@@ -33,6 +33,7 @@ import com.mastercard.api.core.security.Authentication
 import com.mastercard.api.core.security.CryptographyInterceptor
 import com.mastercard.api.core.security.mdes.MDESCryptography
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
+import spock.lang.Ignore
 import spock.lang.Specification
 
 
@@ -59,6 +60,7 @@ public class TokenActivationSpec extends Specification {
 
     }
 
+    @Ignore
     def 'send tokenization request (orginal keys)'() {
         setup:
         InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");
@@ -99,7 +101,7 @@ public class TokenActivationSpec extends Specification {
 
     }
 
-
+    @Ignore
     def 'send tokenization request (p12 keys)'() {
         setup:
         InputStream is2 = new FileInputStream("src/test/resources/mastercard_public.crt");

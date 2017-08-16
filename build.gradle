@@ -94,6 +94,13 @@ test {
     }
 }
 
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Mastercard SDK Core',
+                   'Implementation-Version': version
+    }
+}
+
 
 cobertura {
     coverageFormats = ['html', 'xml']

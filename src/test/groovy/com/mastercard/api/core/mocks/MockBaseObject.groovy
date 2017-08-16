@@ -76,7 +76,7 @@ class MockBaseObject extends BaseObject {
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata("0.0.1", host);
+        return new OperationMetadata("mock:0.0.1", host);
     }
 
 
