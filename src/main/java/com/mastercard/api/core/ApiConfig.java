@@ -4,6 +4,7 @@ import com.mastercard.api.core.model.Environment;
 import com.mastercard.api.core.model.ResourceConfigInterface;
 import com.mastercard.api.core.security.Authentication;
 import com.mastercard.api.core.security.CryptographyInterceptor;
+import org.apache.http.impl.client.CustomHttpClientBuilder;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ public final class ApiConfig {
     private static Set<CryptographyInterceptor> cryptographyInterceptorSet = new HashSet<CryptographyInterceptor>();
     private static Environment currentEnvironment = Environment.SANDBOX;
     private static Map<String,ResourceConfigInterface> registeredInstances = new HashMap<String,ResourceConfigInterface>();
+    private static CustomHttpClientBuilder customHttpClientBuilder = null;
 
 
     /**
@@ -41,6 +43,13 @@ public final class ApiConfig {
         } else {
             setEnvironment(Environment.PRODUCTION);
         }
+    }
+
+    public static CustomHttpClientBuilder getHttpClientBuilder() {
+        if (customHttpClientBuilder == null) {
+            customHttpClientBuilder = CustomHttpClientBuilder.create();
+        }
+        return customHttpClientBuilder;
     }
 
 
@@ -83,9 +92,6 @@ public final class ApiConfig {
              log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss:SSS} [%t] %-5p %c{2}:%L - %m%n
              */
 
-
-            java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINEST);
-            java.util.logging.Logger.getLogger("org.apache.http.headers").setLevel(java.util.logging.Level.FINEST);
 
             System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
             System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");

@@ -29,25 +29,25 @@ package com.mastercard.api.core.functional
 import com.mastercard.api.core.ApiConfig
 import com.mastercard.api.core.functional.model.AccountInquiry
 import com.mastercard.api.core.functional.model.JSONEcho
+import com.mastercard.api.core.model.Environment
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.Authentication
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
 import org.junit.Ignore
 import spock.lang.Specification
 
-@Ignore
-public class JSONEchoSpec extends Specification {
+class JSONEchoSpec extends Specification {
 
 
-    public static final String consumerKey = "sLDddGV2GijXzVaTZxqC9kKTYDwGdFp3pq2ci3-de0b9a383!c02f47460b624d4a9ffb1afdccf9e5730000000000000000";
+    public static final String consumerKey = "sLDddGV2GijXzVaTZxqC9kKTYDwGdFp3pq2ci3-de0b9a383!0fce37293bb847eb96293f501111d9bb0000000000000000";
 
-    def setupSpec() {
+
+    def setup() {
         ApiConfig.setDebug(true);
-        ApiConfig.setSandbox(true);
 
         try {
-            InputStream is = new FileInputStream("src/test/resources/alias-production.p12");
-            Authentication authentication = new OAuthAuthentication(consumerKey, is, "alias", "password");
+            InputStream is = new FileInputStream("src/test/resources/test-api-basic-production.p12");
+            Authentication authentication = new OAuthAuthentication(consumerKey, is, "test_prod", "test_prod");
             ApiConfig.setAuthentication(authentication);
         }
         catch (Exception e) {
@@ -57,56 +57,66 @@ public class JSONEchoSpec extends Specification {
     }
 
 
-//    @Unroll("test ASCII character number: #item")
-//    def 'test_example_stolen' () {
+//    def 'test json echo with UTF-8 (gateway)' () {
 //
 //
-//        expect:
-//        String tmpString = ""+(char)item+"TEXT";
+//        when:
+//
+//        //JSONEcho.setHost("http://sandbox.api.mastercard.com")
+//        String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
 //        RequestMap request = new RequestMap();
-//        request.set("AccountInquiry.AccountNumber", "5343434343434343");
-//        println (tmpString);
-//        request.set("AccountInquiry.AsciiText", tmpString);
-//        AccountInquiry response = new AccountInquiry(request).update();
-//        response != null
+//        request.set("JSONEcho.string", utf8);
+//        JSONEcho response = JSONEcho.create(request);
 //
-//        where:
-//        item << (32..159)
-//        //request.set("AccountInquiry.AsciiText", "!#%&'()*+-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
-//
-//
+//        then:
+//        response.get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
 //
 //    }
 
-    def 'test json echo with UTF-8' () {
+//    def 'test json echo with UTF-8 (direct)' () {
+//
+//
+//        when:
+//        JSONEcho.setHost("https://stage.lisa.mastercard.int:13090")
+//        String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
+//        RequestMap request = new RequestMap();
+//        request.set("JSONEcho.string", utf8);
+//        JSONEcho response = JSONEcho.create(request);
+//
+//        then:
+//        response.get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
+//
+//    }
+
+    def 'test json echo with UTF-8 (public)' () {
 
 
         when:
-
-        JSONEcho.setHost("http://sandbox.api.mastercard.com")
+        JSONEcho.setHost("http://echo.jpillora.com/")
         String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
         RequestMap request = new RequestMap();
         request.set("JSONEcho.string", utf8);
         JSONEcho response = JSONEcho.create(request);
 
         then:
-        response.get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
+        new RequestMap(response.get("body")).get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
 
     }
-
-    def 'test json echo with UTF-8 to geteway' () {
-
-
-        when:
-        String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
-        RequestMap request = new RequestMap();
-        request.set("JSONEcho.string", utf8);
-        JSONEcho response = JSONEcho.create(request);
-
-        then:
-        response.get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
-
-    }
+//
+//    def 'test json echo with UTF-8 (local-apigw)' () {
+//
+//
+//        when:
+//        JSONEcho.setHost("http://dev.api.mastercard.com:8016/mosp")
+//        String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
+//        RequestMap request = new RequestMap();
+//        request.set("JSONEcho.string", utf8);
+//        JSONEcho response = JSONEcho.create(request);
+//
+//        then:
+//        new RequestMap(response.get("body")).get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
+//
+//    }
 
 
 }
