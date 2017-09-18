@@ -13,8 +13,12 @@ import com.mastercard.api.core.model.ResourceList
 import com.mastercard.api.core.security.Authentication
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
 import org.apache.http.HttpHost
+import org.apache.http.auth.AuthScope
+import org.apache.http.auth.UsernamePasswordCredentials
+import org.apache.http.client.CredentialsProvider
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.config.ConnectionConfig
+import org.apache.http.impl.client.BasicCredentialsProvider
 import org.apache.http.impl.client.CustomHttpClientBuilder
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager
 import org.junit.Ignore
@@ -45,6 +49,12 @@ class ProxySpec extends Specification {
         HttpHost proxy = new HttpHost("127.0.0.1", 9999)
         builder.setProxy(proxy);
         builder.setDefaultRequestConfig(requestBuilder);
+
+//        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+//        credentialsProvider.setCredentials(
+//                new AuthScope("127.0.0.1", 9999),
+//                new UsernamePasswordCredentials("username", "password"));
+//        builder.setDefaultCredentialsProvider(credentialsProvider)
 
         try {
             InputStream is = new FileInputStream("src/test/resources/mcapi_sandbox_key.p12");
