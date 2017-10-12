@@ -15,19 +15,19 @@ public class InstallmentCryptography extends FieldLevelEncryption {
 
     public InstallmentCryptography(InputStream publicCertificate, InputStream keystore, String privateKeyAlias, String privateKeyPassword)
             throws SdkException {
-        super(publicCertificate, keystore, privateKeyAlias, privateKeyPassword, Installments());
+        super(publicCertificate, keystore, privateKeyAlias, privateKeyPassword, config());
 
 
     }
 
     public InstallmentCryptography(InputStream publicCertificate, InputStream masterCardPrivateKey)
             throws SdkException {
-        super(publicCertificate, masterCardPrivateKey, Installments());
+        super(publicCertificate, masterCardPrivateKey, config());
 
     }
 
 
-    public final static Config Installments() {
+    public final static Config config() {
         Config tmpConfig = new Config();
         tmpConfig.triggeringEndPath = Arrays.asList("/installmentConfigdata","/calculateInstallment", "/processInstallment", "/receiveApproval");
         tmpConfig.fieldsToEncrypt = Arrays.asList("configReqData.primaryAccountNumber", "calculatorReqData.primaryAccountNumber", "processInstallmentReqData.primaryAccountNumber", "receiveIssuerApprReqData.primaryAccountNumber");

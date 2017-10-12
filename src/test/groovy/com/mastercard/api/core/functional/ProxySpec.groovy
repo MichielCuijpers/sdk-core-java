@@ -30,6 +30,7 @@ import spock.lang.Specification
  */
 
 
+@spock.lang.Ignore
 class ProxySpec extends Specification {
 
 
@@ -50,11 +51,11 @@ class ProxySpec extends Specification {
         builder.setProxy(proxy);
         builder.setDefaultRequestConfig(requestBuilder);
 
-//        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-//        credentialsProvider.setCredentials(
-//                new AuthScope("127.0.0.1", 9999),
-//                new UsernamePasswordCredentials("username", "password"));
-//        builder.setDefaultCredentialsProvider(credentialsProvider)
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                new AuthScope("127.0.0.1", 9999),
+                new UsernamePasswordCredentials("username", "password"));
+        builder.setDefaultCredentialsProvider(credentialsProvider)
 
         try {
             InputStream is = new FileInputStream("src/test/resources/mcapi_sandbox_key.p12");
