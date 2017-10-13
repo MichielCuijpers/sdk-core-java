@@ -14,7 +14,7 @@ public class JSONEcho extends BaseObject {
     public JSONEcho() {
     }
 
-    private static String host = "https://stage .api.mastercard.com";
+    private static String host = "https://stage.api.mastercard.com";
 
     public JSONEcho(BaseObject o) {
         putAll(o);
@@ -26,7 +26,8 @@ public class JSONEcho extends BaseObject {
 
 
     @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
-        return new OperationConfig("/mcapitest/JsonNativePost", Action.create, Arrays.asList(""), Arrays.asList(""));
+        //return new OperationConfig("/mcapitest/JsonNativePost", Action.create, Arrays.asList(""), Arrays.asList(""));
+        return new OperationConfig("/mcapitest/JsonNativePostPublic", Action.create, Arrays.asList(""), Arrays.asList(""));
 
     }
 
