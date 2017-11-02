@@ -83,9 +83,11 @@ dependencies {
     testRuntime "log4j:log4j:1.2.17"
 
     compile group: 'oauth.signpost', name: 'signpost-core', version: signpostVersion
-    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: httpClientVersion
     compile group: 'commons-codec', name: 'commons-codec', version: commonsCodecVersion
+    compile("com.googlecode.json-simple:json-simple:$rootProject.ext.jsonSimpleVersion") {
+        exclude group: 'junit', module: 'junit'
+    }
 }
 
 test {
