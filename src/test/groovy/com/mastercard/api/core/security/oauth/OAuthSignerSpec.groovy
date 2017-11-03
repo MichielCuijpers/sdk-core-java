@@ -5,6 +5,7 @@ import oauth.signpost.exception.OAuthMessageSignerException
 import oauth.signpost.http.HttpParameters
 import oauth.signpost.http.HttpRequest
 import org.apache.http.entity.ContentType
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.security.InvalidKeyException
@@ -18,6 +19,7 @@ public class OAuthSignerSpec extends Specification {
     String password = "password"
     static final keystoreName = "mcapi_sandbox_key.p12"
 
+    @Ignore
     def 'test sign' () {
         given:
         InputStream is = OAuthAuthentication.class.getClassLoader().getResourceAsStream(keystoreName)
@@ -34,6 +36,8 @@ public class OAuthSignerSpec extends Specification {
         request.setRequestUrl("https://sandbox.api.mastercard.com/api/mock");
         request.setContentType(json);
         request.setBody(body);
+
+
 
         HttpParameters httpParameters = new HttpParameters()
         httpParameters.put("oauth_body_hash", "u0JWorwmuzHq%2B83yrTJkjURYjUo%3D")
