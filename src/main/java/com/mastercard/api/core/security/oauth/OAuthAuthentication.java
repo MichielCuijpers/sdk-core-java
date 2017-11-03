@@ -117,7 +117,7 @@ public class OAuthAuthentication implements Authentication {
 
         // Set the additional OAuth Parameters
         HttpParameters params = new HttpParameters();
-        if (body != null) {
+        if (httpMethod != HttpMethod.GET && httpMethod != HttpMethod.HEAD && httpMethod != HttpMethod.DELETE) {
             try {
                 request.setBody((String) body);
                 params.put(OAuthConstants.OAUTH_BODY_HASH, request.getOauthBodyHash(), true);
