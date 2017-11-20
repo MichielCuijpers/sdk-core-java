@@ -238,6 +238,15 @@ public class ApiController {
         return uri;
     }
 
+    private ContentType getContentType(OperationMetadata operationMetadata)
+    {
+        ContentType contentType = ContentType.APPLICATION_JSON;
+        if (operationMetadata.getContentTypeOverride() != null) {
+            contentType = ContentType.create(operationMetadata.getContentTypeOverride(), Consts.UTF_8);
+        }
+        return contentType;
+    }
+
     protected HttpRequestBase getRequest(Authentication authentication, OperationConfig operationConfig,
             OperationMetadata operationMetadata, RequestMap requestObject) {
 
@@ -250,6 +259,8 @@ public class ApiController {
         Map<String, Object> objectMap = new LinkedHashMap<String, Object>(requestObject);
         CryptographyInterceptor interceptor = ApiConfig.getCryptographyInterceptor(uri.getPath());
 
+
+        ContentType contentType = getContentType(operationMetadata);
 
 
         HttpRequestBase message = null;
@@ -276,7 +287,7 @@ public class ApiController {
             payload = JSONValue.toJSONString(objectMap);
             message = new HttpPost(uri);
 
-            HttpEntity createEntity = new StringEntity(payload, ContentType.APPLICATION_JSON);
+            HttpEntity createEntity = new StringEntity(payload, contentType);
             ((HttpPost) message).setEntity(createEntity);
             message.setHeader(createEntity.getContentType());
 
@@ -295,7 +306,7 @@ public class ApiController {
             payload = JSONValue.toJSONString(objectMap);
             message = new HttpPut(uri);
 
-            HttpEntity updateEntity = new StringEntity(payload, ContentType.APPLICATION_JSON);
+            HttpEntity updateEntity = new StringEntity(payload, contentType);
             ((HttpPut) message).setEntity(updateEntity);
             message.setHeader(updateEntity.getContentType());
 
@@ -308,7 +319,7 @@ public class ApiController {
             break;
         }
 
-        message.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.toString());
+        message.setHeader(HttpHeaders.ACCEPT, contentType.toString());
 
         // Set other headers
         for (Map.Entry<String, Object> entry : headerMap.entrySet()) {
@@ -327,7 +338,7 @@ public class ApiController {
 
         // Sign the request
         authentication
-                .sign(uri, HttpMethod.fromAction(operationConfig.getAction()), ContentType.APPLICATION_JSON, payload, message);
+                .sign(uri, HttpMethod.fromAction(operationConfig.getAction()), contentType, payload, message);
 
         return message;
     }
@@ -359,7 +370,7 @@ public class ApiController {
             String scheme = request.getURI().getScheme();
             HttpHost host = new HttpHost(request.getURI().getHost(), port, scheme);
 
-            ResponseHandler<ApiControllerResponse> responseHandler = createResponseHandler();
+            ResponseHandler<ApiControllerResponse> responseHandler = createResponseHandler(getContentType(operationMetadata));
 
             ApiControllerResponse apiResponse = httpClient.execute(host, request, responseHandler);
 
@@ -469,7 +480,7 @@ public class ApiController {
         return ApiConfig.getHttpClientBuilder().build();
     }
 
-    ResponseHandler<ApiControllerResponse> createResponseHandler() {
+    ResponseHandler<ApiControllerResponse> createResponseHandler(final ContentType contentType) {
         return new ResponseHandler<ApiControllerResponse>() {
             public ApiControllerResponse handleResponse(HttpResponse httpResponse) throws IOException {
                 ApiControllerResponse apiResponse = new ApiControllerResponse();
@@ -481,7 +492,7 @@ public class ApiController {
 
                 //arizzini: entity == null when HTTP 200
                 if (entity != null) {
-                    String payload = EntityUtils.toString(entity, ContentType.APPLICATION_JSON.getCharset());
+                    String payload = EntityUtils.toString(entity, contentType.getCharset());
 
                     //arizzini: if we have content, we try to parse it
                     if (!payload.isEmpty()) {
@@ -498,7 +509,7 @@ public class ApiController {
                             }
                         }
 
-                        if (ContentType.parse(responseContentType).getMimeType().equals(ContentType.APPLICATION_JSON.getMimeType())) {
+                        if (ContentType.parse(responseContentType).getMimeType().equals(contentType.getMimeType())) {
                             apiResponse.setPayload(payload);
                         } else {
                             throw new IOException(

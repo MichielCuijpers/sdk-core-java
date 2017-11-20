@@ -8,6 +8,7 @@ public class OperationMetadata {
     String host;
     String context;
     boolean jsonNative;
+    String contentTypeOverride;
 
     public OperationMetadata(String apiVersion, String host) {
         this.apiVersion = apiVersion;
@@ -27,6 +28,14 @@ public class OperationMetadata {
         this.jsonNative = jsonNative;
     }
 
+    public OperationMetadata(String apiVersion, String host, String context, boolean jsonNative, String contentTypeOverride) {
+        this.apiVersion = apiVersion;
+        this.host = host;
+        this.context = context;
+        this.jsonNative = jsonNative;
+        this.contentTypeOverride = contentTypeOverride;
+    }
+
     public String getApiVersion() {
         return apiVersion;
     }
@@ -41,5 +50,9 @@ public class OperationMetadata {
 
     public boolean isJsonNative() {
         return jsonNative;
+    }
+
+    public String getContentTypeOverride() {
+        return contentTypeOverride;
     }
 }
