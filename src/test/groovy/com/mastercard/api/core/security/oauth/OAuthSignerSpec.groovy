@@ -19,7 +19,6 @@ public class OAuthSignerSpec extends Specification {
     String password = "password"
     static final keystoreName = "mcapi_sandbox_key.p12"
 
-    @Ignore
     def 'test sign' () {
         given:
         InputStream is = OAuthAuthentication.class.getClassLoader().getResourceAsStream(keystoreName)
@@ -53,7 +52,7 @@ public class OAuthSignerSpec extends Specification {
         String signature = oAuthSigner.sign(request, httpParameters)
 
         then:
-        signature == "CEpnxXM3TVpANo3pVUy4MnZL8sYFS9yKlRfEKF3mcHOZC4KzkvRX579ImMDW5YvmAL5n2sDk6GdHCRhPbOqtJywwth7uNOId5kkBoM4e8VUm+UgKzJ1rMpMpUe9mv2uZqftnpJBO01F5w4fbeNodzyOCXahU1qSY5eu5cglomghlRNh9+8CMGoLksiCPJrz92ZW/z+XRl5IrghLJ/BsFvaw1sGcULZ0u7zuElLRA6zNERXk82xPWDogw+JQ+oC+fqPR5/AhC2o7BlVP7JlPLO7piNeBEPNUACDw3K4utPbE6zqVnbcr7uuEmCkQeTtENx8YV+i7WIvapXdpMXY2EEg=="
+        signature == "uNumnJAj/6GGnXMkg2ZnnHGL3DetFUhTM+5sc3VhDGk61nLJyo0J9LVTlJWeedRHDANb7Obxx2YcR8/y72xWgCGeCqXuomXB10i4fuXAS8bfkuToVRW2JbiScMvFdCd6YYjzzdfq77FozKUA/ka7JfZWw2NExxmVTz03xMr90CEvV0pigc/P7us2OqOyq7sYuiOULl+lDc0PXyjLZk/OoozQAD6d+2Sy77TPuaRpa9VZnYwChquc46oeJa5zxrtyhjtp9nhdiC3Iw7aCzwNIN/OJJx8bd3egYo8JI3TGF4NewGD5zVyvHLpexZ/GYsWXXqjmeau+82e+UH5oriLyOw=="
     }
 
     def 'test sign with null key throws InvalidKeyException' () {

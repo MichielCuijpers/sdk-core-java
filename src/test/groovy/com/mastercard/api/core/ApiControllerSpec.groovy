@@ -353,6 +353,7 @@ class ApiControllerSpec extends Specification {
         uri.toASCIIString() == "http://localhost:8080/mock/MockObject?Format=JSON"
     }
 
+
     def "test getURI with MockComplexObject" () {
         given:
         Action action
@@ -588,6 +589,41 @@ class ApiControllerSpec extends Specification {
         ((HttpDelete) httpRequestBase).getURI().toASCIIString() == uri.toASCIIString()
         assertHeaders(httpRequestBase, headerMap);
         httpRequestBase.getFirstHeader("Content-Type") == null
+    }
+
+    def "test getRequest jsonNative and contentTypeOverride"() {
+        given:
+        Map<String, Object> objectMap = [a: "a", b: "b", id: 1, 'x-sdk-mock-header': "x-sdk-mock-value"]
+        Map<String, Object> headerMap = ['x-sdk-mock-header': "x-sdk-mock-value"]
+
+        MockComplexTwoObject mockComplexTwoObject = new MockComplexTwoObject(Action.read, objectMap)
+
+        ApiController apiController = new ApiController()
+
+        when: "getRequest for read"
+        HttpRequestBase httpRequestBase = apiController.getRequest(null, mockComplexTwoObject.getOperationConfig(), mockComplexTwoObject.getOperationMetadata(), mockComplexTwoObject)
+
+        then:
+        httpRequestBase instanceof HttpGet
+        ((HttpGet) httpRequestBase).method == "GET"
+        ((HttpGet) httpRequestBase).getURI().toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/MockComplexTwoObject?a=a&b=b&id=1"
+        httpRequestBase.getFirstHeader("Content-Type") == null
+        httpRequestBase.getFirstHeader("Accept").value == "text/json; charset=UTF-8"
+
+
+        when: "getRequest for create"
+        mockComplexTwoObject = new MockComplexTwoObject(Action.create, objectMap)
+        httpRequestBase = apiController.getRequest(null, mockComplexTwoObject.getOperationConfig(), mockComplexTwoObject.getOperationMetadata(), mockComplexTwoObject)
+
+        then:
+        httpRequestBase instanceof HttpPost
+        ((HttpPost) httpRequestBase).method == "POST"
+        ((HttpPost) httpRequestBase).getURI().toASCIIString() == "https://sandbox.api.mastercard.com/mock/v2/MockComplexTwoObject"
+        httpRequestBase.getFirstHeader("Content-Type").value == "text/json; charset=UTF-8"
+        httpRequestBase.getFirstHeader("Accept").value == "text/json; charset=UTF-8"
+
+
+
     }
 
     def "test getRequest with USER_AGENT" () {
