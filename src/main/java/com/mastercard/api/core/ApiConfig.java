@@ -53,6 +53,7 @@ public final class ApiConfig {
     }
 
 
+
     public static Environment getEnvironment() {
         return currentEnvironment;
     }
@@ -62,6 +63,13 @@ public final class ApiConfig {
             resourceConfig.setEnvironment(environment);
         }
         currentEnvironment = environment;
+    }
+
+    public static void setCurrentEnvironment(String host, String context) {
+        for (ResourceConfigInterface resourceConfig : registeredInstances.values()) {
+            resourceConfig.setEnvironment(host, context);
+        }
+        currentEnvironment = null;
     }
 
     public static boolean ignoreSSLErrors() {
