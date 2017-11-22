@@ -513,7 +513,7 @@ public class ApiController {
                             apiResponse.setPayload(payload);
                         } else {
                             throw new IOException(
-                                    "Response was not " + ContentType.APPLICATION_JSON.getMimeType() + ", it was: "
+                                    "Response was not " + contentType.getMimeType() + ", it was: "
                                             + responseContentType + ". Unable to process payload. " +
                                             "\nResponse: [ " + payload + " + ]");
                         }
