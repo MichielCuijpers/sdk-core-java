@@ -30,19 +30,19 @@ repositories {
     }
 
     maven {
-        url "http://artifactory.mastercard.com:16364/artifactory/public"
+        url "https://globalrepository.mclocal.int/artifactory/public"
     }
 
     maven {
-        url "http://artifactory.mastercard.com:16364/artifactory/public-snapshots"
+        url "https://globalrepository.mclocal.int/artifactory/public-snapshots"
     }
 
     maven {
-        url "http://artifactory.mastercard.com:16364/artifactory/snapshots/"
+        url "https://globalrepository.mclocal.int/artifactory/snapshots/"
     }
 
     maven {
-        url "http://artifactory.mastercard.com:16364/artifactory/releases/"
+        url "https://globalrepository.mclocal.int/artifactory/releases/"
     }
 
 
