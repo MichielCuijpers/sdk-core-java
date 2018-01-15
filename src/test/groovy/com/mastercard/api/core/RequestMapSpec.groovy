@@ -274,4 +274,23 @@ class RequestMapSpec extends Specification {
         requestMap.get("user.cards[1].addresses[0].line1") == "1"
     }
 
+    def 'test issue mdes cs with accessing array' () {
+        given:
+        RequestMap requestMap
+
+        when:
+        requestMap = new RequestMap("{\n" +
+                "   \"SearchResponse\":{\n" +
+                "      \"Accounts\":{\n" +
+                "\n" +
+                "      }\n" +
+                "   }\n" +
+                "}")
+
+        then:
+        requestMap.containsKey("SearchResponse.Accounts") == true
+        requestMap.containsKey("SearchResponse.Accounts.Account") == false
+
+    }
+
 }
