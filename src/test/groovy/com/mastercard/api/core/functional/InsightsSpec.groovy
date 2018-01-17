@@ -32,8 +32,10 @@ import com.mastercard.api.core.functional.model.Insights
 import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.Authentication
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
+import spock.lang.Ignore
 import spock.lang.Specification
 
+@Ignore
 public class InsightsSpec extends Specification {
 
     public static final String consumerKey = "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d";
