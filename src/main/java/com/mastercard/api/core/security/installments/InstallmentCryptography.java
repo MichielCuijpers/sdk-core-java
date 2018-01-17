@@ -15,14 +15,23 @@ public class InstallmentCryptography extends FieldLevelEncryption {
 
     public InstallmentCryptography(InputStream publicCertificate, InputStream keystore, String privateKeyAlias, String privateKeyPassword)
             throws SdkException {
-        super(publicCertificate, keystore, privateKeyAlias, privateKeyPassword, config());
+        super(publicCertificate, keystore, privateKeyAlias, privateKeyPassword, config(), null);
+    }
 
-
+    public InstallmentCryptography(InputStream publicCertificate, InputStream keystore, String privateKeyAlias, String privateKeyPassword, String publicKeyFingerprint)
+            throws SdkException {
+        super(publicCertificate, keystore, privateKeyAlias, privateKeyPassword, config(), publicKeyFingerprint);
     }
 
     public InstallmentCryptography(InputStream publicCertificate, InputStream masterCardPrivateKey)
             throws SdkException {
-        super(publicCertificate, masterCardPrivateKey, config());
+        super(publicCertificate, masterCardPrivateKey, config(), null);
+
+    }
+
+    public InstallmentCryptography(InputStream publicCertificate, InputStream masterCardPrivateKey, String publicKeyFingerprint)
+            throws SdkException {
+        super(publicCertificate, masterCardPrivateKey, config(), publicKeyFingerprint);
 
     }
 

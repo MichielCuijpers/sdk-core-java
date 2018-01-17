@@ -26,9 +26,10 @@ public class FieldLevelEncryption implements CryptographyInterceptor {
     private final Certificate publicCertificate;
     private final PrivateKey privateKey;
     protected final Config config;
+    protected final String publicKeyFingerprint;
 
 
-    public FieldLevelEncryption(InputStream publicCertificate, InputStream keystore, String privateKeyAlias, String privateKeyPassword, Config config)
+    public FieldLevelEncryption(InputStream publicCertificate, InputStream keystore, String privateKeyAlias, String privateKeyPassword, Config config, String publicKeyFingerprint)
             throws SdkException {
         try {
             if (publicCertificate != null) {
@@ -44,13 +45,14 @@ public class FieldLevelEncryption implements CryptographyInterceptor {
             }
 
             this.config = config;
+            this.publicKeyFingerprint = publicKeyFingerprint;
         } catch (Exception e) {
             throw new SdkException(e.getMessage(), e);
         }
 
     }
 
-    public FieldLevelEncryption(InputStream publicCertificate, InputStream privateKey, Config config)
+    public FieldLevelEncryption(InputStream publicCertificate, InputStream privateKey, Config config, String publicKeyFingerprint)
             throws SdkException {
         try {
             if (publicCertificate != null) {
@@ -65,6 +67,7 @@ public class FieldLevelEncryption implements CryptographyInterceptor {
                 this.privateKey = null;
             }
             this.config = config;
+            this.publicKeyFingerprint = publicKeyFingerprint;
         } catch (Exception e) {
             throw new SdkException(e.getMessage(), e);
         }
@@ -117,9 +120,14 @@ public class FieldLevelEncryption implements CryptographyInterceptor {
                         byte[] encryptedSecretKey = CryptUtil.wrap(config.asymmetricCipher, "SunJCE", this.publicCertificate.getPublicKey(), secretKey);
                         String encryptedKeyValue = CryptUtil.byteArrayToString(encryptedSecretKey, config.dataEncoding);
 
-                        byte[] certificateFingerprint = CryptUtil.generateFingerprint(config.publicKeyFingerprintHashing, this.publicCertificate);
-                        String fingerprintValue = CryptUtil.byteArrayToString(certificateFingerprint, config.dataEncoding);
-
+                        String fingerprintValue;
+                        if (publicKeyFingerprint == null) {
+                            byte[] certificateFingerprint = CryptUtil.generateFingerprint(config.publicKeyFingerprintHashing, this.publicCertificate);
+                            fingerprintValue = CryptUtil.byteArrayToString(certificateFingerprint, config.dataEncoding);
+                        } else {
+                            //arizzini: use the pre-calculated value
+                            fingerprintValue = publicKeyFingerprint;
+                        }
 
                         String baseKey = "";
                         if ((fieldToEncrypt.indexOf('.') > 0)) {

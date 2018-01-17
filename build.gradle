@@ -26,23 +26,23 @@ repositories {
 
     //arizzini: wait of time, bamboo outbound connections are blocked.
     maven {
-        url 'http://repo1.maven.org/maven2'
+        url 'https://globalrepository.mclocal.int/artifactory/central'
     }
 
     maven {
-        url "http://artifactory.mastercard.com:16364/artifactory/public"
+        url "https://globalrepository.mclocal.int/artifactory/public"
     }
 
     maven {
-        url "http://artifactory.mastercard.com:16364/artifactory/public-snapshots"
+        url "https://globalrepository.mclocal.int/artifactory/public-snapshots"
     }
 
     maven {
-        url "http://artifactory.mastercard.com:16364/artifactory/snapshots/"
+        url "https://globalrepository.mclocal.int/artifactory/snapshots/"
     }
 
     maven {
-        url "http://artifactory.mastercard.com:16364/artifactory/releases/"
+        url "https://globalrepository.mclocal.int/artifactory/releases/"
     }
 
 

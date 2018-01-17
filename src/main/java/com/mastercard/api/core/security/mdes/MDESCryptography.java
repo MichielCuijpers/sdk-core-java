@@ -13,16 +13,29 @@ import java.util.Arrays;
  */
 public class MDESCryptography extends FieldLevelEncryption {
 
+    public MDESCryptography(InputStream publicCertificate, InputStream keystore, String privateKeyAlias, String privateKeyPassword, String publicKeyFingerprint)
+            throws SdkException {
+        super(publicCertificate, keystore, privateKeyAlias, privateKeyPassword, config(), publicKeyFingerprint);
+
+
+    }
+
+    public MDESCryptography(InputStream publicCertificate, InputStream masterCardPrivateKey, String publicKeyFingerprint)
+            throws SdkException {
+        super(publicCertificate, masterCardPrivateKey, config(), publicKeyFingerprint);
+
+    }
+
     public MDESCryptography(InputStream publicCertificate, InputStream keystore, String privateKeyAlias, String privateKeyPassword)
             throws SdkException {
-        super(publicCertificate, keystore, privateKeyAlias, privateKeyPassword, config());
+        super(publicCertificate, keystore, privateKeyAlias, privateKeyPassword, config(), null);
 
 
     }
 
     public MDESCryptography(InputStream publicCertificate, InputStream masterCardPrivateKey)
             throws SdkException {
-        super(publicCertificate, masterCardPrivateKey, config());
+        super(publicCertificate, masterCardPrivateKey, config(), null);
 
     }
 
