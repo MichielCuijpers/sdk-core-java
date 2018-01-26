@@ -1,26 +1,26 @@
 /*
  * Copyright 2015 MasterCard International.
  *
- * Redistribution and use in source and binary forms, with or without modification, are 
+ * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
  *
- * Redistributions of source code must retain the above copyright notice, this list of 
+ * Redistributions of source code must retain the above copyright notice, this list of
  * conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of 
- * conditions and the following disclaimer in the documentation and/or other materials 
+ * Redistributions in binary form must reproduce the above copyright notice, this list of
+ * conditions and the following disclaimer in the documentation and/or other materials
  * provided with the distribution.
- * Neither the name of the MasterCard International Incorporated nor the names of its 
- * contributors may be used to endorse or promote products derived from this software 
+ * Neither the name of the MasterCard International Incorporated nor the names of its
+ * contributors may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
  */
@@ -34,7 +34,7 @@ import java.util.*;
 /**
  * Base class for all API exceptions.
  */
-public class ApiException extends Exception {
+public class    ApiException extends Exception {
 
 
 
@@ -43,8 +43,8 @@ public class ApiException extends Exception {
     private String description;
     private int httpStatus;
     private CaseInsensitiveSmartMap rawErrorData;
-
-    private List<Map<String,Object>> errors = new ArrayList<Map<String,Object>>();
+    private CaseInsensitiveSmartMap error;
+    private List<CaseInsensitiveSmartMap> errors = new ArrayList<CaseInsensitiveSmartMap>();
 
     /**
      * Constructs an <code>ApiException</code> with no detail description.
@@ -100,18 +100,60 @@ public class ApiException extends Exception {
 
         this.httpStatus = httpStatus;
 
-
+        parseRawError(errorData);
         parseErrors(errorData);
-        parseFirstErrorToMemberVariables();
+        parseError(0);
+    }
+
+    /**
+     * Returns a SmartMap of the error object which is returned from the response.
+     * @return
+     */
+    public CaseInsensitiveSmartMap getError() {
+        return this.error;
+    }
+
+    /**
+     * Parse the error object if the response returns a list
+     * To check the error list size see getErrorSize()
+     * @param index of the list to parse error object
+     */
+    public void parseError(int index) {
+        if (index >= 0 && index < errors.size()) {
+            this.error = errors.get(index);
+            parseErrorToMemberVariables();
+        }
+    }
+
+    private void parseRawError(Object response) {
+
+        if (response instanceof Map) {
+            rawErrorData = new CaseInsensitiveSmartMap((Map<String,Object>) response);
+        } else if (response instanceof List && ((List) response).isEmpty() == false) {
+            Object listItem = ((List) response).get(0);
+            if (listItem instanceof Map) {
+                rawErrorData =  new CaseInsensitiveSmartMap ((Map<String,Object>) listItem);
+            }
+        }
+    }
+
+    /**
+     * Return the error list sise
+     * @return
+     */
+    public int getErrorSize() {
+        return this.errors.size();
     }
 
 
-    protected void parseErrors(Object response) {
+    private void parseErrors(Object response) {
 
         List<Map<String,Object>> tmpList = new ArrayList<Map<String, Object>>();
 
-        if (response instanceof List) {
-            tmpList.addAll((List<Map<String,Object>>) response);
+        if (response instanceof List && ((List) response).isEmpty() == false) {
+            if (((List<Map<String,Object>>) response).get(0) instanceof Map) {
+                tmpList.addAll((List<Map<String,Object>>) response);
+            }
         } else if (response instanceof Map) {
             tmpList.add((Map<String,Object>) response);
         }
@@ -119,7 +161,7 @@ public class ApiException extends Exception {
         for (Map<String,Object> tmpErrorMap : tmpList) {
             CaseInsensitiveSmartMap tmpCaseInsensitiveMap = new CaseInsensitiveSmartMap(tmpErrorMap);
             try {
-                if (tmpCaseInsensitiveMap.containsKey("Errors.Error.Description")) {
+                if (tmpCaseInsensitiveMap.containsKey("Errors.Error.ReasonCode")) {
                     //errors object with a list of error object
                     Map<String,Object> tmpErrorObj = (Map<String,Object>) tmpCaseInsensitiveMap.get("Errors.Error");
                     addError(tmpErrorObj);
@@ -130,7 +172,7 @@ public class ApiException extends Exception {
             }
 
             try {
-                if (tmpCaseInsensitiveMap.containsKey("Errors.Error[0].Description")) {
+                if (tmpCaseInsensitiveMap.containsKey("Errors.Error[0].ReasonCode")) {
                     //errors object with a list of error object
                     List<Map<String,Object>> tmpErrorList = (List<Map<String,Object>>) tmpCaseInsensitiveMap.get("Errors.Error");
                     addError(tmpErrorList);
@@ -141,7 +183,7 @@ public class ApiException extends Exception {
             }
 
             try {
-                if (tmpCaseInsensitiveMap.containsKey("Errors[0].Description")) {
+                if (tmpCaseInsensitiveMap.containsKey("Errors[0].ReasonCode")) {
                     List<Map<String,Object>> tmpErrorList = (List<Map<String,Object>>) tmpCaseInsensitiveMap.get("Errors");
                     addError(tmpErrorList);
                     continue;
@@ -152,7 +194,7 @@ public class ApiException extends Exception {
 
             try {
 
-                if (tmpCaseInsensitiveMap.containsKey("Description")) {
+                if (tmpCaseInsensitiveMap.containsKey("ReasonCode")) {
                     addError(tmpCaseInsensitiveMap);
                     continue;
                 }
@@ -162,28 +204,27 @@ public class ApiException extends Exception {
         }
     }
 
-    protected void addError(List<Map<String,Object>> errorList) {
+    private void addError(List<Map<String,Object>> errorList) {
         for (Map<String,Object> errorObj : errorList) {
             addError(errorObj);
         }
     }
 
-    protected void addError(Map<String,Object> errorMap) {
-        errors.add(errorMap);
+    private void addError(Map<String,Object> errorMap) {
+        errors.add(new CaseInsensitiveSmartMap(errorMap));
     }
 
-    protected void parseFirstErrorToMemberVariables() {
-        if (!errors.isEmpty()) {
-            Map<String,Object> tmpErrorMap = errors.get(0);
-            rawErrorData = new CaseInsensitiveSmartMap(tmpErrorMap);
-            if (rawErrorData.get("Source") != null) {
-                source = rawErrorData.get("Source").toString();
+    private void parseErrorToMemberVariables() {
+        if (error != null) {
+
+            if (error.get("Source") != null) {
+                source = error.get("Source").toString();
             }
-            if (rawErrorData.get("ReasonCode") != null) {
-                reasonCode = rawErrorData.get("ReasonCode").toString();
+            if (error.get("ReasonCode") != null) {
+                reasonCode = error.get("ReasonCode").toString();
             }
-            if (rawErrorData.get("Description") != null) {
-                description = rawErrorData.get("Description").toString();
+            if (error.get("Description") != null) {
+                description = error.get("Description").toString();
             }
         }
     }
@@ -214,10 +255,15 @@ public class ApiException extends Exception {
         return source;
     }
 
-    public List<Map<String,Object>> getErrors() {
+    public List<CaseInsensitiveSmartMap> getErrors() {
         return errors;
     }
 
+    /**
+     * This now returns the raw error object
+     * IF you were using this before now use getError() instead
+     * @return
+     */
     public CaseInsensitiveSmartMap getRawErrorData() {
         return rawErrorData;
     }

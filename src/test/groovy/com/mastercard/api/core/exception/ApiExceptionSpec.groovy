@@ -27,6 +27,7 @@
 
 package com.mastercard.api.core.exception
 
+import org.json.simple.JSONValue
 import spock.lang.Specification
 
 /**
@@ -110,6 +111,9 @@ public class ApiExceptionSpec extends Specification {
         exception.getMessage() == "Unknown Error"
         exception.getHttpStatus() == 500
         exception.getCause() == null
+        exception.getRawErrorData().get("Errors.Error.Description") == "Unknown Error"
+
+
 
         when:
         errorData =
@@ -135,6 +139,7 @@ public class ApiExceptionSpec extends Specification {
         exception.getMessage() == "Unknown Error"
         exception.getHttpStatus() == 500
         exception.getCause() == null
+        exception.getRawErrorData().get("errors.error.description") == "Unknown Error"
 
         when:
         errorData =
@@ -168,6 +173,7 @@ public class ApiExceptionSpec extends Specification {
         exception.getMessage() == "Unknown Error1"
         exception.getHttpStatus() == 500
         exception.getCause() == null
+        exception.getRawErrorData().get("errors.Error[0].Description") == "Unknown Error1"
 
 
         when:
@@ -203,6 +209,15 @@ public class ApiExceptionSpec extends Specification {
         exception.getHttpStatus() == 500
         exception.getCause() == null
 
+        exception.parseError(1)
+        exception.getReasonCode() == "SYSTEM_ERROR2"
+        exception.getErrors() == errorData.errors.error
+        exception.getMessage() == "Unknown Error2"
+
+        exception.getRawErrorData().get("errors.error[0].description") == "Unknown Error1"
+        exception.getRawErrorData().get("errors.error[1].description") == "Unknown Error2"
+
+
 
         //{"errors":[{"source":"OpenAPIClientId","reasonCode":"AUTHORIZATION_FAILED","key":"050007","description":"Unauthorized Access","recoverable":false,"requestId":null,"details":{"details":[{"name":"ErrorDetailCode","value":"050007"}]}}]}
 
@@ -233,6 +248,7 @@ public class ApiExceptionSpec extends Specification {
         exception.getSource() == "OpenAPIClientId"
         exception.getHttpStatus() == 500
         exception.getCause() == null
+        exception.getRawErrorData().get("errors[0].description") == "Unauthorized Access"
 
         when:
         List<Map<String, Object>> errorDataList = [
@@ -259,6 +275,7 @@ public class ApiExceptionSpec extends Specification {
         exception.getSource() == "OpenAPIClientId"
         exception.getHttpStatus() == 500
         exception.getCause() == null
+        exception.getRawErrorData().get("description") == "Unauthorized Access"
 
         when:
         errorData = [:]
@@ -298,6 +315,30 @@ public class ApiExceptionSpec extends Specification {
 
         then:
         describe == "ApiException: \"Unknown Error\" (httpStatus: 500, reasonCode: SYSTEM_ERROR, source: System)"
+    }
+
+
+    def 'test STP error' () {
+        given:
+        String stpJsonError = "{\n" +
+                "                \"logref\": \"05bf08cb-b18f-42be-bb23-7e17518611dd\",\n" +
+                "                \"message\": \"Error - [ICA] element is missing\",\n" +
+                "                \"_links\": {\n" +
+                "                  \"about\": {\n" +
+                "                    \"href\": \"https://api.mastercard.com/stp-api/v1/payments\"\n" +
+                "                  }\n" +
+                "                }\n" +
+                "              }"
+        Map<String,Object> errorMap = (Map<String,Object>) JSONValue.parse(stpJsonError)
+
+        when:
+        ApiException apiException = new ApiException(400, errorMap)
+
+        then:
+        apiException.getRawErrorData().get("logref") == "05bf08cb-b18f-42be-bb23-7e17518611dd"
+        apiException.getRawErrorData().get("message") == "Error - [ICA] element is missing"
+        apiException.getRawErrorData().get("_links.about.href") == "https://api.mastercard.com/stp-api/v1/payments"
+
     }
 
 }
