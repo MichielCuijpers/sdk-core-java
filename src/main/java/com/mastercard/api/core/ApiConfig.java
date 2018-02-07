@@ -65,12 +65,15 @@ public final class ApiConfig {
         currentEnvironment = environment;
     }
 
-    public static void setCurrentEnvironment(String host, String context) {
-        for (ResourceConfigInterface resourceConfig : registeredInstances.values()) {
-            resourceConfig.setEnvironment(host, context);
-        }
-        currentEnvironment = null;
-    }
+//    arizzini: this method should not been published.
+//    public static void setCurrentEnvironment(String host, String context) {
+//
+//        Environment.MAPPINGS.put(Environment.CUSTOM, new String[] { host, context});
+//
+//        for (ResourceConfigInterface resourceConfig : registeredInstances.values()) {
+//            resourceConfig.setEnvironment(host, context);
+//        }
+//    }
 
     public static boolean ignoreSSLErrors() {
         return ignoreSSLErrors;
