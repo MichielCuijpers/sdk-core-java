@@ -501,19 +501,14 @@ public class ApiController {
                         if (header == null) {
                             throw new IllegalStateException("Unknown content type. Missing Content-Type header");
                         } else {
-                            if (header.getValue().contains(HEADER_SEPARATOR)) {
-                                String parts[] = header.getValue().split(HEADER_SEPARATOR);
-                                responseContentType = parts[0];
-                            } else {
-                                responseContentType = header.getValue();
-                            }
+                           responseContentType = header.getValue();
                         }
 
-                        if (ContentType.parse(responseContentType).getMimeType().equals(contentType.getMimeType())) {
+                        if (ContentType.parse(responseContentType).getMimeType().contains("json")) {
                             apiResponse.setPayload(payload);
                         } else {
                             throw new IOException(
-                                    "Response was not " + contentType.getMimeType() + ", it was: "
+                                    "Response was not json, it was: "
                                             + responseContentType + ". Unable to process payload. " +
                                             "\nResponse: [ " + payload + " + ]");
                         }

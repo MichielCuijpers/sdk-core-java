@@ -27,6 +27,7 @@
 
 package com.mastercard.api.core.functional.model;
 
+import com.mastercard.api.core.ApiConfig;
 import com.mastercard.api.core.model.Environment;
 import com.mastercard.api.core.model.ResourceConfigInterface;
 
@@ -50,7 +51,13 @@ public class ResourceConfig implements ResourceConfigInterface {
      */
     public static ResourceConfig getInstance() {
         if (instance == null) {
+            // need to instantiate the SDKConfig
             instance = new ResourceConfig();
+            // need to set the current configuration, given the fact that
+            // the object may not be already registered with the ApiConfig
+            instance.setEnvironment(ApiConfig.getEnvironment());
+            // finally register the instance with the ApiConfig for future changes.
+            ApiConfig.registerResourceConfig(instance);
         }
         return instance;
 
