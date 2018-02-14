@@ -27,7 +27,6 @@ public class MerchantIdentifier extends BaseObject {
 
     @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
         return new OperationConfig("/MerchantID/openAPI/merchantid/v1/merchantid", Action.query, Arrays.asList("Type", "MerchantId"), Arrays.asList(""));
-        //return new OperationConfig("/MerchantID/openAPI/merchantid/v1/merchantid", Action.create, Arrays.asList(""), Arrays.asList(""));
 
     }
 
