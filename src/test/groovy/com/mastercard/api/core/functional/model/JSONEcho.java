@@ -27,12 +27,12 @@ public class JSONEcho extends BaseObject {
 
     @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
         //return new OperationConfig("/mcapitest/JsonNativePost", Action.create, Arrays.asList(""), Arrays.asList(""));
-        return new OperationConfig("/mcapitest/JsonNativePostPublic", Action.create, Arrays.asList(""), Arrays.asList(""));
+        return new OperationConfig("/mcapitest/JsonNativePost", Action.create, Arrays.asList(""), Arrays.asList(""));
 
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata("0.0.1", host, null);
+        return new OperationMetadata("0.0.1", host, null, false);
     }
 
     public static void setHost(String host) {
