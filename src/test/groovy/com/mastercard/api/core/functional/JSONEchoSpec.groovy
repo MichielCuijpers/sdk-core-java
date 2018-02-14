@@ -90,11 +90,11 @@ class JSONEchoSpec extends Specification {
     }
 
 //
-//    def 'test json echo with UTF-8 (local-apigw)' () {
+//    def 'test json echo with UTF-8 (public)' () {
 //
 //
 //        when:
-//        JSONEcho.setHost("http://dev.api.mastercard.com:8016/mosp")
+//        JSONEcho.setHost("http://echo.jpillora.com/")
 //        String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
 //        RequestMap request = new RequestMap();
 //        request.set("JSONEcho.string", utf8);
@@ -104,6 +104,21 @@ class JSONEchoSpec extends Specification {
 //        new RequestMap(response.get("body")).get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
 //
 //    }
+
+    def 'test json echo with UTF-8 (local-apigw)' () {
+
+
+        when:
+        JSONEcho.setHost("http://dev.api.mastercard.com:8016/mosp")
+        String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
+        RequestMap request = new RequestMap();
+        request.set("JSONEcho.string", utf8);
+        JSONEcho response = JSONEcho.create(request);
+
+        then:
+        response.get("body").toString().contains(utf8);
+
+    }
 
 
 }

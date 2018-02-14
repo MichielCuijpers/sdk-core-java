@@ -9,34 +9,34 @@ import java.util.Map;
 /**
  * Created by andrearizzini on 08/03/2017.
  */
-public class JSONEcho extends BaseObject {
+public class MerchantIdentifier extends BaseObject {
 
-    public JSONEcho() {
+    public MerchantIdentifier() {
     }
 
     private static String host = "https://stage.api.mastercard.com";
 
-    public JSONEcho(BaseObject o) {
+    public MerchantIdentifier(BaseObject o) {
         putAll(o);
     }
 
-    public JSONEcho(Map m) {
+    public MerchantIdentifier(Map m) {
         putAll(m);
     }
 
 
     @Override protected final OperationConfig getOperationConfig(String operationUUID) throws IllegalArgumentException{
-        //return new OperationConfig("/mcapitest/JsonNativePost", Action.create, Arrays.asList(""), Arrays.asList(""));
-        return new OperationConfig("/mcapitest/EchoPost", Action.create, Arrays.asList(""), Arrays.asList(""));
+        return new OperationConfig("/MerchantID/openAPI/merchantid/v1/merchantid", Action.query, Arrays.asList("Type", "MerchantId"), Arrays.asList(""));
+        //return new OperationConfig("/MerchantID/openAPI/merchantid/v1/merchantid", Action.create, Arrays.asList(""), Arrays.asList(""));
 
     }
 
     @Override protected OperationMetadata getOperationMetadata() throws IllegalArgumentException {
-        return new OperationMetadata("0.0.1", host, null, false);
+        return new OperationMetadata("0.0.1", host, null);
     }
 
     public static void setHost(String host) {
-        JSONEcho.host = host;
+        MerchantIdentifier.host = host;
     }
 
     /**
@@ -47,10 +47,10 @@ public class JSONEcho extends BaseObject {
      * @return      a Insights object
      *
      */
-    public static JSONEcho create(RequestMap map)
+    public static MerchantIdentifier query(RequestMap map)
             throws ApiException {
 
-        return new JSONEcho(BaseObject.executeOperation(null, "uuid", new JSONEcho(map)));
+        return new MerchantIdentifier(BaseObject.executeOperation(null, "uuid", new MerchantIdentifier(map)));
     }
 
 }
