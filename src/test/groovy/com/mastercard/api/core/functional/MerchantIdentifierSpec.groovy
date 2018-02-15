@@ -38,15 +38,15 @@ import spock.lang.Specification
 class MerchantIdentifierSpec extends Specification {
 
 
-    public static final String consumerKey = "sLDddGV2GijXzVaTZxqC9kKTYDwGdFp3pq2ci3-de0b9a383!0fce37293bb847eb96293f501111d9bb0000000000000000";
+    public static final String consumerKey = "sLDddGV2GijXzVaTZxqC9kKTYDwGdFp3pq2ci3-de0b9a383!9354e490ed5a4be6a18406d172ad59040000000000000000";
 
 
     def setup() {
         ApiConfig.setDebug(true);
 
         try {
-            InputStream is = new FileInputStream("src/test/resources/test-api-basic-production.p12");
-            Authentication authentication = new OAuthAuthentication(consumerKey, is, "test_prod", "test_prod");
+            InputStream is = new FileInputStream("src/test/resources/test_prod4-production.p12");
+            Authentication authentication = new OAuthAuthentication(consumerKey, is, "test_prod4", "test_prod4");
             ApiConfig.setAuthentication(authentication);
         }
         catch (Exception e) {
@@ -61,7 +61,7 @@ class MerchantIdentifierSpec extends Specification {
 
 
         when:
-        MerchantIdentifier.setHost("http://dev.api.mastercard.com:8016/mosp")
+        //MerchantIdentifier.setHost("http://dev.api.mastercard.com:8016/mosp")
         //MerchantIdentifier.setHost("https://services.mastercard.com")
         RequestMap request = new RequestMap();
         request.set("Type", "FuzzyMatch");

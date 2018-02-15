@@ -36,6 +36,8 @@ import com.mastercard.api.core.security.oauth.OAuthAuthentication
 import org.junit.Ignore
 import spock.lang.Specification
 
+import java.nio.charset.Charset
+
 class JSONEchoSpec extends Specification {
 
 
@@ -56,9 +58,18 @@ class JSONEchoSpec extends Specification {
 
     }
 
+    private static String getDefaultCharSet() {
+        OutputStreamWriter writer = new OutputStreamWriter(new ByteArrayOutputStream());
+        String enc = writer.getEncoding();
+        return enc;
+    }
+
 
     def 'test json echo with UTF-8 (apigw-stage)' () {
 
+        System.out.println("Default Charset=" + Charset.defaultCharset());
+        System.out.println("Default Charset=" + Charset.defaultCharset());
+        System.out.println("Default Charset in Use=" + getDefaultCharSet());
 
         when:
         //JSONEcho.setHost("http://echo.jpillora.com/")
@@ -68,26 +79,31 @@ class JSONEchoSpec extends Specification {
         request.set("JSONEcho.string", utf8);
         JSONEcho response = JSONEcho.create(request);
 
+        System.out.println("Default Charset=" + Charset.defaultCharset());
+        System.out.println("Default Charset=" + Charset.defaultCharset());
+        System.out.println("Default Charset in Use=" + getDefaultCharSet());
+
         then:
-        new RequestMap(response.get("body")).get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
+        response.get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
 
     }
 
 
-    def 'test json echo with UTF-8 (public)' () {
-
-
-        when:
-        JSONEcho.setHost("http://echo.jpillora.com/")
-        String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
-        RequestMap request = new RequestMap();
-        request.set("JSONEcho.string", utf8);
-        JSONEcho response = JSONEcho.create(request);
-
-        then:
-        new RequestMap(response.get("body")).get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
-
-    }
+//    def 'test json echo with UTF-8 (public)' () {
+//
+//
+//        when:
+//        JSONEcho.setHost("http://echo.jpillora.com/")
+//        String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
+//        RequestMap request = new RequestMap();
+//        request.set("JSONEcho.string", utf8);
+//        JSONEcho response = JSONEcho.create(request);
+//
+//        then:
+//        def newResponse = new RequestMap(response.get("body"))
+//        newResponse.get("JSONEcho.string").toString().equalsIgnoreCase(utf8);
+//
+//    }
 
 //
 //    def 'test json echo with UTF-8 (public)' () {
@@ -105,20 +121,20 @@ class JSONEchoSpec extends Specification {
 //
 //    }
 
-    def 'test json echo with UTF-8 (local-apigw)' () {
-
-
-        when:
-        JSONEcho.setHost("http://dev.api.mastercard.com:8016/mosp")
-        String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
-        RequestMap request = new RequestMap();
-        request.set("JSONEcho.string", utf8);
-        JSONEcho response = JSONEcho.create(request);
-
-        then:
-        response.get("body").toString().contains(utf8);
-
-    }
+//    def 'test json echo with UTF-8 (local-apigw)' () {
+//
+//
+//        when:
+//        JSONEcho.setHost("http://dev.api.mastercard.com:8016/mosp")
+//        String utf8 = "мảŝťễřÇāŕď Ľẵвš ạאָđ мãśţēяĈẫřđ ĀקÏ ŕồçҝş...";
+//        RequestMap request = new RequestMap();
+//        request.set("JSONEcho.string", utf8);
+//        JSONEcho response = JSONEcho.create(request);
+//
+//        then:
+//        response.get("body").toString().contains(utf8);
+//
+//    }
 
 
 }
