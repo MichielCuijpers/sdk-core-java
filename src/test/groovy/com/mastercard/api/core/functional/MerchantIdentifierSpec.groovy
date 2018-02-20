@@ -33,8 +33,10 @@ import com.mastercard.api.core.model.RequestMap
 import com.mastercard.api.core.security.Authentication
 import com.mastercard.api.core.security.oauth.OAuthAuthentication
 import org.junit.Assert
+import spock.lang.Ignore
 import spock.lang.Specification
 
+@Ignore
 class MerchantIdentifierSpec extends Specification {
 
 
