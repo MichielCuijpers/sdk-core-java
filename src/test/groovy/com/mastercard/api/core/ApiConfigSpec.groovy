@@ -47,13 +47,6 @@ class ApiConfigSpec extends Specification {
 
     }
 
-    def 'test default values' () {
-        expect:
-        ApiConfig.authentication == null
-        !ApiConfig.debug
-        ApiConfig.sandbox
-    }
-
     def 'test settings debug' () {
         when:
         ApiConfig.setDebug(false)
