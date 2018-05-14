@@ -61,8 +61,7 @@ repositories {
         url 'http://labs.mastercard.com/artifactory/local-repos'
     }
 
-
-
+    maven { url "http://jcenter.bintray.com" }
 
 }
 
