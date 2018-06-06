@@ -14,10 +14,10 @@ import java.security.PrivateKey;
 
 public class OAuthSignerSpec extends Specification {
 
-    String consumerKey = "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d"
-    String alias = "test"
-    String password = "password"
-    static final keystoreName = "mcapi_sandbox_key.p12"
+    String consumerKey = "uLXKmWNmIkzIGKfA2injnNQqpZaxaBSKxa3ixEVu2f283c95!33b9b2bd960147e387fa6f3f238f07170000000000000000"
+    String alias = "fake-key"
+    String password = "fakepassword"
+    static final keystoreName = "fake-key.p12"
 
     def 'test sign' () {
         given:
@@ -52,7 +52,7 @@ public class OAuthSignerSpec extends Specification {
         String signature = oAuthSigner.sign(request, httpParameters)
 
         then:
-        signature == "uNumnJAj/6GGnXMkg2ZnnHGL3DetFUhTM+5sc3VhDGk61nLJyo0J9LVTlJWeedRHDANb7Obxx2YcR8/y72xWgCGeCqXuomXB10i4fuXAS8bfkuToVRW2JbiScMvFdCd6YYjzzdfq77FozKUA/ka7JfZWw2NExxmVTz03xMr90CEvV0pigc/P7us2OqOyq7sYuiOULl+lDc0PXyjLZk/OoozQAD6d+2Sy77TPuaRpa9VZnYwChquc46oeJa5zxrtyhjtp9nhdiC3Iw7aCzwNIN/OJJx8bd3egYo8JI3TGF4NewGD5zVyvHLpexZ/GYsWXXqjmeau+82e+UH5oriLyOw=="
+        signature == "UL+yrxiGyZduujqUzh7rBe7LZM28o4RC1CKHj+vSjMGn5jOBXBoObASKLeJXo6LcUJ23IBuFGMsnfkYdRwjHsWYhUeU4zki3B6p40BwNRdtrO7NYB4cSldFHoM8N6EMNXNfTGAYryKx+KJpxVoOXG+aqXFku6l1Ayz9uGJnVo6OxpsLDbVkc9u5XAHmc3hJvcYZ59bD5odzofbCDB3Es0VCEzksFAHTrwwk1NDcOS6w47N6CZ++pCAbHlC7GKvmB7LiPIdcR5OnDGj2o4RlhSw2f440KK1f7vgOPF9fOs5OD3E5lnC0ossLfIEu7KO1Nzy0d0ksS7Pb2lmtlOtfqkw=="
     }
 
     def 'test sign with null key throws InvalidKeyException' () {

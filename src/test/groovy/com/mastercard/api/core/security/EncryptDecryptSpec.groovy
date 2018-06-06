@@ -64,8 +64,8 @@ class EncryptDecryptSpec extends Specification {
 
 
 
-        PublicKey publicKey = CryptUtil.loadKey(KeyType.PUBLIC, "PKCS12", null, this.class.getClassLoader().getResourceAsStream("certificate.p12"), "1", "");
-        PrivateKey privateKey = CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", null, this.class.getClassLoader().getResourceAsStream("certificate.p12"), "1", "");
+        PublicKey publicKey = CryptUtil.loadKey(KeyType.PUBLIC, "PKCS12", null, this.class.getClassLoader().getResourceAsStream("fake-key.p12"), "fake-key", "fakepassword");
+        PrivateKey privateKey = CryptUtil.loadKey(KeyType.PRIVATE, "PKCS12", null, this.class.getClassLoader().getResourceAsStream("fake-key.p12"), "fake-key", "fakepassword");
 //        KeyStore ks = KeyStore.getInstance();
 //        ks.load(, "".toCharArray());
 //        Key privateKey = ks.getKey("1", "".toCharArray());

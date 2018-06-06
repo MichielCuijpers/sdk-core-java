@@ -91,6 +91,10 @@ dependencies {
 }
 
 test {
+    testLogging.showStandardStreams = true
+    reports {
+        html.enabled = true
+    }
     filter {
         includeTestsMatching "*Spec"
     }
