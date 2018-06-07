@@ -6,6 +6,8 @@ apply plugin: "net.saliman.cobertura"
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'signing'
 
+def environment = hasProperty('env') ? env : 'labs-jenkins'
+println "Environment is set to $environment"
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -14,7 +16,6 @@ buildscript {
     repositories {
         maven { url "http://jcenter.bintray.com" }
     }
-
 
     dependencies {
         classpath files('libs/gradle-cobertura-plugin-2.3.2.jar')
@@ -60,8 +61,7 @@ repositories {
         url 'http://labs.mastercard.com/artifactory/local-repos'
     }
 
-
-
+    maven { url "http://jcenter.bintray.com" }
 
 }
 
@@ -91,6 +91,10 @@ dependencies {
 }
 
 test {
+    testLogging.showStandardStreams = true
+    reports {
+        html.enabled = true
+    }
     filter {
         includeTestsMatching "*Spec"
     }
@@ -139,18 +143,39 @@ publishing {
 }
 
 artifactory {
-    contextUrl = 'http://tools.labs.mastercard.com/artifactory/'
 
-    publish {
-        repository {
-            repoKey = version.contains('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
+    if (environment == "mc-jenkins") {
+        println "Publishing to MC Artifactory"
+
+        contextUrl = 'https://globalrepository.mclocal.int/artifactory/'
+
+        publish {
+            repository {
+                repoKey = version.contains('SNAPSHOT') ? 'snapshots' : 'releases'
+                username = "${mc_artifactory_user}"
+                password = "${mc_artifactory_password}"
+            }
+            defaults {
+                publications('mavenJava')
+                publishArtifacts = true
+                publishPom = true
+            }
         }
-        defaults {
-            publications('mavenJava')
-            publishArtifacts = true
-            publishPom = true
+    } else {
+        println "Publishing to Labs Artifactory"
+        contextUrl = 'http://tools.labs.mastercard.com/artifactory/'
+
+        publish {
+            repository {
+                repoKey = version.contains('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+            }
+            defaults {
+                publications('mavenJava')
+                publishArtifacts = true
+                publishPom = true
+            }
         }
     }
 

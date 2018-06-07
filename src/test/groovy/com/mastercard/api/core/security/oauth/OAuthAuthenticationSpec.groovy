@@ -20,10 +20,10 @@ import java.util.regex.Pattern
 
 public class OAuthAuthenticationSpec extends Specification {
 
-    String consumerKey = "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d"
-    String alias = "test"
-    String password = "password"
-    static final keystoreName = "mcapi_sandbox_key.p12"
+    String consumerKey = "uLXKmWNmIkzIGKfA2injnNQqpZaxaBSKxa3ixEVu2f283c95!33b9b2bd960147e387fa6f3f238f07170000000000000000"
+    String alias = "fake-key"
+    String password = "fakepassword"
+    static final keystoreName = "fake-key.p12"
 
     static final Pattern AUTHORIZATION = Pattern.compile("\\s*(\\w*)\\s+(.*)");
     static final Pattern NVP = Pattern.compile("(\\S*)\\s*\\=\\s*\"([^\"]*)\"");
@@ -40,7 +40,7 @@ public class OAuthAuthenticationSpec extends Specification {
         PrivateKey privateKey = (PrivateKey) ks.getKey(alias, password.toCharArray());
 
         expect:
-        authentication.consumerKey == "L5BsiPgaF-O3qA36znUATgQXwJB6MRoMSdhjd7wt50c97279!50596e52466e3966546d434b7354584c4975693238513d3d"
+        authentication.consumerKey == "uLXKmWNmIkzIGKfA2injnNQqpZaxaBSKxa3ixEVu2f283c95!33b9b2bd960147e387fa6f3f238f07170000000000000000"
         authentication.privateKey == privateKey
     }
 

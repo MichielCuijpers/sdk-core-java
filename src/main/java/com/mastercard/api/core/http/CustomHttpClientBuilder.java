@@ -770,6 +770,12 @@ public class CustomHttpClientBuilder {
         final String[] supportedProtocols = SUPPORTED_TLS;
         final String[] supportedCipherSuites = split(System.getProperty("https.cipherSuites"));
 
+        // If debug is enabled disable the compression encoding
+        // This is so we can see the "non-encoded" response
+        if (ApiConfig.isDebug()){
+            this.disableContentCompression();
+        }
+
         if (ApiConfig.ignoreSSLErrors()) {
             try {
                 SSLContext sslContext = SSLContext.getInstance("SSL");
